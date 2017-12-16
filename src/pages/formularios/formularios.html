@@ -1,0 +1,188 @@
+<!--
+  Generated template for the FormulariosPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <ion-navbar color="secondary">
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button> 
+    <div *ngIf="caso == 1">
+    <ion-title>UNIDADES PARA AUDITORIA </ion-title>
+    </div>
+    <div *ngIf="caso == 2">
+        <ion-title>UNIDADES PARA PROMOTORIA</ion-title>
+        </div>
+    <div *ngIf="caso == 3">
+        <ion-title>Grupos - UNIDAD {{up}}</ion-title>
+    </div>
+    <div *ngIf="caso == 4">
+        <ion-title>{{grupo}} - UNIDAD {{up}}</ion-title>
+    </div>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content  >
+  <div *ngIf="caso < 3">
+      <div *ngFor="let item of items">
+          <ion-card  *ngIf="item.terminado === 1"  style="border-top:2px solid mediumseagreen">
+            <button ion-item (click)="mostrargrupos(item.tipo, item.idUnidadProductiva )">
+                <ion-row>
+                      
+                <ion-col col-6 text-center>  {{item.idUnidadProductiva}} <br></ion-col>  
+                <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+                <ion-col col-6 text-center><span> {{item.region}} </span></ion-col>
+                <ion-col col-6 text-center><span> {{item.productor}} </span></ion-col>
+              </ion-row>                
+              
+            </button>
+          </ion-card>
+          
+          <ion-card  style="border-top:2px solid lightgray" *ngIf="item.terminado === 0"  >
+              <button ion-item (click)="mostrargrupos(item.tipo, item.idUnidadProductiva)">
+                  <ion-row>
+                <ion-col col-6 text-center>  {{item.idUnidadProductiva}} <br></ion-col>  
+                <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+                <ion-col col-6 text-center><span> {{item.region}} </span></ion-col>
+                <ion-col col-6 text-center><span> {{item.productor}} </span></ion-col>
+                </ion-row>
+            </button>
+              
+          </ion-card>
+          </div>
+  </div>
+  <div *ngIf="caso == 3">
+      <div *ngFor="let item of items">
+          <ion-card style="border-top:2px solid mediumseagreen">
+              <button ion-item (click)="mostrarpreguntas(item.idgrupobase,item.nombre )">
+                  <ion-row>
+                  <ion-col col-6 text-center>  {{item.nombre}} <br></ion-col>  
+                  <ion-col col-6 text-center> {{item.textoayuda}}</ion-col>
+                </ion-row>                
+              </button>
+            </ion-card>
+            
+      </div>
+  </div>
+  
+  <div *ngIf="caso == 4">
+<!--
+    {{prueba}}
+      <h2>
+        esta es las resp
+      </h2>
+      <p>      {{resp}}
+      </p>
+      <button ion-button button-block (click)="llamar2()">llamar</button>
+      <h2>
+        esta es la prueba2
+      </h2>
+      <p>      {{prueba2}}
+      </p>
+      <h2>estya es la prueba3</h2>
+<p> {{prueba3}}
+</p>     
+<ion-item>
+  <ion-label>Date</ion-label>
+  <ion-datetime displayFormat="MM/DD/YYYY" [(ngModel)]="myDate"></ion-datetime>
+</ion-item>
+
+<ion-item>
+  <ion-label>Gender</ion-label>
+  <ion-select [(ngModel)]="gender">
+    <ion-option value="f">Female</ion-option>
+    <ion-option value="m">Male</ion-option>
+  </ion-select>
+</ion-item>
+
+-->
+      <div *ngFor="let item of final">
+        
+        <div *ngIf="item.tipo==3006"><!--etiqueta -->
+            <ion-item>
+                <ion-label  style="color:black">{{item.enunciado}}</ion-label>
+              </ion-item>
+        </div>
+               
+        <div *ngIf="item.tipo==3001"><!--sleeccion multiple con unica respuesta -->
+          <ion-item>
+              <ion-label style="color:#000000" >{{item.enunciado}}</ion-label>
+              <ion-select  (ionChange)="guardar3001($event, item.codigo, item.codigorespuesta)">  <!--(ionChange)="onChange($event, preguntas.id)"-->
+                <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones">{{opciones.nombre}}</ion-option>
+              </ion-select>
+            </ion-item>
+          
+      </div>
+      <div *ngIf="item.tipo==3002"><!--seleccion nmultiple con multiple respuesta -->
+        <ion-item >
+            <ion-label  style="color:black">{{item.enunciado}}</ion-label>
+            <ion-select multiple="true">  <!--(ionChange)="onChange($event, preguntas.id)"-->
+              <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones.valor">{{opciones.nombre}}</ion-option>
+            </ion-select>
+        </ion-item>
+    </div>
+    <div *ngIf="item.tipo==3003"><!--abierta -->
+<div *ngFor="let opciones of item.respuestas">
+
+  <div *ngIf="opciones.tipo==210001">
+    <ion-item>
+      <ion-label >{{item.enunciado}}</ion-label>
+    <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="item.identificador"></ion-datetime>
+</ion-item>
+  </div>
+
+
+  <div *ngIf="opciones.tipo==210002">
+    <ion-item>
+      <ion-label floating  style="color:black">{{item.enunciado}}</ion-label>
+      <ion-input type="number" [(ngModel)]="item.identificador"> </ion-input>
+</ion-item>
+  </div>
+
+  <div *ngIf="opciones.tipo==210003">
+    <ion-item>
+      <ion-label floating   >{{item.enunciado}}</ion-label>
+      <ion-input type="text" [(ngModel)]="item.identificador"> </ion-input>
+</ion-item>
+  </div>
+</div>
+      
+       
+
+  </div>
+  <div *ngIf="item.tipo==3004"><!--seleccion multiple unica respueista y abierta -->
+    <ion-item no-lines>
+        <ion-label  style="color:black">{{item.enunciado}}</ion-label>
+        <ion-select>  <!--(ionChange)="onChange($event, preguntas.id)"-->
+          <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones.valor">{{opciones.nombre}}</ion-option>
+        </ion-select>
+    </ion-item>
+    <ion-item >
+      <ion-input  placeholder="Observaciones"> </ion-input>
+    </ion-item>
+</div>
+<div *ngIf="item.tipo==3005"><!--seleccion multiple -->
+  <ion-item no-lines>
+      <ion-label  style="color:black">{{item.enunciado}}</ion-label>
+      <ion-select multiple="true">  <!--(ionChange)="onChange($event, preguntas.id)"-->
+        <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones.valor">{{opciones.nombre}}</ion-option>
+      </ion-select>
+  </ion-item>
+  <ion-item >
+    <ion-input  placeholder="Observaciones"> </ion-input>
+  </ion-item>
+</div>
+      
+    </div>
+
+  </div>
+  
+  
+  
+  
+  
+  </ion-content>
+  

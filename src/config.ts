@@ -1,0 +1,2 @@
+export const SERVER_URL = "http://vps152534.vps.ovh.ca:10080/Agrolink/";
+//10.0.0.2:8080/Agrolink/login-- --vs152534.vps.ovh.pca:10080/Agrolink

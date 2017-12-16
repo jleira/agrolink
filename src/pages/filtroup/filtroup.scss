@@ -1,0 +1,62 @@
+page-filtroup {
+    .radio-md .radio-icon {
+        width:20px !important;
+        height: 20px !important;
+      }
+      .radio-md .radio-checked {
+        width: 25px !important;
+        height: 25px !important;
+        color: red !important ;
+      //  background-color:#448aff !important; 
+      background-color:  green !important;
+      border: 2px solid GREEN !important;
+      }
+      .radio-md .radio-inner {
+      
+      background-color:  green !important;
+      }
+          
+            .row-dots {
+              border-bottom: 1px solid $list-md-border-color;
+            }
+          
+            .dot {
+              border: 1px solid $list-md-border-color;
+            }
+      
+            .text-to-change div {
+              margin: 10px auto;
+            }
+          
+            ion-row,
+            ion-col {
+              padding: 0;
+            }
+          
+      
+          
+      
+            
+            .row-dots {
+              text-align: center;
+          
+        
+            }
+          
+        
+          
+            .dot.selected {
+              border-width: 2px;
+              border-color: #32ff4d;
+            }
+          
+      
+          }
+          
+          .popover-page {
+            .text-smaller,
+            .row-dots,
+            .dot {
+              border-width: $hairlines-width;
+            }
+}

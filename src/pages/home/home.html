@@ -1,0 +1,76 @@
+<ion-header>
+  <ion-navbar color="secondary">
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>{{rol}} - {{user}}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content >
+    <ion-list  style="margin-top:2%">
+      <button ion-item (click)="openPage(1)" >
+          <ion-icon ios="ios-clipboard" md="md-clipboard" item-start></ion-icon>
+        <h3 style="font-weight:bold">Formulario de Auditoria</h3>
+        <p>
+          Ingrese para realizar el diligenciamiento del formulario de auditoria para un producto
+        </p>
+      </button>
+      <button ion-item  (click)="openPage(2)">
+        <ion-icon ios="ios-clipboard" md="md-clipboard" item-start></ion-icon>
+      <h3 style="font-weight:bold">Formulario de promotoria</h3>
+      <p>
+        Ingrese para realizar el diligenciamiento del formulario de promotoria para un producto
+      </p>
+    </button>
+    
+      <button ion-item  (click)="openPage(3)">
+          <ion-icon ios="ios-paper-outline" md="md-paper" item-start></ion-icon>
+        <h3 style="font-weight:bold">Unidades productivas asignadas</h3>
+        <p>
+          Ingrese aca para consultar las unidades productivas asignadas y el estado del trabajo en cada una de ellas 
+        </p>
+      </button>
+      <button ion-item  >
+          <ion-icon ios="ios-sync" md="md-sync" item-start></ion-icon>
+        <h3 style="font-weight:bold">Sincronizacion De datos</h3>
+        <p>
+          Ingrese aqui para realizar el envio de los formularios diligenciados 
+        </p>
+      </button>
+      <button ion-item  >
+          <ion-icon ios="ios-swap" md="md-swap" item-start></ion-icon>
+        <h3 style="font-weight:bold">Precargue de datos</h3>
+        <p>
+            Ingrese aqui para realizar el precargado de los formularios
+        </p>
+      </button> 
+    </ion-list>
+    <button ion-button button-block (click)="llamardb()">db</button>
+    <p>
+      {{productor}}
+    </p>
+<!--  
+    <ion-card *ngFor="let item of productor" >
+      
+          <ion-card-content>
+         <ion-row>
+           <ion-col col-10>
+              {{item.idUnidadProductiva}} -  {{item.nombre}}
+           </ion-col>
+      
+            <ion-col col-2>
+             <ion-icon name="checkbox" *ngIf="item.terminado === 1" style="color:green" item-end></ion-icon>
+              <ion-icon name="square-outline" *ngIf="item.terminado === 0" style="color:gray" item-end></ion-icon>
+
+      </ion-col>
+         </ion-row>
+                
+          </ion-card-content>
+      
+ 
+        </ion-card>
+          -->
+    
+  </ion-content>
+  

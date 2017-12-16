@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-navbar color="secondary">
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Perfil</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content >
+
+    <ion-item-group>
+        <ion-item-divider color="light">Informacion Personal</ion-item-divider>
+
+        <ion-item>
+            <h2>Usuario</h2>
+            <p>{{usuario}}</p>
+        </ion-item>
+
+        <ion-item>
+            <h2>Roll</h2>
+            <p>{{roll}}</p>
+        </ion-item>
+
+        <ion-item>
+            <h2>Nombre</h2>
+            <p>{{nombre}}</p>
+        </ion-item>
+
+        <ion-item>
+            <h2>Correo</h2>
+            <p>{{correo}}</p>
+        </ion-item>
+
+        <ion-item>
+            <h2>Tipo de identificacion</h2>
+            <p>{{tipo_id}}</p>
+        </ion-item>
+
+        <ion-item>
+            <h2>ID</h2>
+            <p>{{id}}</p>
+        </ion-item>
+
+
+      </ion-item-group>
+      
+      <ion-card>
+
+      </ion-card>
+
+  <button ion-button button-block (click)="logout()">salir</button>
+
+
+</ion-content>

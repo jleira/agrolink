@@ -1,0 +1,96 @@
+<ion-header  >
+  <ion-toolbar class="cyan" color="secondary">
+    <ion-title>
+     Detalles
+    </ion-title>
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">
+        cerrar
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen >
+
+      <ion-item-group *ngFor="let data of detalles"> 
+
+          <ion-item-divider color="light" >Informacion</ion-item-divider>
+          <ion-item>
+              <h2>ID</h2>
+              <p>{{data.idUnidadProductiva}}</p>
+          </ion-item>
+          <ion-item>
+              <h2>Nombre</h2>
+              <p>{{data.nombre}}</p>
+          </ion-item>
+          <ion-item>
+              <h2>Fecha Ingreso</h2>
+              <p>{{data.fechaIngreso}}</p>
+          </ion-item>
+          <ion-item>
+              <h2>Localizacion</h2>
+              <ion-row>
+                  <ion-col col-6>
+                      <p>Longitud : {{data.localizacion_longitude}}</p><br>                        
+                    </ion-col>
+                  <ion-col col-6>
+                      <p>Latitud  : {{data.localizacion_latitude}}</p>                        
+                  </ion-col>
+              </ion-row>
+          </ion-item>
+
+          <ion-item *ngIf="data.terminado === 1" >
+            <h2>Estado </h2>
+            <p><ion-icon name="checkbox"  style="color:mediumseagreen" item-end></ion-icon> Unidad productiva terminada</p>
+        </ion-item>
+          
+        <ion-item *ngIf="data.terminado === 0" >
+              <h2>Estado </h2>
+            <p><ion-icon name="square-outline" style="color:gray" item-end> Unidad productiva pendiente</ion-icon></p>
+          
+      </ion-item>
+      <ion-item-divider color="light" >Informacion Productor</ion-item-divider>            
+      <ion-item>
+          <h2>Nombre</h2>
+          <p> {{data.productornombre}}</p>
+      </ion-item>
+      <ion-item>
+          <h2>Identificacion</h2>
+          <p> {{data.identificacion}}</p>
+      </ion-item>
+      <ion-item>
+          <h2>Telefono</h2>
+          <p> {{data.telefono}}</p>
+      </ion-item>
+      <ion-item>
+          <h2>Año Ingreso</h2>
+          <p> {{data.annoIngreso}}</p>
+      </ion-item>
+      <ion-item>
+          <h2>Ultima aplicacion</h2>
+          <p>{{data.ultimaAplicacion}}</p>
+      </ion-item>
+      
+
+      <ion-item-divider color="light" >Informacion Productor</ion-item-divider>           
+      <ion-item>
+          <h2>Region</h2>
+          <p> {{reg}}    </p>
+      </ion-item>
+      <ion-item>
+          <h2>Municipio</h2>
+          <p>{{municipio}}</p>
+      </ion-item>
+      <ion-item>
+          <h2>Departamento</h2>
+          <p>{{departamento}}</p>
+      </ion-item>       
+      <ion-item>
+          <h2>Pais</h2>
+          <p>{{pais}}  </p>
+      </ion-item>         
+
+        </ion-item-group>
+
+  </ion-content>
