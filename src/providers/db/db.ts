@@ -868,6 +868,27 @@ todasuproductivas(){
         })
 }
 
+todasuproductivas2(){
+  return this.isReady()
+    .then(()=>{
+      return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado from unidades_productivas`, []).then((data)=>{
+          let todas = [];
+          for(let i=0; i<data.rows.length; i++){
+            let todo = data.rows.item(i);
+            this.nombreregion(todo.regionId).then((data:any)=> {
+              todo.region=data;
+            });
+            this.nombreproductor(todo.IdProductor).then((data:any)=> {
+              todo.productor=data;
+            });
+            todas.push(todo);
+          }
+          return todas;
+          })
+        })
+}
+
+
 guardarrespuestaporpregunta(unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext){
   return this.isReady()
   .then(()=>{
