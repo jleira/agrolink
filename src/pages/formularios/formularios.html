@@ -69,7 +69,7 @@
   </div>
   
   <div *ngIf="caso == 4">
-<!--
+
     {{prueba}}
       <h2>
         esta es las resp
@@ -92,13 +92,11 @@
 
 <ion-item>
   <ion-label>Gender</ion-label>
-  <ion-select [(ngModel)]="gender">
-    <ion-option value="f">Female</ion-option>
-    <ion-option value="m">Male</ion-option>
-  </ion-select>
+<ion-input type="text" [(ngModel)]="estosoloesunapuebamas" (change)="llamar2()"></ion-input>
 </ion-item>
 
--->
+
+
       <div *ngFor="let item of final">
         
         <div *ngIf="item.tipo==3006"><!--etiqueta -->
@@ -119,8 +117,8 @@
       <div *ngIf="item.tipo==3002"><!--seleccion nmultiple con multiple respuesta -->
         <ion-item >
             <ion-label  style="color:black">{{item.enunciado}}</ion-label>
-            <ion-select multiple="true">  <!--(ionChange)="onChange($event, preguntas.id)"-->
-              <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones.valor">{{opciones.nombre}}</ion-option>
+            <ion-select multiple="true"  (ionChange)="guardar3002($event, item.codigo, item.codigorespuesta)">  <!--(ionChange)="onChange($event, preguntas.id)"-->
+              <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones">{{opciones.nombre}}</ion-option>
             </ion-select>
         </ion-item>
     </div>
@@ -130,7 +128,8 @@
   <div *ngIf="opciones.tipo==210001">
     <ion-item>
       <ion-label >{{item.enunciado}}</ion-label>
-    <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="item.identificador"></ion-datetime>
+    <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="item.identificador" (ionChange)="guardar3006(opciones, item.codigo, item.codigorespuesta,item.identificador )"></ion-datetime>
+    
 </ion-item>
   </div>
 
@@ -138,14 +137,14 @@
   <div *ngIf="opciones.tipo==210002">
     <ion-item>
       <ion-label floating  style="color:black">{{item.enunciado}}</ion-label>
-      <ion-input type="number" [(ngModel)]="item.identificador"> </ion-input>
+      <ion-input type="number" [(ngModel)]="item.identificador" (change)="guardar3006(opciones, item.codigo, item.codigorespuesta,item.identificador )"> </ion-input>
 </ion-item>
   </div>
 
   <div *ngIf="opciones.tipo==210003">
     <ion-item>
       <ion-label floating   >{{item.enunciado}}</ion-label>
-      <ion-input type="text" [(ngModel)]="item.identificador"> </ion-input>
+      <ion-input type="text" [(ngModel)]="item.identificador" (change)="guardar3006(opciones, item.codigo, item.codigorespuesta,item.identificador )"> </ion-input>
 </ion-item>
   </div>
 </div>

@@ -120,6 +120,20 @@ grupoidselected:any;
     this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid,valor.codigo, valor.valor, true);
  }
 
+ guardar3002(valor ,preguntaid, respcodigo) {
+
+  valor.forEach(element => { 
+    this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid,element.codigo, element.valor, true);    
+  });
+
+}
+
+
+
+ guardar3006(valor ,preguntaid, respcodigo, respuestafinal) {
+  this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid,valor.codigo, valor.valor, respuestafinal);
+}
+
   mostrargrupos(tipop, upva){
       this.formulario.gruposbase(tipop).then(gps=>{
         if (gps==null){
