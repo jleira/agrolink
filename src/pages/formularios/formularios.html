@@ -69,7 +69,7 @@
   </div>
   
   <div *ngIf="caso == 4">
-
+<!--
     {{prueba}}
       <h2>
         esta es las resp
@@ -87,15 +87,21 @@
 </p>     
 <ion-item>
   <ion-label>Date</ion-label>
-  <ion-datetime displayFormat="MM/DD/YYYY" [(ngModel)]="myDate"></ion-datetime>
+  <ion-datetime cancelText="Cancelar" doneText="Ok" (initialValue)="2017-10-18" [(ngModel)]="dataFalha" displayFormat="DD MMM YYYY"></ion-datetime>
 </ion-item>
 
 <ion-item>
-  <ion-label>Gender</ion-label>
-<ion-input type="text" [(ngModel)]="estosoloesunapuebamas" (change)="llamar2()"></ion-input>
+  <ion-label>Date2</ion-label>
+  <ion-datetime displayFormat="DD MM YYYY" pickerFormat="DD MM YYYY" [(ngModel)]="myDate2"  pickerDefault="2017-08-06"  ></ion-datetime>
 </ion-item>
 
 
+<ion-item>
+  <ion-label>Gender</ion-label>
+<ion-input type="text" [(ngModel)]="estosoloesunapuebamas"  value="esto es un input cn valor por dfecto" (change)="llamar2()"></ion-input>
+</ion-item>
+
+-->
 
       <div *ngFor="let item of final">
         
@@ -108,8 +114,8 @@
         <div *ngIf="item.tipo==3001"><!--sleeccion multiple con unica respuesta -->
           <ion-item>
               <ion-label style="color:#000000" >{{item.enunciado}}</ion-label>
-              <ion-select  (ionChange)="guardar3001($event, item.codigo, item.codigorespuesta)">  <!--(ionChange)="onChange($event, preguntas.id)"-->
-                <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones">{{opciones.nombre}}</ion-option>
+              <ion-select  (ionChange)="guardar3001($event, item.codigo ,item.codigorespuesta)">  <!--(ionChange)="onChange($event, preguntas.id)"-->
+                <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
               </ion-select>
             </ion-item>
           
@@ -118,7 +124,7 @@
         <ion-item >
             <ion-label  style="color:black">{{item.enunciado}}</ion-label>
             <ion-select multiple="true"  (ionChange)="guardar3002($event, item.codigo, item.codigorespuesta)">  <!--(ionChange)="onChange($event, preguntas.id)"-->
-              <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones">{{opciones.nombre}}</ion-option>
+              <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
             </ion-select>
         </ion-item>
     </div>
@@ -128,7 +134,7 @@
   <div *ngIf="opciones.tipo==210001">
     <ion-item>
       <ion-label >{{item.enunciado}}</ion-label>
-    <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="item.identificador" (ionChange)="guardar3006(opciones, item.codigo, item.codigorespuesta,item.identificador )"></ion-datetime>
+    <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="item.identificador"  placeholder="{{opciones.respuesta}}" (ionChange)="guardar3006(opciones, item.codigo, item.codigorespuesta,item.identificador )"></ion-datetime>
     
 </ion-item>
   </div>
@@ -137,14 +143,14 @@
   <div *ngIf="opciones.tipo==210002">
     <ion-item>
       <ion-label floating  style="color:black">{{item.enunciado}}</ion-label>
-      <ion-input type="number" [(ngModel)]="item.identificador" (change)="guardar3006(opciones, item.codigo, item.codigorespuesta,item.identificador )"> </ion-input>
+      <ion-input type="number" [(ngModel)]="item.identificador" value="{{opciones.respuesta}}" placeholder="{{opciones.respuesta}}"  (change)="guardar3006(opciones, item.codigo, item.codigorespuesta,item.identificador )"> </ion-input>
 </ion-item>
   </div>
 
   <div *ngIf="opciones.tipo==210003">
     <ion-item>
       <ion-label floating   >{{item.enunciado}}</ion-label>
-      <ion-input type="text" [(ngModel)]="item.identificador" (change)="guardar3006(opciones, item.codigo, item.codigorespuesta,item.identificador )"> </ion-input>
+      <ion-input type="text" [(ngModel)]="item.identificador" value="{{opciones.respuesta}}" (change)="guardar3006(opciones, item.codigo, item.codigorespuesta,item.identificador )"> </ion-input>
 </ion-item>
   </div>
 </div>
@@ -155,8 +161,8 @@
   <div *ngIf="item.tipo==3004"><!--seleccion multiple unica respueista y abierta -->
     <ion-item no-lines>
         <ion-label  style="color:black">{{item.enunciado}}</ion-label>
-        <ion-select>  <!--(ionChange)="onChange($event, preguntas.id)"-->
-          <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones.valor">{{opciones.nombre}}</ion-option>
+        <ion-select  (ionChange)="guardar3001($event, item.codigo, item.codigorespuesta)">  <!--(ionChange)="onChange($event, preguntas.id)"-->
+          <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
         </ion-select>
     </ion-item>
     <ion-item >
@@ -166,8 +172,8 @@
 <div *ngIf="item.tipo==3005"><!--seleccion multiple -->
   <ion-item no-lines>
       <ion-label  style="color:black">{{item.enunciado}}</ion-label>
-      <ion-select multiple="true">  <!--(ionChange)="onChange($event, preguntas.id)"-->
-        <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones.valor">{{opciones.nombre}}</ion-option>
+      <ion-select multiple="true"  (ionChange)="guardar3002($event, item.codigo, item.codigorespuesta)">  <!--(ionChange)="onChange($event, preguntas.id)"-->
+        <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
       </ion-select>
   </ion-item>
   <ion-item >

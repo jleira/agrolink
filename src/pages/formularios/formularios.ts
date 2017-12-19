@@ -81,7 +81,7 @@ grupoidselected:any;
           r.push(element.codigo);
         });        
         this.resp=r;
-        return this.formulario.respuestasporpreguntas(this.resp).then(data=>{
+        return this.formulario.respuestasporpreguntas(this.resp, this.up, this.grupoidselected ).then(data=>{
           this.resp=data;
           this.items.forEach(element => {
             let vr:any;
@@ -109,22 +109,23 @@ grupoidselected:any;
 }
 
   asignarRespuestas(){
-    
-    return this.formulario.respuestasporpreguntas(2).then(data=>{
-      this.prueba4=data;
-    return this.prueba4;
-     });
-  }
+    }
 
   guardar3001(valor ,preguntaid, respcodigo) {
-    this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid,valor.codigo, valor.valor, true);
+    this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid,valor.codigo, valor.valor, valor.valor);
  }
 
  guardar3002(valor ,preguntaid, respcodigo) {
 
+  let codigosrespuestas:any=[];
+  let valoresrespuesta:any=[];
   valor.forEach(element => { 
-    this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid,element.codigo, element.valor, true);    
+    codigosrespuestas.push(element.codigo);
+    valoresrespuesta.push(element.valor);
   });
+  codigosrespuestas=codigosrespuestas.join(',');
+  valoresrespuesta=valoresrespuesta.join(',');
+  this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, codigosrespuestas, valoresrespuesta, valoresrespuesta);
 
 }
 
@@ -169,15 +170,15 @@ grupoidselected:any;
 }
 
   llamar2(){
-    this.formulario.respuestasporpreguntas([2,3]).then(data=>{
-      this.prueba2=JSON.stringify(data);
-      return this.prueba2;
-    });
-    this.prueba3=[];
-    this.items.forEach(element => {
-      this.prueba3.push(element.respuestas);
-    });
-    this.prueba3=JSON.stringify(this.prueba3);
+    // this.formulario.(this.up, this.grupoidselected).then(data=>{
+    //   this.prueba2=data ;
+    //   return this.prueba2;
+    // });
+    // this.prueba3=[];
+    // this.items.forEach(element => {
+    //   this.prueba3.push(element.respuestas);
+    // });
+    // this.prueba3=JSON.stringify(this.prueba3);
  //
 
 }

@@ -68,7 +68,7 @@ descargarformularios(){
                     this.authHttp.get(`${SERVER_URL}/api/answers/find/${pr.pregunta.respCodigo.codigo}`).subscribe(
                       respuestas=>{
                         respuestas.json().valores.forEach(resp => {
-                          this.database.guardarrespuesta(resp.codigo, resp.nombre, resp.valor, resp.tipoDato, pregunt);
+                          this.database.guardarrespuesta(resp.codigo, resp.nombre, resp.valor, resp.tipoDato, pregunt, respuestas.json().codigo);
                         });
                       }
                     );
@@ -104,17 +104,55 @@ preguntasgrupo(grupo){
    return this.items;
    });
 }
-respuestasporpreguntas(preguntas){
-return this.database.respuestasporpregunta(preguntas).then(data=> {
+respuestasporpreguntas(preguntas, up, grupo){
+
+   return this.database.respuestasporpregunta(preguntas).then(data=> {
   this.items=data;
   return this.items;
+}).then(()=>{
+  return this.database.respuestasguardadas(up, grupo).then((dt)=>{
+    let da:any;
+    da=dt;
+    this.items.forEach(respuestas => {
+      if(da!=false){
+        respuestas.respuesta='esto es una prueb';
+        da.forEach(valores => {
+        
+          if( respuestas.preguntaid==valores.pregunta){
+            if (respuestas.tipo==210001 || respuestas.tipo==2100003){
+              respuestas.respuesta=valores.valor;
+            }else if(respuestas.tipo==210002){
+              respuestas.respuesta=parseInt(valores.valor);
+            }else if(respuestas.tipo==210004){
+              let arrayvalores;
+              arrayvalores=valores.valor.split(',');
+              if(arrayvalores.indexOf(respuestas.valor.toString())!=-1){
+                respuestas.respuesta=true;
+              }else{
+                respuestas.respuesta=false;
+              }
+            }
+//            respuestas.respuesta=valores.valor;parseInt(str)
+          }
+        });
+      }
+    });
+    return this.items;
+  })
 });
 }
+respuestasguardada(up, grupo){
+  return this.database.respuestasguardadas(up, grupo).then((dt)=>{
+    this.items=dt;    
+    return this.items;
+  })
+}
 
-guardar3001(unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext){
-  this.database.guardarrespuestaporpregunta(unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext);
+guardar3001(unidadp, grup, codigopararespuestas, preguntaid ,codigosdelasrespuestas , valoresdelasrespuestas , valortext){
+  this.database.guardarrespuestaporpregunta(unidadp, grup, codigopararespuestas, preguntaid ,codigosdelasrespuestas , valoresdelasrespuestas , valortext);
 
 }
+
 
 
 }

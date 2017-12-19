@@ -132,6 +132,7 @@ private createTables(){
                   valor INTEGER,
                   tipo INTEGER,
                   preguntaid INTEGER,
+                  codigorespuestapadre INTEGER,
                   FOREIGN KEY(preguntaid) REFERENCES preguntas(codigo)
                 );`,{} )
             }).then(()=>{
@@ -142,8 +143,8 @@ private createTables(){
                     grupo INTEGER,
                     pregunta INTEGER,
                     respuestascodigo INTEGER, 
-                    codigorespuesta INTEGER,
-                    valorrespuesta INTEGER,
+                    codigorespuesta TEXT,
+                    valorrespuesta TEXT,
                     valor TEXT,
                     observacion TEXT
 
@@ -746,11 +747,11 @@ guardarpregunta(codigo, enunciado, posicion, tipo, valorinicial, grupobase, requ
       [codigo, enunciado, posicion, tipo, valorinicial, grupobase, requerido, codresp]);
   }); 
 }
-guardarrespuesta(codigo, nombre, valor, tipo, preguntaid){
+guardarrespuesta(codigo, nombre, valor, tipo, preguntaid, codigorespuestapadre){
   return this.isReady()
   .then(()=>{
-    return this.database.executeSql(`INSERT INTO respuestas (codigo, nombre, valor, tipo, preguntaid) VALUES (?, ?, ?, ?, ?);`, 
-      [codigo, nombre, valor, tipo, preguntaid]);
+    return this.database.executeSql(`INSERT INTO respuestas (codigo, nombre, valor, tipo, preguntaid, codigorespuestapadre) VALUES (?, ?, ?, ?, ?, ?);`, 
+      [codigo, nombre, valor, tipo, preguntaid, codigorespuestapadre]);
   }); 
 }
 
@@ -834,18 +835,41 @@ respuestasporpregunta(pregunta){
       if(data.rows.length){
         for (let i = 0; i < data.rows.length; i++) {
           let todo = data.rows.item(i);
-          todo.respuesta=[];
+          todo.respuesta=false;
           todos.push(todo);
         }
       }else{
         let todo;
-        todo='.l. jodete ';
+        todo=false;
         todos=todo;          
       }
       return todos;
     })
   })
 
+}
+
+respuestasguardadas(up, grupo){
+  let upi=up;
+  let grupoi=grupo;
+  return this.isReady(
+  ).then(()=>{
+    return this.database.executeSql(`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?)`, [upi,grupoi]).then((data)=>{
+      let todos=[];
+      if(data.rows.length){
+        for (let i = 0; i < data.rows.length; i++) {
+          let todo = data.rows.item(i);
+          todos.push(todo);
+        }
+      }else{
+        let todo;
+        todo=false;
+        todos=todo;          
+      }
+      return todos;
+    })
+  })
+  
 }
 
 todasuproductivas(){
@@ -889,7 +913,7 @@ todasuproductivas2(){
 }
 
 
-guardarrespuestaporpregunta(unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext){
+guardarrespuestaporpregunta2(unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext){
   return this.isReady()
   .then(()=>{
     return this.database.executeSql(`INSERT INTO respuestasguardadas (unidadproductiva, grupo, pregunta, respuestascodigo, codigorespuesta, valorrespuesta, valor, observacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?);`, 
@@ -897,5 +921,43 @@ guardarrespuestaporpregunta(unidadp, grup, respuestascodigo, preguntaid ,codigor
   }); 
   
 }
+guardarrespuestaporpregunta(unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext){
+  let up= unidadp;
+  let gr=grup;
+  let pr=preguntaid;
+
+  return this.isReady()
+  .then(()=>{
+    return this.database.executeSql
+    (`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND pregunta =(?) `, 
+    [up, gr, pr]).then((data)=>{
+      let id;
+      if(data.rows.length>0){
+        id = data.rows.item(0).id;
+      }else{
+        id=false;
+      }
+    return id;  
+    }).then((idseleccion)=>{
+
+      if (idseleccion==false){
+
+        return this.database.executeSql(
+          `INSERT INTO respuestasguardadas 
+          (unidadproductiva, grupo, respuestascodigo ,pregunta, codigorespuesta, valorrespuesta, valor, observacion )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?);`, 
+        [unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext, idseleccion]);
+ 
+        }else{
+          return this.database.executeSql(
+               `UPDATE respuestasguardadas SET codigorespuesta = ${codigoresp}, valorrespuesta = ${valorresp}, valor =${valortext} WHERE id=${idseleccion} ;`, 
+             []);
+        }
+    })
+    }); 
+  
+}
+
+
 
 }
