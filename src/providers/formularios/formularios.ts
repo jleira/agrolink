@@ -119,20 +119,20 @@ respuestasporpreguntas(preguntas, up, grupo){
         da.forEach(valores => {
         
           if( respuestas.preguntaid==valores.pregunta){
+            respuestas.observacion=valores.observacion;
             if (respuestas.tipo==210001 || respuestas.tipo==2100003){
               respuestas.respuesta=valores.valor;
             }else if(respuestas.tipo==210002){
               respuestas.respuesta=parseInt(valores.valor);
             }else if(respuestas.tipo==210004){
               let arrayvalores;
-              arrayvalores=valores.valor.split(',');
+              arrayvalores=valores.valor.split('_');
               if(arrayvalores.indexOf(respuestas.valor.toString())!=-1){
                 respuestas.respuesta=true;
               }else{
                 respuestas.respuesta=false;
               }
             }
-//            respuestas.respuesta=valores.valor;parseInt(str)
           }
         });
       }
@@ -151,6 +151,9 @@ respuestasguardada(up, grupo){
 guardar3001(unidadp, grup, codigopararespuestas, preguntaid ,codigosdelasrespuestas , valoresdelasrespuestas , valortext){
   this.database.guardarrespuestaporpregunta(unidadp, grup, codigopararespuestas, preguntaid ,codigosdelasrespuestas , valoresdelasrespuestas , valortext);
 
+}
+guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion){
+this.database.guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion);
 }
 
 

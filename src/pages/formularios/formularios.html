@@ -69,7 +69,7 @@
   </div>
   
   <div *ngIf="caso == 4">
-<!--
+
     {{prueba}}
       <h2>
         esta es las resp
@@ -101,7 +101,6 @@
 <ion-input type="text" [(ngModel)]="estosoloesunapuebamas"  value="esto es un input cn valor por dfecto" (change)="llamar2()"></ion-input>
 </ion-item>
 
--->
 
       <div *ngFor="let item of final">
         
@@ -166,7 +165,7 @@
         </ion-select>
     </ion-item>
     <ion-item >
-      <ion-input  placeholder="Observaciones"> </ion-input>
+      <ion-input  placeholder="Observaciones" [(ngModel)]="item.observacion" value={{item.observacion}} (change)="guardarobservacion( item.codigo, item.codigorespuesta,item.observacion )">  </ion-input>
     </ion-item>
 </div>
 <div *ngIf="item.tipo==3005"><!--seleccion multiple -->
@@ -177,7 +176,7 @@
       </ion-select>
   </ion-item>
   <ion-item >
-    <ion-input  placeholder="Observaciones"> </ion-input>
+    <ion-input    [(ngModel)]="item.observacion" placeholder={{item.observacion}} (change)="guardarobservacion( item.codigo, item.codigorespuesta,item.observacion )"> </ion-input>
   </ion-item>
 </div>
       

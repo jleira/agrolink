@@ -836,6 +836,7 @@ respuestasporpregunta(pregunta){
         for (let i = 0; i < data.rows.length; i++) {
           let todo = data.rows.item(i);
           todo.respuesta=false;
+          todo.observacion='';
           todos.push(todo);
         }
       }else{
@@ -912,15 +913,6 @@ todasuproductivas2(){
         })
 }
 
-
-guardarrespuestaporpregunta2(unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext){
-  return this.isReady()
-  .then(()=>{
-    return this.database.executeSql(`INSERT INTO respuestasguardadas (unidadproductiva, grupo, pregunta, respuestascodigo, codigorespuesta, valorrespuesta, valor, observacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?);`, 
-      [unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext, '']);
-  }); 
-  
-}
 guardarrespuestaporpregunta(unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext){
   let up= unidadp;
   let gr=grup;
@@ -946,12 +938,49 @@ guardarrespuestaporpregunta(unidadp, grup, respuestascodigo, preguntaid ,codigor
           `INSERT INTO respuestasguardadas 
           (unidadproductiva, grupo, respuestascodigo ,pregunta, codigorespuesta, valorrespuesta, valor, observacion )
           VALUES (?, ?, ?, ?, ?, ?, ?, ?);`, 
-        [unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext, idseleccion]);
+        [unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext, '']);
  
         }else{
           return this.database.executeSql(
-               `UPDATE respuestasguardadas SET codigorespuesta = ${codigoresp}, valorrespuesta = ${valorresp}, valor =${valortext} WHERE id=${idseleccion} ;`, 
-             []);
+               `UPDATE respuestasguardadas SET codigorespuesta = (?), valorrespuesta = (?), valor =(?) WHERE id=${idseleccion} ;`, 
+             [codigoresp,valorresp,valortext]);
+        }
+    })
+    }); 
+  
+}
+
+guardarobservacion(unidadp, grup, respuestascodigo, preguntaid , observacion){
+  let up= unidadp;
+  let gr=grup;
+  let pr=preguntaid;
+
+  return this.isReady()
+  .then(()=>{
+    return this.database.executeSql
+    (`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND pregunta =(?) `, 
+    [up, gr, pr]).then((data)=>{
+      let id;
+      if(data.rows.length>0){
+        id = data.rows.item(0).id;
+      }else{
+        id=false;
+      }
+    return id;  
+    }).then((idseleccion)=>{
+
+      if (idseleccion==false){
+
+        return this.database.executeSql(
+          `INSERT INTO respuestasguardadas 
+          (unidadproductiva, grupo, respuestascodigo ,pregunta, observacion )
+          VALUES (?, ?, ?, ?, ?);`, 
+        [unidadp, grup, respuestascodigo, preguntaid , observacion]);
+ 
+        }else{
+          return this.database.executeSql(
+               `UPDATE respuestasguardadas SET observacion = (?) WHERE id=${idseleccion} ;`, 
+             [observacion]);
         }
     })
     }); 

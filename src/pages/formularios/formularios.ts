@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
+import { observeOn } from 'rxjs/operators/observeOn';
 /**
  * Generated class for the FormulariosPage page.
  *
@@ -119,20 +120,27 @@ grupoidselected:any;
 
   let codigosrespuestas:any=[];
   let valoresrespuesta:any=[];
+  this.prueba=JSON.stringify(valor);
   valor.forEach(element => { 
     codigosrespuestas.push(element.codigo);
     valoresrespuesta.push(element.valor);
   });
-  codigosrespuestas=codigosrespuestas.join(',');
-  valoresrespuesta=valoresrespuesta.join(',');
+  codigosrespuestas=codigosrespuestas.join('_');
+  valoresrespuesta=valoresrespuesta.join('_');
   this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, codigosrespuestas, valoresrespuesta, valoresrespuesta);
-
+this.prueba2=[];
+this.prueba2.push({up: this.up, grupo: this.grupoidselected, codigopararespuestas: respcodigo, preguntaid: preguntaid,codigosdelasrespuestas: codigosrespuestas, valoresrespuesta:valoresrespuesta, valoresrespuestatext:valoresrespuesta });
+this.prueba2=JSON.stringify(this.prueba2);
 }
 
 
 
  guardar3006(valor ,preguntaid, respcodigo, respuestafinal) {
   this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid,valor.codigo, valor.valor, respuestafinal);
+}
+
+guardarobservacion(preguntaid, respcodigo, observacion) {
+//  this.formulario.guardarobservacion(this.up, this.grupoidselected, respcodigo, preguntaid, observacion);
 }
 
   mostrargrupos(tipop, upva){
