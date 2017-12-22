@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
-import {JwtHelper, AuthHttp,  AuthConfig} from "angular2-jwt";
+import {JwtHelper, AuthHttp} from "angular2-jwt";
 import {SERVER_URL} from "../../config";
 import {Storage} from "@ionic/storage";
 import { DbProvider } from '../db/db';
@@ -18,7 +18,7 @@ export class RegionProvider {
     private readonly storage: Storage) {
   }
   obtenerpaises(){
-    this.storage.get('jwt').then(jwt => {   
+    this.storage.get('jwt').then(jwt => {  
               this.authHttp.get(`${SERVER_URL}/api/pais/`).subscribe(
                   data =>{ 
                   if(!(data.json()==null)){
@@ -29,6 +29,7 @@ export class RegionProvider {
   };
 
   guardarpais(value){
+    
   value.forEach(element => {
    this.database.agregarregion(1,element['idPais'],element['nombre'],null,null);
   });

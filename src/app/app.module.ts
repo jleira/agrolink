@@ -30,6 +30,10 @@ import { DbProvider } from '../providers/db/db';
 import { SQLite } from '@ionic-native/sqlite';
 import { FormulariosProvider } from '../providers/formularios/formularios';
 
+import { Camera } from '@ionic-native/camera';
+import { File } from '@ionic-native/file';
+
+
 
 export function authHttpServiceFactory(http: Http, options: RequestOptions, storage: Storage) {
   const authConfig = new AuthConfig({
@@ -88,7 +92,9 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     RegionProvider,
     UproductivaProvider,
     DbProvider,
-    FormulariosProvider
+    FormulariosProvider,
+    Camera,
+    File
   ]
 })
 export class AppModule {}

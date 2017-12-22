@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, ToastController} from 'ionic-angular';
+import { IonicPage, LoadingController, ToastController} from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
 import { PerfilProvider} from '../../providers/perfil/perfil';
 import { RegionProvider } from '../../providers/region/region';
 import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
-import { FormulariosPage } from '../formularios/formularios';
 
 @IonicPage()
 @Component({
@@ -18,8 +17,6 @@ export class LoginPage {
   data: any;
 
   constructor(
-    public navCtrl: NavController, 
-    public navParams: NavParams,
     public authService: AuthProvider,
     public loadingCtrl: LoadingController, 
     private toastCtrl: ToastController,
@@ -41,13 +38,14 @@ export class LoginPage {
         loading.dismiss();
       })
       .subscribe(()=>{
-        this.getinitialinformation();
-        this.region.obtenerpaises();
-        this.region.obtenerdepartamentos();
-        this.region.obtenermunicipios();
-        this.region.obtenerregiones();
-        this.uproductiva.descargarunidadesproductivas();
-        this.formularios.descargarformularios();
+        this.perfil.getinfo();
+       this.region.obtenerpaises();
+ //       this.region.obtenerdepartamentos();
+ //      this.region.obtenermunicipios();
+//       this.region.obtenerregiones();
+  //      this.uproductiva.descargarunidadesproductivas();
+//        this.formularios.descargarformularios();
+        
       },
         (err) => {
           this.handleError(err);
@@ -72,10 +70,6 @@ export class LoginPage {
     toast.present();
   }
 
-  getinitialinformation(){
-    this.perfil.getinfo();
-    
-  }
-
+ 
 
 }

@@ -7,11 +7,13 @@ import {JwtHelper, AuthHttp} from "angular2-jwt";
 import {SERVER_URL} from "../../config";
 import 'rxjs/Rx';
 import 'rxjs/add/operator/map';
+import { DbProvider } from '../db/db';
+
 let apiUrl = SERVER_URL;
 
 
 /*
-  Generated class for the AuthProvider provider.
+  Generated class for the AuthProvider provider. 
 
   See https://angular.io/guide/dependency-injection for more info on providers
   and Angular DI.
@@ -22,10 +24,14 @@ export class AuthProvider {
   
   constructor(public http: Http, private readonly authHttp: AuthHttp,
     private readonly storage: Storage,
-    private readonly jwtHelper: JwtHelper) {}
+    private readonly jwtHelper: JwtHelper,
+    public database:DbProvider) {}
     checkLogin() {
       this.storage.get('jwt').then(jwt => {
-        this.authUser.next(jwt);
+        this.database.creartablas().then(()=>{},()=>{}).then(()=>
+         { this.authUser.next(jwt);
+      });
+
       });
 /* 
         if (jwt && !this.jwtHelper.isTokenExpired(jwt)) {
@@ -54,6 +60,7 @@ export class AuthProvider {
         .then(() => jwt);
     }
     logout() {
+      this.database.limpiardb().then((ok)=>{console.log('borrado',JSON.stringify(ok)),(err)=>{console.log('no borrado',JSON.stringify(err))} });
       this.storage.remove('jwt').then(() => this.authUser.next(null));
       this.storage.remove('nombre');
       this.storage.remove('identificador');

@@ -31,6 +31,10 @@ export class DbProvider {
       })
     });
   }
+creartablas(){
+ return this.createTables();
+}
+
 private createTables(){    
   return this.database.executeSql(
           `CREATE TABLE IF NOT EXISTS paises (
@@ -987,6 +991,45 @@ guardarobservacion(unidadp, grup, respuestascodigo, preguntaid , observacion){
   
 }
 
+limpiardb(){
 
+  return this.isReady().then(()=>{
+    return this.database.executeSql(
+      `DROP TABLE IF EXISTS paises;`,{})
+      .then(()=>{
+  return this.database.executeSql(
+      `DROP TABLE IF EXISTS departamentos ;`,{} )
+    }).then(()=>{
+  return this.database.executeSql(
+      `DROP TABLE IF EXISTS municipios ;`,{} )
+    }).then(()=>{
+  return this.database.executeSql(
+      `DROP TABLE IF EXISTS regiones ;`,{} )
+    }).then(()=>{
+  return this.database.executeSql(
+      `DROP TABLE IF EXISTS productores;`,{} )
+    }).then(()=>{
+  return this.database.executeSql(
+      `DROP TABLE IF EXISTS unidades_productivas ;`,{} )
+    }).then(()=>{
+      return this.database.executeSql(
+              `DROP TABLE IF EXISTS formularios ;`,{} )
+    }).then(()=>{
+    return this.database.executeSql(
+        `DROP TABLE IF EXISTS grupos ;`,{} )
+    }).then(()=>{
+      return this.database.executeSql(
+          `DROP TABLE IF EXISTS preguntas;`,{} )
+      }).then(()=>{
+        return this.database.executeSql(
+            `DROP TABLE IF EXISTS respuestas;`,{} )
+        }).then(()=>{
+          return this.database.executeSql(
+              `DROP TABLE IF EXISTS respuestasguardadas;`,{} )});
+
+  })
+ 
+
+}
 
 }

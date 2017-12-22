@@ -1,8 +1,12 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
 import { observeOn } from 'rxjs/operators/observeOn';
+import { Camera, CameraOptions } from '@ionic-native/camera';
+import { File, DirectoryEntry } from '@ionic-native/file';
+
+
 /**
  * Generated class for the FormulariosPage page.
  *
@@ -35,7 +39,10 @@ grupoidselected:any;
     public navCtrl: NavController, 
     public navParams: NavParams, 
     public uproductiva: UproductivaProvider,
-    public formulario: FormulariosProvider) {
+    public formulario: FormulariosProvider,
+    private camera: Camera, 
+    public alertCtrl: AlertController, 
+    private file: File) {
     this.caso=navParams.get('caso');
    }
 
@@ -191,4 +198,90 @@ guardarobservacion(preguntaid, respcodigo, observacion) {
 
 }
 
+
+presentConfirm() {
+  
+      let targetPath = this.file.externalDataDirectory;
+      let nombrecarpetapadre = 'OC21';// unidad productiva 
+      let idgrupo = 1;
+  
+      console.log(this.file.externalCacheDirectory);
+      let alert = this.alertCtrl.create({
+  
+        title: 'Desea adjuntar una imagen a esta pregunta',
+        message: 'En caso afirmativo debe seleccionar CAMARA si desea tomar una foto, o Escoger galeria si desea ewscoger una foto de su dispositivo',
+        buttons: [
+          {
+            text: 'Galeria',
+            handler: () => {
+              return this.galeria();
+            }
+          },
+          {
+            text: 'Camara',
+            handler: () => {
+              return this.getPicture();
+  
+            }
+          }
+        ]
+      });
+      alert.present();
+    }
+
+    getPicture() {
+      let options: CameraOptions = {
+        quality: 100,
+        destinationType: this.camera.DestinationType.FILE_URI,
+        sourceType: this.camera.PictureSourceType.CAMERA,
+        encodingType: this.camera.EncodingType.PNG,
+        mediaType: this.camera.MediaType.PICTURE,
+        correctOrientation: true
+      }
+      let targetPath = this.file.externalDataDirectory;
+      let nombrecarpetapadre = 'OC21';// unidad productiva 
+      let idgrupo = 2;
+      let preguntaid = 1;
+      
+  
+      this.camera.getPicture(options).then(imageData => {
+        return this.file.createDir(targetPath, nombrecarpetapadre, false).then(() => {
+        }, () => {
+        }).then(() => {
+          return this.file.createDir(targetPath + `/${nombrecarpetapadre}`, idgrupo.toString(), false).then(() => {
+          }, () => { });
+        }).then(() => {
+      return this.file.copyFile(this.file.externalCacheDirectory,imageData.replace(this.file.externalCacheDirectory, ""),
+            targetPath + `/${nombrecarpetapadre}/${idgrupo.toString()}`,
+            imageData.replace(this.file.externalCacheDirectory, "")).then(()=>{}, ()=> {});
+        }).then((ok
+        )=>{
+          this.file.removeFile(this.file.externalCacheDirectory, imageData.replace(this.file.externalCacheDirectory, ""
+        )).then((ok)=>{
+            console.log(JSON.stringify(ok));
+          },(err)=>{console.log(JSON.stringify(err))});
+        });
+        //      console.log(imageData);
+      }
+      ).catch(error => {
+        console.error(JSON.stringify(error));
+      });
+    }
+
+
+  galeria() {
+    let options: CameraOptions = {
+      //    destinationType: this.camera.PictureSourceType.CAMERA
+      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
+      mediaType: this.camera.MediaType.PICTURE,
+      saveToPhotoAlbum: true
+    }
+    this.camera.getPicture(options)
+      .then(imageData => {
+        console.log(imageData);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }
 }

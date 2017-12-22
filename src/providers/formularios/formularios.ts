@@ -82,7 +82,9 @@ descargarformularios(){
           });
 
         });
-  });
+  }), (err)=>{
+    console.log(err);
+  };
 
   });
 
