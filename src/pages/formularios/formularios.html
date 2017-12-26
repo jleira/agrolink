@@ -85,22 +85,14 @@
       <h2>estya es la prueba3</h2>
 <p> {{prueba3}}
 </p>     
-<ion-item>
-  <ion-label>Date</ion-label>
-  <ion-datetime cancelText="Cancelar" doneText="Ok" (initialValue)="2017-10-18" [(ngModel)]="dataFalha" displayFormat="DD MMM YYYY"></ion-datetime>
-</ion-item>
+<ion-list>
+  <ion-item>
+    <h2>Esta es la pregunta</h2>
+    <p>Adjuntar imagen..</p>
+  </ion-item>
+</ion-list>
 
-<ion-item>
-  <ion-label>Date2</ion-label>
-  <ion-datetime displayFormat="DD MM YYYY" pickerFormat="DD MM YYYY" [(ngModel)]="myDate2"  pickerDefault="2017-08-06"  ></ion-datetime>
-</ion-item>
-
-
-<ion-item>
-  <ion-label>Gender</ion-label>
-<ion-input type="text" [(ngModel)]="estosoloesunapuebamas"  value="esto es un input cn valor por dfecto" (change)="llamar2()"></ion-input>
-</ion-item>
-
+<img [src]="imm" *ngIf="imm" />
 
       <div *ngFor="let item of final">
         
@@ -110,35 +102,34 @@
               </ion-item>
         </div>
                
-        <div *ngIf="item.tipo==3001"><!--sleeccion multiple con unica respuesta -->
-          <ion-item>
-              <ion-label style="color:#000000" >{{item.enunciado}}</ion-label>
-              <ion-select  (ionChange)="guardar3001($event, item.codigo ,item.codigorespuesta)">  <!--(ionChange)="onChange($event, preguntas.id)"-->
-                <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
-              </ion-select>
-            </ion-item>
-          
-      </div>
-      <div *ngIf="item.tipo==3002"><!--seleccion nmultiple con multiple respuesta -->
-        <ion-item >
-            <ion-label  style="color:black">{{item.enunciado}}</ion-label>
-            <ion-select multiple="true"  (ionChange)="guardar3002($event, item.codigo, item.codigorespuesta)">  <!--(ionChange)="onChange($event, preguntas.id)"-->
-              <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
-            </ion-select>
-        </ion-item>
-    </div>
-    <div *ngIf="item.tipo==3003"><!--abierta -->
+     <div *ngIf="item.tipo==3003"><!--abierta -->
 <div *ngFor="let opciones of item.respuestas">
 
   <div *ngIf="opciones.tipo==210001">
-    <ion-item>
-      <ion-label >{{item.enunciado}}</ion-label>
-    <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="item.identificador"  placeholder="{{opciones.respuesta}}" (ionChange)="guardar3006(opciones, item.codigo, item.codigorespuesta,item.identificador )"></ion-datetime>
+    <div *ngIf="opciones.respuesta">
+        <ion-item text-wrap no-lines>
+            <ion-label >
+              {{item.enunciado}}
+            </ion-label>
+          <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar" [(ngModel)]="opciones.respuesta" (ionChange)="guardarfecha(opciones, item.codigo, item.codigorespuesta, $event)"></ion-datetime>    
+       </ion-item>
+       <div *ngIf="item.archivo===1">
+              <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">Adjuntar imagen..</a>
+              <p>{{rutaimg+'/'+opciones.ruta}}  es es la ruta</p>
+              <img width="80" height="80" [src]="rutaimg+'/'+opciones.ruta"/>
+       </div>
     
-</ion-item>
+    </div>
+    <div *ngIf="!opciones.respuesta"> 
+        <ion-item>
+            <ion-label >{{item.enunciado}}</ion-label>
+          <ion-datetime displayFormat="YYY-MM-DD" cancelText="Cancelar" doneText="Guardar" (ionChange)="guardarfecha(opciones, item.codigo, item.codigorespuesta, $event)"></ion-datetime>    
+      </ion-item>
+    </div>
+    
   </div>
 
-
+<!--
   <div *ngIf="opciones.tipo==210002">
     <ion-item>
       <ion-label floating  style="color:black">{{item.enunciado}}</ion-label>
@@ -152,33 +143,12 @@
       <ion-input type="text" [(ngModel)]="item.identificador" value="{{opciones.respuesta}}" (change)="guardar3006(opciones, item.codigo, item.codigorespuesta,item.identificador )"> </ion-input>
 </ion-item>
   </div>
+-->
 </div>
       
        
 
   </div>
-  <div *ngIf="item.tipo==3004"><!--seleccion multiple unica respueista y abierta -->
-    <ion-item no-lines>
-        <ion-label  style="color:black">{{item.enunciado}}</ion-label>
-        <ion-select  (ionChange)="guardar3001($event, item.codigo, item.codigorespuesta)">  <!--(ionChange)="onChange($event, preguntas.id)"-->
-          <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
-        </ion-select>
-    </ion-item>
-    <ion-item >
-      <ion-input  placeholder="Observaciones" [(ngModel)]="item.observacion" value={{item.observacion}} (change)="guardarobservacion( item.codigo, item.codigorespuesta,item.observacion )">  </ion-input>
-    </ion-item>
-</div>
-<div *ngIf="item.tipo==3005"><!--seleccion multiple -->
-  <ion-item no-lines>
-      <ion-label  style="color:black">{{item.enunciado}}</ion-label>
-      <ion-select multiple="true"  (ionChange)="guardar3002($event, item.codigo, item.codigorespuesta)">  <!--(ionChange)="onChange($event, preguntas.id)"-->
-        <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
-      </ion-select>
-  </ion-item>
-  <ion-item >
-    <ion-input    [(ngModel)]="item.observacion" placeholder={{item.observacion}} (change)="guardarobservacion( item.codigo, item.codigorespuesta,item.observacion )"> </ion-input>
-  </ion-item>
-</div>
       
     </div>
 

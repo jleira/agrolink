@@ -119,16 +119,23 @@ respuestasporpreguntas(preguntas, up, grupo){
     da=dt;
     this.items.forEach(respuestas => {
       if(da!=false){
+ 
         respuestas.respuesta='esto es una prueb';
+        
         da.forEach(valores => {
         
           if( respuestas.preguntaid==valores.pregunta){
             respuestas.observacion=valores.observacion;
             if (respuestas.tipo==210001 || respuestas.tipo==2100003){
               respuestas.respuesta=valores.valor;
+              respuestas.ruta=valores.ruta;
             }else if(respuestas.tipo==210002){
+              respuestas.ruta=valores.ruta;
+
               respuestas.respuesta=parseInt(valores.valor);
             }else if(respuestas.tipo==210004){
+              respuestas.ruta=valores.ruta;
+
               let arrayvalores;
               arrayvalores=valores.valor.split('_');
               if(arrayvalores.indexOf(respuestas.valor.toString())!=-1){
@@ -136,10 +143,14 @@ respuestasporpreguntas(preguntas, up, grupo){
               }else{
                 respuestas.respuesta=false;
               }
+            }else{
+              respuestas.ruta=valores.ruta;
+              
             }
           }
         });
       }
+
     });
     return this.items;
   })
@@ -159,7 +170,9 @@ guardar3001(unidadp, grup, codigopararespuestas, preguntaid ,codigosdelasrespues
 guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion){
 this.database.guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion);
 }
-
+guardarimagen(up, grupoidselected, respcodigo, preguntaid, imagen){
+  this.database.guardarimagen(up, grupoidselected, respcodigo, preguntaid, imagen);
+  }
 
 
 }

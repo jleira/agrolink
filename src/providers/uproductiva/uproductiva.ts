@@ -130,7 +130,20 @@ descargarunidadesproductivas(){
     this.authHttp.get(`${SERVER_URL}/api/unidadesproductivas/`).subscribe(
       data => {
         if(!(data.json()==null)){
+          console.log(JSON.stringify(data.json()));
               this.guardarunidades(data.json());
+          }
+      }
+    );
+  })
+}
+descargarunidadesproductivasasignadas(){
+  this.storage.get('jwt').then(jwt => {   
+    this.authHttp.get(`${SERVER_URL}/api/asignaciones/`).subscribe(
+      data => {
+        if(!(data.json()==null)){
+          console.log(JSON.stringify(data.json()));
+//              this.guardarunidades(data.json());
           }
       }
     );

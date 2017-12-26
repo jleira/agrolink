@@ -5,6 +5,7 @@ import { FormulariosProvider } from '../../providers/formularios/formularios';
 import { observeOn } from 'rxjs/operators/observeOn';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { File, DirectoryEntry } from '@ionic-native/file';
+import { retry } from 'rxjs/operator/retry';
 
 
 /**
@@ -34,6 +35,7 @@ grupo:any;
 up:any;
 respuestasguardades:any;
 grupoidselected:any;
+rutaimg:any;
 
 
   constructor(
@@ -45,6 +47,7 @@ grupoidselected:any;
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController, 
     private file: File) {
+      console.log(this.file.dataDirectory);
     this.caso=navParams.get('caso');
    }
 
@@ -75,31 +78,20 @@ grupoidselected:any;
       this.up=this.navParams.get('up');
       let casot=this.navParams.get('tipo');
      return this.formulario.gruposbase(casot).then(gps=>{
-        if (gps==null){
-          this.items="la variable retorno null";
-        }else if(gps== "undefined"){
-          this.items="la variable retorno indefinida";
-          
-        } else{
-          this.items=gps;
-        }
+        this.items=gps;
         loading.dismiss();
         return this.items;
         
       });
     }else if(this.caso==4){//promotoria
       this.grupoidselected=this.navParams.get('grupo');
+      
       this.up=this.navParams.get('up');
       this.grupo=this.navParams.get('gruponombre');
-      
+      this.rutaimg=this.file.dataDirectory + `${this.up}/${this.grupoidselected.toString()}`;
+console.log(this.rutaimg);
       this.formulario.preguntasgrupo(this.grupoidselected).then(preguntasg=>{
-        if (preguntasg==null){
-          this.prueba="la variable retorno null";
-        }else if(preguntasg== "undefined"){
-          this.prueba="la variable retorno indefinida";
-        } else{
-          this.items=preguntasg;
-        }
+          this.items=preguntasg;        
         let r=[];
         this.items.forEach(element => {
           r.push(element.codigo);
@@ -119,11 +111,9 @@ grupoidselected:any;
         }).
         then(()=>{
           this.final=this.items;          
-          this.prueba=JSON.stringify(this.items);
-          this.prueba3=JSON.stringify(this.final);
-          
           loading.dismiss();
-          return this.items, this.prueba, this.resp, this.final;          
+          this.prueba2=JSON.stringify(this.final);
+          return this.final;
         });
 
   
@@ -132,8 +122,6 @@ grupoidselected:any;
   }
 }
 
-  asignarRespuestas(){
-    }
 
   guardar3001(valor ,preguntaid, respcodigo) {
     this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid,valor.codigo, valor.valor, valor.valor);
@@ -156,27 +144,30 @@ this.prueba2.push({up: this.up, grupo: this.grupoidselected, codigopararespuesta
 this.prueba2=JSON.stringify(this.prueba2);
 }
 
-
+guardarfecha(valor ,preguntaid, respcodigo, $event){
+  this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid,valor.codigo, valor.valor, $event.year+'-'+$event.month+'-'+$event.day);
+}
 
  guardar3006(valor ,preguntaid, respcodigo, respuestafinal) {
   this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid,valor.codigo, valor.valor, respuestafinal);
 }
+guardar3006p(valor ,preguntaid, respcodigo, respuestafinal) {
+  console.log(this.up, this.grupoidselected, respcodigo, preguntaid,valor.codigo, valor.valor, respuestafinal);
+}
+
+pruebafecha($event) {
+  console.log(JSON.stringify($event));
+  console.log($event.year+'-'+$event.month+'-'+$event.day);
+}
+
+
 
 guardarobservacion(preguntaid, respcodigo, observacion) {
 //  this.formulario.guardarobservacion(this.up, this.grupoidselected, respcodigo, preguntaid, observacion);
 }
 
   mostrargrupos(tipop, upva){
-      this.formulario.gruposbase(tipop).then(gps=>{
-        if (gps==null){
-          this.items="la variable retorno null";
-        }else if(gps== "undefined"){
-          this.items="la variable retorno indefinida";
-          
-        } else{
-
-          this.prueba=JSON.stringify(gps);
-        }
+      this.formulario.gruposbase(tipop).then(gps=>{        
         this.navCtrl.push(FormulariosPage, {
           caso: 3,tipo: tipop, up: upva
         });
@@ -185,15 +176,6 @@ guardarobservacion(preguntaid, respcodigo, observacion) {
 
   mostrarpreguntas(grupoid, nbre){
     this.formulario.preguntasgrupo(grupoid).then(preguntasg=>{
-      if (preguntasg==null){
-        this.prueba="la variable retorno null";
-      }else if(preguntasg== "undefined"){
-        this.prueba="la variable retorno indefinida";
-        
-      } else{
-
-        this.prueba=JSON.stringify(preguntasg);
-      }
       this.navCtrl.push(FormulariosPage, {
         caso: 4, grupo: grupoid , up: this.up, gruponombre: nbre
       });
@@ -215,11 +197,11 @@ guardarobservacion(preguntaid, respcodigo, observacion) {
 }
 
 
-presentConfirm() {
+presentConfirm(codigo, respcodigo) {
   
       let targetPath = this.file.externalDataDirectory;
       let nombrecarpetapadre = 'OC21';// unidad productiva 
-      let idgrupo = 1;
+      let idgrupo = codigo;
   
       console.log(this.file.externalCacheDirectory);
       let alert = this.alertCtrl.create({
@@ -236,7 +218,7 @@ presentConfirm() {
           {
             text: 'Camara',
             handler: () => {
-              return this.getPicture();
+              return this.getPicture(codigo, respcodigo);
   
             }
           }
@@ -245,7 +227,7 @@ presentConfirm() {
       alert.present();
     }
 
-    getPicture() {
+    getPicture(codigo, respcodigo) {
       let options: CameraOptions = {
         quality: 100,
         destinationType: this.camera.DestinationType.FILE_URI,
@@ -255,9 +237,9 @@ presentConfirm() {
         correctOrientation: true
       }
       let targetPath = this.file.externalDataDirectory;
-      let nombrecarpetapadre = 'OC21';// unidad productiva 
-      let idgrupo = 2;
-      let preguntaid = 1;
+      let nombrecarpetapadre = this.up;// unidad productiva 
+      let idgrupo = this.grupoidselected;
+      let preguntaid = codigo;
       
   
       this.camera.getPicture(options).then(imageData => {
@@ -267,9 +249,12 @@ presentConfirm() {
           return this.file.createDir(targetPath + `/${nombrecarpetapadre}`, idgrupo.toString(), false).then(() => {
           }, () => { });
         }).then(() => {
-      return this.file.copyFile(this.file.externalCacheDirectory,imageData.replace(this.file.externalCacheDirectory, ""),
-            targetPath + `/${nombrecarpetapadre}/${idgrupo.toString()}`,
-            imageData.replace(this.file.externalCacheDirectory, "")).then(()=>{}, ()=> {});
+      return this.file.copyFile(
+        this.file.externalCacheDirectory,imageData.replace(this.file.externalCacheDirectory, ""),
+        targetPath + `/${nombrecarpetapadre}/${idgrupo.toString()}`,
+            imageData.replace(this.file.externalCacheDirectory, "")).then(()=>{
+              this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imageData.replace(this.file.externalCacheDirectory, ""));
+            }, ()=> {});
         }).then((ok
         )=>{
           this.file.removeFile(this.file.externalCacheDirectory, imageData.replace(this.file.externalCacheDirectory, ""
@@ -299,5 +284,9 @@ presentConfirm() {
       .catch(error => {
         console.error(error);
       });
+  }
+
+  imagen(imgr){
+    return `data:image/jpeg;base64,${imgr}`;
   }
 }

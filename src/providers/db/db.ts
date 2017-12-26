@@ -126,6 +126,7 @@ private createTables(){
                 estado INTEGER,
                 requerido INTEGER,
                 codigorespuesta INTEGER,
+                archivo INTEGER,
                 FOREIGN KEY(grupoid) REFERENCES grupos(idgrupobase)
               );`,{} )
           }).then(()=>{
@@ -150,7 +151,8 @@ private createTables(){
                     codigorespuesta TEXT,
                     valorrespuesta TEXT,
                     valor TEXT,
-                    observacion TEXT
+                    observacion TEXT,
+                    ruta TEXT
 
 
                   );`,{} )
@@ -841,6 +843,7 @@ respuestasporpregunta(pregunta){
           let todo = data.rows.item(i);
           todo.respuesta=false;
           todo.observacion='';
+          todo.ruta='';
           todos.push(todo);
         }
       }else{
@@ -985,6 +988,43 @@ guardarobservacion(unidadp, grup, respuestascodigo, preguntaid , observacion){
           return this.database.executeSql(
                `UPDATE respuestasguardadas SET observacion = (?) WHERE id=${idseleccion} ;`, 
              [observacion]);
+        }
+    })
+    }); 
+  
+}
+
+guardarimagen(unidadp, grup, respuestascodigo, preguntaid , ruta){
+  let up= unidadp;
+  let gr=grup;
+  let pr=preguntaid;
+
+  return this.isReady()
+  .then(()=>{
+    return this.database.executeSql
+    (`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND pregunta =(?) `, 
+    [up, gr, pr]).then((data)=>{
+      let id;
+      if(data.rows.length>0){
+        id = data.rows.item(0).id;
+      }else{
+        id=false;
+      }
+    return id;  
+    }).then((idseleccion)=>{
+
+      if (idseleccion==false){
+
+        return this.database.executeSql(
+          `INSERT INTO respuestasguardadas 
+          (unidadproductiva, grupo, respuestascodigo ,pregunta, ruta )
+          VALUES (?, ?, ?, ?, ?);`, 
+        [unidadp, grup, respuestascodigo, preguntaid , ruta]);
+ 
+        }else{
+          return this.database.executeSql(
+               `UPDATE respuestasguardadas SET ruta = (?) WHERE id=${idseleccion} ;`, 
+             [ruta]);
         }
     })
     }); 
