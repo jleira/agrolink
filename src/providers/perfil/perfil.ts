@@ -19,7 +19,8 @@ export class PerfilProvider {
       
               this.authHttp.get(`${SERVER_URL}/api/users/findMyData/`).subscribe(
                     data => this.guardarinfo(data.json()),
-                    err => console.log(err)
+                    err =>{console.log(err);
+                    return this.getinfo();}
                   );
           })
   };

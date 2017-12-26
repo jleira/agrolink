@@ -6,6 +6,7 @@ import {SERVER_URL} from "../../config";
 import {JwtHelper, AuthHttp,  AuthConfig} from "angular2-jwt";
 import { DbProvider } from '../db/db';
 import {Storage} from "@ionic/storage";
+import { retry } from 'rxjs/operator/retry';
 
 @Injectable()
 export class UproductivaProvider {
@@ -129,7 +130,7 @@ descargarunidadesproductivas(){
     this.authHttp.get(`${SERVER_URL}/api/unidadesproductivas/`).subscribe(
       data => {
         if(!(data.json()==null)){
-              this.guardarunidades(data.json());               
+              this.guardarunidades(data.json());
           }
       }
     );
@@ -154,7 +155,8 @@ guardarunidades(value){
       long,
       lat,
       element['productor']['idProductor']
-    )
+    ).then(
+      (ok)=>{
         this.validarproductor(element['productor']['idProductor']).then(
           (data:any)=>{
             if(data==0){
@@ -164,15 +166,26 @@ guardarunidades(value){
                 element['productor']['identificacion'],
                 element['productor']['telefono'],
                 element['productor']['annoIngreso'],
-                element['productor']['ultimaAplicacion']);
+                element['productor']['ultimaAplicacion']).then(
+                  (ok)=>{},
+                  (err)=>{}
+                );
             }
           }
         )
+      },
+    (err)=>{}
+    );
+
       });
     }
 
     validarproductor(idproductor: number){
-      return this.database.existeproductor(idproductor);
+      return this.database.existeproductor(idproductor).then(
+        (ok)=>{
+      return ok},
+    (err)=>{}
+      );
     }
 
     paises2(){

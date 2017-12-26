@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { IonicPage, LoadingController, ToastController} from 'ionic-angular';
+import { IonicPage, LoadingController, ToastController } from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
-import { PerfilProvider} from '../../providers/perfil/perfil';
+import { PerfilProvider } from '../../providers/perfil/perfil';
 import { RegionProvider } from '../../providers/region/region';
 import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
@@ -13,18 +13,18 @@ import { FormulariosProvider } from '../../providers/formularios/formularios';
 })
 export class LoginPage {
   loading: any;
-  loginData = { username:'', password:''};
+  loginData = { username: '', password: '' };
   data: any;
 
   constructor(
     public authService: AuthProvider,
-    public loadingCtrl: LoadingController, 
+    public loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
     public perfil: PerfilProvider,
     public region: RegionProvider,
     public uproductiva: UproductivaProvider,
     public formularios: FormulariosProvider
-) {
+  ) {
   }
   login(value: any) {
     let loading = this.loadingCtrl.create({
@@ -34,23 +34,23 @@ export class LoginPage {
 
     loading.present();
     this.authService
-      .login(value).finally(()=>{
+      .login(value).finally(() => {
         loading.dismiss();
       })
-      .subscribe(()=>{
+      .subscribe(() => {
         this.perfil.getinfo();
-       this.region.obtenerpaises();
- //       this.region.obtenerdepartamentos();
- //      this.region.obtenermunicipios();
-//       this.region.obtenerregiones();
-  //      this.uproductiva.descargarunidadesproductivas();
-//        this.formularios.descargarformularios();
-        
+        this.region.obtenerpaises();
+        this.region.obtenerdepartamentos();
+        this.region.obtenermunicipios();
+        this.region.obtenerregiones();
+        this.uproductiva.descargarunidadesproductivas();
+       this.formularios.descargarformularios();
+
       },
-        (err) => {
-          this.handleError(err);
-        });
-        
+      (err) => {
+        this.handleError(err);
+      });
+
   }
   handleError(error: any) {
     let message: string;
@@ -70,6 +70,6 @@ export class LoginPage {
     toast.present();
   }
 
- 
+
 
 }

@@ -3,7 +3,7 @@ import { Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 import {ReplaySubject, Observable} from "rxjs";
 import {Storage} from "@ionic/storage";
-import {JwtHelper, AuthHttp} from "angular2-jwt";
+import {JwtHelper} from "angular2-jwt";
 import {SERVER_URL} from "../../config";
 import 'rxjs/Rx';
 import 'rxjs/add/operator/map';
@@ -22,16 +22,13 @@ let apiUrl = SERVER_URL;
 export class AuthProvider {
   authUser = new ReplaySubject<any>(1);
   
-  constructor(public http: Http, private readonly authHttp: AuthHttp,
+  constructor(public http: Http,
     private readonly storage: Storage,
     private readonly jwtHelper: JwtHelper,
     public database:DbProvider) {}
     checkLogin() {
-      this.storage.get('jwt').then(jwt => {
-        this.database.creartablas().then(()=>{},()=>{}).then(()=>
-         { this.authUser.next(jwt);
-      });
-
+      this.storage.get('jwt').then(jwt => {        
+          this.authUser.next(jwt);          
       });
 /* 
         if (jwt && !this.jwtHelper.isTokenExpired(jwt)) {
@@ -56,11 +53,13 @@ export class AuthProvider {
     }
     private handleJwtResponse(jwt: string) {
       return this.storage.set('jwt', jwt)
-        .then(() => this.authUser.next(jwt))
+        .then(() => {this.authUser.next(jwt);
+        this.database.creartablas().then(()=>{},()=>{});
+      })
         .then(() => jwt);
     }
     logout() {
-      this.database.limpiardb().then((ok)=>{console.log('borrado',JSON.stringify(ok)),(err)=>{console.log('no borrado',JSON.stringify(err))} });
+      this.database.limpiardb().then((ok)=>{console.log(JSON.stringify(ok))},()=>{} );
       this.storage.remove('jwt').then(() => this.authUser.next(null));
       this.storage.remove('nombre');
       this.storage.remove('identificador');

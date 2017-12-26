@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
 import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
 import { observeOn } from 'rxjs/operators/observeOn';
@@ -20,6 +20,7 @@ import { File, DirectoryEntry } from '@ionic-native/file';
   templateUrl: 'formularios.html',
 })
 export class FormulariosPage {
+  loading: any;
 caso:any;
 items:any;
 respuestas;
@@ -41,21 +42,34 @@ grupoidselected:any;
     public uproductiva: UproductivaProvider,
     public formulario: FormulariosProvider,
     private camera: Camera, 
-    public alertCtrl: AlertController, 
+    public alertCtrl: AlertController,
+    public loadingCtrl: LoadingController, 
     private file: File) {
     this.caso=navParams.get('caso');
    }
 
   ionViewDidLoad() {
     this.prueba=[];
+    let loading = this.loadingCtrl.create({
+      spinner: 'bubbles',
+      content: 'Cargando informacion...'
+    });
+    loading.present();
+
     if(this.caso==1){//auditoria
+  
+    
       this.uproductiva.llamaruproductivasap(1002).then((data:any)=>{
         this.items=data;
+        loading.dismiss();
      });  
     }else if(this.caso==2){//promotoria
        this.uproductiva.llamaruproductivasap(1001).then((data:any)=>{
        this.items=data;
-       return this.items;
+       loading.present();
+       
+       loading.dismiss();
+
      });
     }else if(this.caso==3){//auditoria
       this.up=this.navParams.get('up');
@@ -69,7 +83,9 @@ grupoidselected:any;
         } else{
           this.items=gps;
         }
+        loading.dismiss();
         return this.items;
+        
       });
     }else if(this.caso==4){//promotoria
       this.grupoidselected=this.navParams.get('grupo');
@@ -106,7 +122,7 @@ grupoidselected:any;
           this.prueba=JSON.stringify(this.items);
           this.prueba3=JSON.stringify(this.final);
           
-
+          loading.dismiss();
           return this.items, this.prueba, this.resp, this.final;          
         });
 

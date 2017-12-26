@@ -79,7 +79,7 @@ private createTables(){
         }).then(()=>{
   return this.database.executeSql(
           `CREATE TABLE IF NOT EXISTS unidades_productivas (
-            idUnidadProductiva TEXT,
+            idUnidadProductiva TEXT PRIMARY KEY,
             nombre TEXT,
             fechaIngreso TEXT,
             regionId INTEGER,
@@ -214,7 +214,7 @@ agregarproductor(id,nombre,identificacion,telefono,annoIngreso,UltimaAplicacion)
               return this.database.executeSql(`INSERT INTO productores 
                 (idProductor, nombre,identificacion,telefono,annoIngreso,ultimaAplicacion ) VALUES (?, ?,?,?,?,?);`, 
                 [id,nombre,identificacion,telefono,annoIngreso,UltimaAplicacion]);
-            }); 
+            });
 }
  agregarunidadproductiva(idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor){
             return this.isReady()
@@ -228,13 +228,13 @@ agregarproductor(id,nombre,identificacion,telefono,annoIngreso,UltimaAplicacion)
 existeproductor(id:number){ 
             return this.isReady(
             ).then(()=>{
-              return this.database.executeSql(`SELECT * FROM productores WHERE idProductor =  ${id}`, []).then((data)=>{
+              return this.database.executeSql(`SELECT idProductor FROM productores WHERE idProductor =  ${id}`, []).then((data)=>{
                 let decide;
-                if(data.rows.length){
+                if(data.rows.length>0){
                  decide=1;
-                 return decide;
+                }else{
+                  decide=0;
                 }
-               decide=0;
                return decide;
               })
             })

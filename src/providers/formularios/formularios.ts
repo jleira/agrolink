@@ -25,11 +25,12 @@ descargarformularios(){
   this.storage.get('jwt').then(jwt => {
 
     this.authHttp.get(`${SERVER_URL}/api/inquiries/findByPeriodoUser`).subscribe(
+
       data=>{
+//      console.log('iquieres',JSON.stringify(data.json()));      
         let ind=0;
         let tform;
-        let per;
-        
+        let per;        
         data.json().forEach(element => {
           ind=ind+1;
           if(element.cataTienCodigo==null){
@@ -61,14 +62,15 @@ descargarformularios(){
                    let preg=pr.pregunta.respCodigo;
                   let pregunt=pr.pregunta.codigo;
                   if(preg===null){
-                    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '');                    
+                    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '');
                   }else{
-                    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo);                    
+                    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo);
                     
                     this.authHttp.get(`${SERVER_URL}/api/answers/find/${pr.pregunta.respCodigo.codigo}`).subscribe(
                       respuestas=>{
                         respuestas.json().valores.forEach(resp => {
-                          this.database.guardarrespuesta(resp.codigo, resp.nombre, resp.valor, resp.tipoDato, pregunt, respuestas.json().codigo);
+                          this.database.guardarrespuesta(resp.codigo, resp.nombre, resp.valor, resp.tipoDato, pregunt, respuestas.json().codigo).then(
+                            (ok)=>{console.log('ok',JSON.stringify(ok))},(orr)=>{console.log('orr',JSON.stringify(orr))});
                         });
                       }
                     );

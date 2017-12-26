@@ -20,18 +20,20 @@ export class RegionProvider {
   obtenerpaises(){
     this.storage.get('jwt').then(jwt => {  
               this.authHttp.get(`${SERVER_URL}/api/pais/`).subscribe(
-                  data =>{ 
+                  data =>{
                   if(!(data.json()==null)){
                     this.guardarpais(data.json())
-                  }}
+                  }},(err)=>{}
                   );
           })
   };
 
-  guardarpais(value){
-    
+  guardarpais(value){    
   value.forEach(element => {
-   this.database.agregarregion(1,element['idPais'],element['nombre'],null,null);
+   this.database.agregarregion(1,element['idPais'],element['nombre'],null,null).then(
+     (ok)=>{},
+    (err)=>{}
+  );
   });
   }
 
@@ -40,9 +42,8 @@ export class RegionProvider {
               this.authHttp.get(`${SERVER_URL}/api/departamentos/`).subscribe(
                     data =>{ 
                       if(!(data.json()==null)){
-                        console.log(data);
                         this.guardardepartamento(data.json());
-                      }});
+                      }},()=>{this.obtenerdepartamentos();});
           })
   };
   guardardepartamento(value){
@@ -55,7 +56,6 @@ export class RegionProvider {
               this.authHttp.get(`${SERVER_URL}/api/municipios/findAllActive/`).subscribe(
                     data =>{ 
                       if(!(data.json()==null)){
-                        console.log(data);
                         this.guardarmunicipio(data.json())
                       }});
     })
@@ -71,9 +71,9 @@ export class RegionProvider {
               this.authHttp.get(`${SERVER_URL}/api/regiones/findAllActive/`).subscribe(
                     data =>{ 
                       if(!(data.json()==null)){
-                        console.log(data);
+                      //  console.log(data);
                      this.guardarregion(data.json())
-                    }});
+                    }},()=>{this.obtenerregiones();});
           })
   };
   guardarregion(value){
