@@ -1023,12 +1023,24 @@ guardarimagen(unidadp, grup, respuestascodigo, preguntaid , ruta, tipof){
           `INSERT INTO respuestasguardadas 
           (unidadproductiva, grupo, respuestascodigo ,pregunta, ruta, tipoformulario )
           VALUES (?, ?, ?, ?, ?, ?);`, 
-        [unidadp, grup, respuestascodigo, preguntaid , ruta, tipop]);
+        [unidadp, grup, respuestascodigo, preguntaid , ruta, tipop]).then(
+          (ok)=>{
+            return ok;
+          },
+        (err)=>{
+          return err;
+        });
  
         }else{
           return this.database.executeSql(
                `UPDATE respuestasguardadas SET ruta = (?) WHERE id=${idseleccion} ;`, 
-             [ruta]);
+             [ruta]).then(
+              (ok)=>{
+                return ok;
+              },
+            (err)=>{
+              return err;
+            });;
         }
     })
     }); 

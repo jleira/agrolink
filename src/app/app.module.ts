@@ -11,6 +11,7 @@ import { UnidadproductivaPage } from '../pages/unidadproductiva/unidadproductiva
 import { UpdetallesPage} from '../pages/updetalles/updetalles';
 import { FiltroupPage} from '../pages/filtroup/filtroup';
 import { FormulariosPage} from '../pages/formularios/formularios';
+import { ImagePage} from '../pages/formularios/imagenes';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -52,7 +53,8 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     UnidadproductivaPage,
     UpdetallesPage,
     FiltroupPage,
-    FormulariosPage
+    FormulariosPage,
+    ImagePage
     ],
   imports: [
     BrowserModule,
@@ -75,7 +77,8 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     UnidadproductivaPage,
     UpdetallesPage,
     FiltroupPage,
-    FormulariosPage
+    FormulariosPage,
+    ImagePage
   ],
   providers: [
     StatusBar,

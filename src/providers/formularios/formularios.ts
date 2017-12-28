@@ -144,12 +144,18 @@ respuestasporpreguntas(preguntas, up, grupo, tipo){
             }else if(respuestas.tipo==210004){
               respuestas.ruta=valores.ruta;
               let arrayvalores;
-              arrayvalores=valores.valor.split('_');
-              if(arrayvalores.indexOf(respuestas.valor.toString())!=-1){
-                respuestas.respuesta=true;
+              if(valores.valor){
+                arrayvalores=valores.valor.split('_');
+                if(arrayvalores.indexOf(respuestas.valor.toString())!=-1){
+                  respuestas.respuesta=true;
+                }else{
+                  respuestas.respuesta=false;
+                }
               }else{
                 respuestas.respuesta=false;
-              }
+
+              };
+
             }else{
               respuestas.ruta=valores.ruta;
               
@@ -178,7 +184,10 @@ guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion, tip
 this.database.guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion, tipof);
 }
 guardarimagen(up, grupoidselected, respcodigo, preguntaid, imagen, tipof){
-  this.database.guardarimagen(up, grupoidselected, respcodigo, preguntaid, imagen, tipof);
+ return this.database.guardarimagen(up, grupoidselected, respcodigo, preguntaid, imagen, tipof).then((dt)=>{
+  this.items=dt;    
+  return this.items;
+});
   }
 
 
