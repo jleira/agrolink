@@ -85,16 +85,6 @@
   <div *ngIf="caso == 4">
 
 
-    <h2>
-      esta es la prueba2
-    </h2>
-    <p> {{prueba2}}
-    </p>
-    <h2>estya es la prueba3</h2>
-    <p> {{prueba3}}
-    </p>
-
-
 
     <div *ngFor="let item of final">
 
@@ -118,9 +108,26 @@
                 <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar" [(ngModel)]="opciones.respuesta" (ionChange)="guardarfecha(opciones, item.codigo, item.codigorespuesta, $event)"></ion-datetime>
               </ion-item>
               <div *ngIf="item.archivo===1">
-                <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">Adjuntar imagen..</a>
-                <p>{{rutaimg+'/'+opciones.ruta}}</p>
-                <img width="80" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
+                  <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>                              
+
+                <ion-item *ngIf="opciones.ruta">
+                    <ion-avatar item-start>
+                        <img width="200" height="80" (click)="verimagen('http://cdn.imagentv.com/resources/defaults/v2/imagen_default300.png')" *ngIf="opciones.ruta" src="http://cdn.imagentv.com/resources/defaults/v2/imagen_default300.png" />
+                      </ion-avatar>
+                      
+                      <ion-grid>
+                          <ion-row>
+                              <ion-col col-8>
+                                  <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">cambiar imagen</a>                              
+                                </ion-col>
+                              <ion-col col-4>
+                                  <a (click)="eliminarimagen(item.codigo, item.codigorespuesta)">Eliminar</a>
+
+                              </ion-col>
+
+                            </ion-row>
+                        </ion-grid>
+                </ion-item>
               </div>
 
             </div>
@@ -132,7 +139,7 @@
               <div *ngIf="item.archivo===1">
                 <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">Adjuntar imagen..</a>
                 <p>{{rutaimg+'/'+opciones.ruta}}</p>
-                <img width="80" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
+                <img width="80%" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
               </div>
             </div>
 
@@ -149,7 +156,7 @@
               <div *ngIf="item.archivo===1">
                 <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">Adjuntar imagen..</a>
                 <p>{{rutaimg+'/'+opciones.ruta}}</p>
-                <img width="80" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
+                <img width="80%" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
               </div>
 
             </div>
@@ -161,7 +168,7 @@
               <div *ngIf="item.archivo===1">
                 <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">Adjuntar imagen..</a>
                 <p>{{rutaimg+'/'+opciones.ruta}}</p>
-                <img width="80" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
+                <img width="80%" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
               </div>
             </div>
 
@@ -178,7 +185,7 @@
               <div *ngIf="item.archivo===1">
                 <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">Adjuntar imagen..</a>
                 <p>{{rutaimg+'/'+opciones.ruta}}</p>
-                <img width="80" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
+                <img width="80%" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
               </div>
 
             </div>
@@ -189,8 +196,7 @@
               </ion-item>
               <div *ngIf="item.archivo===1">
                 <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">Adjuntar imagen..</a>
-                <p>{{rutaimg+'/'+opciones.ruta}}</p>
-                <img width="80" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
+                <img width="80%" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
               </div>
             </div>
           </div>
@@ -198,14 +204,22 @@
       </div>
 
       <div *ngIf="item.tipo==3001">
-        <!--sleeccion multiple con unica respuesta sin observacion -->
+
         <ion-item>
           <ion-label style="color:#000000">{{item.enunciado}}</ion-label>
           <ion-select (ionChange)="guardar3001($event, item.codigo ,item.codigorespuesta)">
             <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
           </ion-select>
         </ion-item>
-
+        <div *ngIf="item.archivo===1">
+            <div *ngFor="let opciones of item.respuestas;  let i = index">
+                <div *ngIf="i==0">  
+          <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">Adjuntar imagen..</a>
+          <p>{{rutaimg+'/'+opciones.ruta}}</p>
+          <img width="80%" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
+        </div>
+      </div>
+        </div>
       </div>
 
       <div *ngIf="item.tipo==3002">
@@ -213,10 +227,18 @@
         <ion-item>
           <ion-label style="color:black">{{item.enunciado}}</ion-label>
           <ion-select multiple="true" (ionChange)="guardar3002($event, item.codigo, item.codigorespuesta)">
-            <!--(ionChange)="onChange($event, preguntas.id)"-->
             <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
           </ion-select>
         </ion-item>
+        <div *ngIf="item.archivo===1">
+            <div *ngFor="let opciones of item.respuestas;  let i = index">
+                <div *ngIf="i==0">  
+          <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">Adjuntar imagen..</a>
+          <p>{{rutaimg+'/'+opciones.ruta}}</p>
+          <img width="80%" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
+        </div>
+      </div>
+        </div>
       </div>
 
       <div *ngIf="item.tipo==3004">
@@ -234,6 +256,11 @@
                   <ion-input type="text" [(ngModel)]="opciones.observacion" placeholder="observacion" (change)="guardarobservacion( item.codigo, item.codigorespuesta,opciones.observacion )">
                   </ion-input>
                 </ion-item>
+                <div *ngIf="item.archivo===1">
+                  <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">Adjuntar imagen..</a>
+                  <p>{{rutaimg+'/'+opciones.ruta}}</p>
+                  <img width="80%" height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
+                </div>
                 </div>
 
         </div>
@@ -241,7 +268,7 @@
 
       <div *ngIf="item.tipo==3005">
           <!--seleccion nmultiple con multiple respuesta y abierta -->
-          <ion-item>
+          <ion-item no-lines>
             <ion-label style="color:black">{{item.enunciado}}</ion-label>
             <ion-select multiple="true" (ionChange)="guardar3002($event, item.codigo, item.codigorespuesta)">
               <!--(ionChange)="onChange($event, preguntas.id)"-->
@@ -254,6 +281,12 @@
                       <ion-input type="text" [(ngModel)]="opciones.observacion" placeholder="observacion" (change)="guardarobservacion( item.codigo, item.codigorespuesta,opciones.observacion )">
                       </ion-input>
                     </ion-item>
+                    <div *ngIf="item.archivo===1">
+                      <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">Adjuntar imagen..</a>
+                      <p>{{rutaimg+'/'+opciones.ruta}}</p>
+                      <img width="  " height="80" *ngIf="opciones.ruta" [src]="rutaimg+'/'+opciones.ruta" />
+                    </div>
+
                     </div>
     
             </div>

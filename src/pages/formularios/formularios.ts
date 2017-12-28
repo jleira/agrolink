@@ -157,8 +157,6 @@ export class FormulariosPage {
     this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, codigosrespuestas, valoresrespuesta, valoresrespuesta, this.tipocuestionario);
   }
 
-
-
   guardarobservacion(preguntaid, respcodigo, observacion) {
       this.formulario.guardarobservacion(this.up, this.grupoidselected, respcodigo, preguntaid, observacion, this.tipocuestionario);
   }
@@ -182,20 +180,6 @@ export class FormulariosPage {
         caso: 4, grupo: grupoid, up: this.up, gruponombre: nbre, tipo: this.navParams.get('tipo')
       });
     });
-  }
-
-  llamar2() {
-    // this.formulario.(this.up, this.grupoidselected).then(data=>{
-    //   this.prueba2=data ;
-    //   return this.prueba2;
-    // });
-    // this.prueba3=[];
-    // this.items.forEach(element => {
-    //   this.prueba3.push(element.respuestas);
-    // });
-    // this.prueba3=JSON.stringify(this.prueba3);
-    //
-
   }
 
 
@@ -235,8 +219,7 @@ export class FormulariosPage {
       destinationType: this.camera.DestinationType.FILE_URI,
       sourceType: this.camera.PictureSourceType.CAMERA,
       encodingType: this.camera.EncodingType.PNG,
-      mediaType: this.camera.MediaType.PICTURE,
-      correctOrientation: true
+      mediaType: this.camera.MediaType.PICTURE
     }
     let targetPath = this.file.externalDataDirectory;
     let nombrecarpetapadre = this.up;// unidad productiva 
@@ -337,6 +320,11 @@ export class FormulariosPage {
     var blob = new Blob(byteArrays, { type: contentType });
     return blob;
   }
+verimagen(link){
 
-
+}
+eliminarimagen(codigo, respcodigo){
+  let preguntaid = codigo;
+  this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, '', this.tipocuestionario);
+}
 }

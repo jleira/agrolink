@@ -46,6 +46,10 @@ export class HomePage {
     );
 }
 
+abririmagen(ruta){
+  console.log(ruta);
+}
+
   openPage(caso) {
     if (caso==1){
       this.navCtrl.push(FormulariosPage,{caso:1});
