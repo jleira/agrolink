@@ -44,6 +44,7 @@ export class LoginPage {
         this.region.obtenermunicipios();
         this.region.obtenerregiones();
         this.uproductiva.descargarunidadesproductivas();
+        this.uproductiva.descargarunidadesproductivasasignadas();
        this.formularios.descargarformularios();
 
       },

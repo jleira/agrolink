@@ -26,6 +26,7 @@ export class PerfilProvider {
   };
 
 guardarinfo(value){
+  this.storage.set('codigo', value['codigo']);
   this.storage.set('nombre', value['nombre']);
   this.storage.set('identificador', value['identificador']);
   this.storage.set('roll', value['roles']);

@@ -152,7 +152,8 @@ private createTables(){
                     valorrespuesta TEXT,
                     valor TEXT,
                     observacion TEXT,
-                    ruta TEXT
+                    ruta TEXT,
+                    tipoformulario INTEGER
 
 
                   );`,{} )
@@ -218,12 +219,13 @@ agregarproductor(id,nombre,identificacion,telefono,annoIngreso,UltimaAplicacion)
                 [id,nombre,identificacion,telefono,annoIngreso,UltimaAplicacion]);
             });
 }
- agregarunidadproductiva(idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor){
+ agregarunidadproductiva(idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor, tipo){
             return this.isReady()
             .then(()=>{
+              console.log('tipo q llega a db', tipo);
               return this.database.executeSql(`INSERT INTO unidades_productivas
                 (idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor, terminado, tipo ) VALUES (?, ?,?,?,?,?,?,?,?);`, 
-                [idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor,0, 1001]);
+                [idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor,0, tipo]);
             }); 
 }
 
@@ -247,7 +249,7 @@ existeproductor(id:number){
 todasuproductivasap(caso){
   return this.isReady()
     .then(()=>{
-      return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado, tipo from unidades_productivas WHERE tipo =  ${caso}`, []).then((data)=>{
+      return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado, tipo from unidades_productivas WHERE tipo IN (${caso},1003)`, []).then((data)=>{
           let todas = [];
           for(let i=0; i<data.rows.length; i++){
             let todo = data.rows.item(i);
@@ -260,7 +262,7 @@ todasuproductivasap(caso){
             todas.push(todo);
           }
           return todas;
-          })
+          },err => console.log('err',JSON.stringify(err)))
         })
 }
 
@@ -746,11 +748,11 @@ guardargrupo(idGrupoBase, nombre, posicion, id, textoAyuda){
       [idGrupoBase, nombre, posicion, id, textoAyuda]);
   }); 
 }
-guardarpregunta(codigo, enunciado, posicion, tipo, valorinicial, grupobase, requerido, codresp){
+guardarpregunta(codigo, enunciado, posicion, tipo, valorinicial, grupobase, requerido, codresp, archivo){
   return this.isReady()
   .then(()=>{
-    return this.database.executeSql(`INSERT INTO preguntas (codigo, enunciado, posicion, tipo, valorinicial, grupoid, requerido, codigorespuesta) VALUES (?, ?, ?, ?, ?, ?, ?, ?);`, 
-      [codigo, enunciado, posicion, tipo, valorinicial, grupobase, requerido, codresp]);
+    return this.database.executeSql(`INSERT INTO preguntas (codigo, enunciado, posicion, tipo, valorinicial, grupoid, requerido, codigorespuesta, archivo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`, 
+      [codigo, enunciado, posicion, tipo, valorinicial, grupobase, requerido, codresp, archivo]);
   }); 
 }
 guardarrespuesta(codigo, nombre, valor, tipo, preguntaid, codigorespuestapadre){
@@ -857,12 +859,13 @@ respuestasporpregunta(pregunta){
 
 }
 
-respuestasguardadas(up, grupo){
+respuestasguardadas(up, grupo, tipo){
   let upi=up;
   let grupoi=grupo;
+  let tipoe=tipo;
   return this.isReady(
   ).then(()=>{
-    return this.database.executeSql(`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?)`, [upi,grupoi]).then((data)=>{
+    return this.database.executeSql(`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND tipoformulario =(?)`, [upi,grupoi, tipo]).then((data)=>{
       let todos=[];
       if(data.rows.length){
         for (let i = 0; i < data.rows.length; i++) {
@@ -920,16 +923,16 @@ todasuproductivas2(){
         })
 }
 
-guardarrespuestaporpregunta(unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext){
+guardarrespuestaporpregunta(unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext, tipoformulario){
   let up= unidadp;
   let gr=grup;
   let pr=preguntaid;
-
+  let tipop=tipoformulario;
   return this.isReady()
   .then(()=>{
     return this.database.executeSql
-    (`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND pregunta =(?) `, 
-    [up, gr, pr]).then((data)=>{
+    (`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND pregunta =(?) AND tipoformulario =(?)`, 
+    [up, gr, pr, tipop]).then((data)=>{
       let id;
       if(data.rows.length>0){
         id = data.rows.item(0).id;
@@ -943,9 +946,9 @@ guardarrespuestaporpregunta(unidadp, grup, respuestascodigo, preguntaid ,codigor
 
         return this.database.executeSql(
           `INSERT INTO respuestasguardadas 
-          (unidadproductiva, grupo, respuestascodigo ,pregunta, codigorespuesta, valorrespuesta, valor, observacion )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?);`, 
-        [unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext, '']);
+          (unidadproductiva, grupo, respuestascodigo ,pregunta, codigorespuesta, valorrespuesta, valor, observacion , tipoformulario)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`, 
+        [unidadp, grup, respuestascodigo, preguntaid ,codigoresp , valorresp , valortext, '', tipoformulario]);
  
         }else{
           return this.database.executeSql(
@@ -957,16 +960,17 @@ guardarrespuestaporpregunta(unidadp, grup, respuestascodigo, preguntaid ,codigor
   
 }
 
-guardarobservacion(unidadp, grup, respuestascodigo, preguntaid , observacion){
+guardarobservacion(unidadp, grup, respuestascodigo, preguntaid , observacion, tipof){
   let up= unidadp;
   let gr=grup;
   let pr=preguntaid;
+  let tipop=tipof;
 
   return this.isReady()
   .then(()=>{
     return this.database.executeSql
-    (`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND pregunta =(?) `, 
-    [up, gr, pr]).then((data)=>{
+    (`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND pregunta =(?) AND tipoformulario =(?)`, 
+    [up, gr, pr, tipop]).then((data)=>{
       let id;
       if(data.rows.length>0){
         id = data.rows.item(0).id;
@@ -980,9 +984,9 @@ guardarobservacion(unidadp, grup, respuestascodigo, preguntaid , observacion){
 
         return this.database.executeSql(
           `INSERT INTO respuestasguardadas 
-          (unidadproductiva, grupo, respuestascodigo ,pregunta, observacion )
+          (unidadproductiva, grupo, respuestascodigo ,pregunta, observacion, tipoformulario )
           VALUES (?, ?, ?, ?, ?);`, 
-        [unidadp, grup, respuestascodigo, preguntaid , observacion]);
+        [unidadp, grup, respuestascodigo, preguntaid , observacion, tipop]);
  
         }else{
           return this.database.executeSql(
@@ -994,16 +998,16 @@ guardarobservacion(unidadp, grup, respuestascodigo, preguntaid , observacion){
   
 }
 
-guardarimagen(unidadp, grup, respuestascodigo, preguntaid , ruta){
+guardarimagen(unidadp, grup, respuestascodigo, preguntaid , ruta, tipof){
   let up= unidadp;
   let gr=grup;
   let pr=preguntaid;
-
+  let tipop=tipof;
   return this.isReady()
   .then(()=>{
     return this.database.executeSql
-    (`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND pregunta =(?) `, 
-    [up, gr, pr]).then((data)=>{
+    (`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND pregunta =(?)  AND tipoformulario =(?)`, 
+    [up, gr, pr, tipop]).then((data)=>{
       let id;
       if(data.rows.length>0){
         id = data.rows.item(0).id;
@@ -1017,9 +1021,9 @@ guardarimagen(unidadp, grup, respuestascodigo, preguntaid , ruta){
 
         return this.database.executeSql(
           `INSERT INTO respuestasguardadas 
-          (unidadproductiva, grupo, respuestascodigo ,pregunta, ruta )
-          VALUES (?, ?, ?, ?, ?);`, 
-        [unidadp, grup, respuestascodigo, preguntaid , ruta]);
+          (unidadproductiva, grupo, respuestascodigo ,pregunta, ruta, tipoformulario )
+          VALUES (?, ?, ?, ?, ?, ?);`, 
+        [unidadp, grup, respuestascodigo, preguntaid , ruta, tipop]);
  
         }else{
           return this.database.executeSql(

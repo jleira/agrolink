@@ -17,9 +17,7 @@ export class HomePage {
   productor:any;
   constructor(
     public navCtrl: NavController, 
-    private readonly storage: Storage 
-  ) {
-
+    private readonly storage: Storage  ) {
     this.storage.get('nombre').then( (decoded) =>
       {
         this.user = decoded;

@@ -50,6 +50,7 @@ descargarformularios(){
            let gid=element2.idGrupoBase;
             this.authHttp.get(`${SERVER_URL}/api/grupoBasesPreguntasBases/findByGroup/${element2.idGrupoBase}`).subscribe(
               preguntas=>{
+
                 preguntas.json().forEach(pr => {
                   let requerido;
                   if(pr.requerido)
@@ -58,19 +59,25 @@ descargarformularios(){
                   }else{
                     requerido=0;
                   }
-                  
+                  if(pr.pregunta.adjuntos===true){
+                    pr.pregunta.adjuntos=1;
+                  }
                    let preg=pr.pregunta.respCodigo;
                   let pregunt=pr.pregunta.codigo;
                   if(preg===null){
-                    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '');
+                    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '',pr.pregunta.adjuntos);
                   }else{
-                    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo);
+                    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo,pr.pregunta.adjuntos);
                     
                     this.authHttp.get(`${SERVER_URL}/api/answers/find/${pr.pregunta.respCodigo.codigo}`).subscribe(
                       respuestas=>{
                         respuestas.json().valores.forEach(resp => {
                           this.database.guardarrespuesta(resp.codigo, resp.nombre, resp.valor, resp.tipoDato, pregunt, respuestas.json().codigo).then(
-                            (ok)=>{console.log('ok',JSON.stringify(ok))},(orr)=>{console.log('orr',JSON.stringify(orr))});
+                            (ok)=>{
+                              //console.log('ok',JSON.stringify(ok))
+                            },(orr)=>{
+                            //  console.log('orr',JSON.stringify(orr))
+                            });
                         });
                       }
                     );
@@ -108,34 +115,34 @@ preguntasgrupo(grupo){
    return this.items;
    });
 }
-respuestasporpreguntas(preguntas, up, grupo){
+respuestasporpreguntas(preguntas, up, grupo, tipo){
 
    return this.database.respuestasporpregunta(preguntas).then(data=> {
   this.items=data;
   return this.items;
 }).then(()=>{
-  return this.database.respuestasguardadas(up, grupo).then((dt)=>{
+  return this.database.respuestasguardadas(up, grupo, tipo).then((dt)=>{
     let da:any;
     da=dt;
     this.items.forEach(respuestas => {
       if(da!=false){
  
-        respuestas.respuesta='esto es una prueb';
         
         da.forEach(valores => {
         
           if( respuestas.preguntaid==valores.pregunta){
             respuestas.observacion=valores.observacion;
-            if (respuestas.tipo==210001 || respuestas.tipo==2100003){
+            if (respuestas.tipo==210001){
+              respuestas.respuesta=valores.valor;
+              respuestas.ruta=valores.ruta;
+            }else if (respuestas.tipo==210003){
               respuestas.respuesta=valores.valor;
               respuestas.ruta=valores.ruta;
             }else if(respuestas.tipo==210002){
               respuestas.ruta=valores.ruta;
-
               respuestas.respuesta=parseInt(valores.valor);
             }else if(respuestas.tipo==210004){
               respuestas.ruta=valores.ruta;
-
               let arrayvalores;
               arrayvalores=valores.valor.split('_');
               if(arrayvalores.indexOf(respuestas.valor.toString())!=-1){
@@ -156,22 +163,22 @@ respuestasporpreguntas(preguntas, up, grupo){
   })
 });
 }
-respuestasguardada(up, grupo){
-  return this.database.respuestasguardadas(up, grupo).then((dt)=>{
+respuestasguardada(up, grupo, tipo){
+  return this.database.respuestasguardadas(up, grupo, tipo).then((dt)=>{
     this.items=dt;    
     return this.items;
   })
 }
 
-guardar3001(unidadp, grup, codigopararespuestas, preguntaid ,codigosdelasrespuestas , valoresdelasrespuestas , valortext){
-  this.database.guardarrespuestaporpregunta(unidadp, grup, codigopararespuestas, preguntaid ,codigosdelasrespuestas , valoresdelasrespuestas , valortext);
+guardar3001(unidadp, grup, codigopararespuestas, preguntaid ,codigosdelasrespuestas , valoresdelasrespuestas , valortext,tipoformulario){
+  this.database.guardarrespuestaporpregunta(unidadp, grup, codigopararespuestas, preguntaid ,codigosdelasrespuestas , valoresdelasrespuestas , valortext, tipoformulario);
 
 }
-guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion){
-this.database.guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion);
+guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion, tipof){
+this.database.guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion, tipof);
 }
-guardarimagen(up, grupoidselected, respcodigo, preguntaid, imagen){
-  this.database.guardarimagen(up, grupoidselected, respcodigo, preguntaid, imagen);
+guardarimagen(up, grupoidselected, respcodigo, preguntaid, imagen, tipof){
+  this.database.guardarimagen(up, grupoidselected, respcodigo, preguntaid, imagen, tipof);
   }
 
 
