@@ -222,7 +222,7 @@ agregarproductor(id,nombre,identificacion,telefono,annoIngreso,UltimaAplicacion)
  agregarunidadproductiva(idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor, tipo){
             return this.isReady()
             .then(()=>{
-              console.log('tipo q llega a db', tipo);
+              
               return this.database.executeSql(`INSERT INTO unidades_productivas
                 (idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor, terminado, tipo ) VALUES (?, ?,?,?,?,?,?,?,?);`, 
                 [idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor,0, tipo]);
@@ -262,7 +262,7 @@ todasuproductivasap(caso){
             todas.push(todo);
           }
           return todas;
-          },err => console.log('err',JSON.stringify(err)))
+          },err =>{})
         })
 }
 

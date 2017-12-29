@@ -15,12 +15,13 @@ export class PerfilProvider {
     private readonly storage: Storage
   ) { }
   getinfo(){
-    this.storage.get('jwt').then(jwt => {
+  return this.storage.get('jwt').then(jwt => {
       
-              this.authHttp.get(`${SERVER_URL}/api/users/findMyData/`).subscribe(
-                    data => this.guardarinfo(data.json()),
-                    err =>{console.log(err);
-                    return this.getinfo();}
+             return this.authHttp.get(`${SERVER_URL}/api/users/findMyData/`).subscribe(
+                    data =>{ 
+                    return this.guardarinfo(data.json())},
+                    err =>{
+                    }
                   );
           })
   };
@@ -34,5 +35,6 @@ guardarinfo(value){
   this.storage.set('tipo_id', value['cataTiidCodigo']['campo2']);
   this.storage.set('identificacion', value['numeroIdentificacion']);
   this.storage.set('mail', value['correoElectronico']);
+  return 'fiannle;';
 }
 }

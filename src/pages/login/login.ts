@@ -14,7 +14,7 @@ import { FormulariosProvider } from '../../providers/formularios/formularios';
 export class LoginPage {
   loading: any;
   loginData = { username: '', password: '' };
-  data: any;
+  data: any; 
 
   constructor(
     public authService: AuthProvider,
@@ -35,10 +35,13 @@ export class LoginPage {
     loading.present();
     this.authService
       .login(value).finally(() => {
-        loading.dismiss();
+        this.perfil.getinfo().then(()=>{
+          loading.dismiss();
+ 
+        });
       })
       .subscribe(() => {
-        this.perfil.getinfo();
+//        this.perfil.getinfo();
         this.region.obtenerpaises();
         this.region.obtenerdepartamentos();
         this.region.obtenermunicipios();

@@ -175,10 +175,7 @@ guardarunidades(value){
       }else if(element.auditor.codigo!=micodigo && element.promotor.codigo===micodigo){
         tipo =1001;
       }
-      console.log('auitor',element.auditor.codigo);
-      console.log('promotor',element.promotor.codigo);
-      console.log('este es mi codigo',micodigo);
-      console.log('tipo', tipo);
+  
 
       this.database.agregarunidadproductiva(
         element.unidadProductiva['idUnidadProductiva'],

@@ -64,23 +64,28 @@ descargarformularios(){
                   }
                    let preg=pr.pregunta.respCodigo;
                   let pregunt=pr.pregunta.codigo;
+                  console.log('codigo' ,pr.pregunta.cataTipeCodigo.codigo);
                   if(preg===null){
                     this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '',pr.pregunta.adjuntos);
                   }else{
                     this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo,pr.pregunta.adjuntos);
+                    if(pr.pregunta.cataTipeCodigo.codigo==3007){//pregunta tipo tabla
+                      console.log(' vamos a descargar la cabecera');
+                    }else{
+                      this.authHttp.get(`${SERVER_URL}/api/answers/find/${pr.pregunta.respCodigo.codigo}`).subscribe(
+                        respuestas=>{
+                          respuestas.json().valores.forEach(resp => {
+                            this.database.guardarrespuesta(resp.codigo, resp.nombre, resp.valor, resp.tipoDato, pregunt, respuestas.json().codigo).then(
+                              (ok)=>{
+                                //console.log('ok',JSON.stringify(ok))
+                              },(orr)=>{
+                              //  console.log('orr',JSON.stringify(orr))
+                              });
+                          });
+                        }
+                      );
+                    }
                     
-                    this.authHttp.get(`${SERVER_URL}/api/answers/find/${pr.pregunta.respCodigo.codigo}`).subscribe(
-                      respuestas=>{
-                        respuestas.json().valores.forEach(resp => {
-                          this.database.guardarrespuesta(resp.codigo, resp.nombre, resp.valor, resp.tipoDato, pregunt, respuestas.json().codigo).then(
-                            (ok)=>{
-                              //console.log('ok',JSON.stringify(ok))
-                            },(orr)=>{
-                            //  console.log('orr',JSON.stringify(orr))
-                            });
-                        });
-                      }
-                    );
 
                   }
                   
@@ -92,7 +97,6 @@ descargarformularios(){
 
         });
   }), (err)=>{
-    console.log(err);
   };
 
   });
