@@ -64,14 +64,23 @@ descargarformularios(){
                   }
                    let preg=pr.pregunta.respCodigo;
                   let pregunt=pr.pregunta.codigo;
-                  console.log('codigo' ,pr.pregunta.cataTipeCodigo.codigo);
+                  
                   if(preg===null){
+                    if(pr.pregunta.cataTipeCodigo.codigo===3007){//pregunta tipo tabla
+                      console.log(' vamos a descargar la cabecera',pr.pregunta.codigo);
+//http://localhost:10080/Agrolink/api/questions/findPreguntasOfTable/{codigoPreguntaTabla}
+this.authHttp.get(`${SERVER_URL}/api/questions/findPreguntasOfTable/${pr.pregunta.codigo}`).subscribe(
+  preguntatabla=>{
+    console.log(JSON.parse(atob(preguntatabla.json()['header']['cuerpo'])));
+  }
+);
+                    }
                     this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '',pr.pregunta.adjuntos);
+                    
                   }else{
-                    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo,pr.pregunta.adjuntos);
-                    if(pr.pregunta.cataTipeCodigo.codigo==3007){//pregunta tipo tabla
-                      console.log(' vamos a descargar la cabecera');
-                    }else{
+                   
+                      this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo,pr.pregunta.adjuntos);
+
                       this.authHttp.get(`${SERVER_URL}/api/answers/find/${pr.pregunta.respCodigo.codigo}`).subscribe(
                         respuestas=>{
                           respuestas.json().valores.forEach(resp => {
@@ -84,7 +93,8 @@ descargarformularios(){
                           });
                         }
                       );
-                    }
+                    
+                    
                     
 
                   }
