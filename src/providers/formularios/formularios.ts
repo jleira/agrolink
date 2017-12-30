@@ -66,20 +66,46 @@ descargarformularios(){
                   let pregunt=pr.pregunta.codigo;
                   
                   if(preg===null){
+                    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '',pr.pregunta.adjuntos, '');
+
                     if(pr.pregunta.cataTipeCodigo.codigo===3007){//pregunta tipo tabla
-                      console.log(' vamos a descargar la cabecera',pr.pregunta.codigo);
+
+                      console.log(' vamos por la pregunta');
 //http://localhost:10080/Agrolink/api/questions/findPreguntasOfTable/{codigoPreguntaTabla}
 this.authHttp.get(`${SERVER_URL}/api/questions/findPreguntasOfTable/${pr.pregunta.codigo}`).subscribe(
   preguntatabla=>{
-    console.log(JSON.parse(atob(preguntatabla.json()['header']['cuerpo'])));
+    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '',pr.pregunta.adjuntos, preguntatabla.json()['header']['cuerpo']);
+    //    console.log(JSON.parse(atob(preguntatabla.json()['header']['cuerpo'])));
+    console.log(preguntatabla.json());
+
+   preguntatabla.json().preguntaTabla.forEach(element => {
+//      console.log(`preguntapasreid: ${element.preguntaTablaId.codigoPreguntaPadre.codigo} - preguntaid: ${element.preguntaTablaId.codigoPregunta.codigo}
+ //     - enunciado: ${element.preguntaTablaId.codigoPregunta.enunciado} - fila: ${element.fila} - tipo: ${element.preguntaTablaId.codigoPregunta.cataTipeCodigo.codigo} 
+ //     -estado: 0 -requerido: ${element.preguntaTablaId.codigoPregunta.requerido} - codigorespuesta: ${element.preguntaTablaId.codigoPregunta.respCodigo.codigo}`);
+     
+      this.database.guardarpreguntatabla(
+        element.preguntaTablaId.codigoPreguntaPadre.codigo, 
+        element.preguntaTablaId.codigoPregunta.codigo, 
+        element.preguntaTablaId.codigoPregunta.enunciado, 
+        element.fila,
+        element.preguntaTablaId.codigoPregunta.cataTipeCodigo.codigo,
+        0, 
+        element.preguntaTablaId.codigoPregunta.requerido,
+        element.preguntaTablaId.codigoPregunta.respCodigo.codigo ).then(()=>{
+          element.preguntaTablaId.codigoPregunta.respCodigo.valores.forEach(respuestastabla => {
+            console.log('respuesta de pregunta: '+ element.preguntaTablaId.codigoPregunta.codigo,respuestastabla.codigo, respuestastabla.nombre ,
+            respuestastabla.valor, respuestastabla.valorConstante ,respuestastabla.tipoDato,element.preguntaTablaId.codigoPregunta.codigo,respuestastabla.respCodigo);
+          });
+        }
+        ) ;
+    });
+
   }
 );
                     }
-                    this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '',pr.pregunta.adjuntos);
-                    
                   }else{
                    
-                      this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo,pr.pregunta.adjuntos);
+                      this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo,pr.pregunta.adjuntos,'');
 
                       this.authHttp.get(`${SERVER_URL}/api/answers/find/${pr.pregunta.respCodigo.codigo}`).subscribe(
                         respuestas=>{
