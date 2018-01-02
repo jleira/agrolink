@@ -101,7 +101,26 @@ export class FormulariosPage {
         this.resp = r;
         return this.formulario.respuestasporpreguntas(this.resp, this.up, this.grupoidselected, this.tipocuestionario).then(data => {
           this.resp = data;
+
           this.items.forEach(element => {
+if(element.tipo==3007){
+  element.encabezado=JSON.parse(atob(element.encabezado));
+//  console.log(element.encabezado);
+this.formulario.preguntasconrespuestastabla(element.codigo).then((data)=>{
+  data.forEach(pregunta => {
+    return this.formulario.respuestastablas(pregunta.codigorespuesta).then((respu)=>{
+      element.respuestas=respu;
+      console.log(element);
+   }); 
+  });
+return this.items;  
+},(err)=>{
+  console.log(err);
+
+}).then((data)=>{
+
+});
+}
             let vr: any;
             this.resp.forEach(element2 => {
               if (element2.preguntaid == element.codigo) {

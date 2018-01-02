@@ -456,6 +456,29 @@
 
         </div>
       </div>
+      <div *ngIf="item.tipo==3007">
+        <!--tabla -->
+        <ion-grid>
+            <ion-row *ngFor="let encabezado of item.encabezado">
+                <ion-col *ngFor="let columnas of encabezado.columnas" >
+                    {{columnas.enunciado}}
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+        <ion-grid>
+            <ion-row >
+                <ion-col *ngFor="let respuestas of item.respuestas"  >
+                    <ion-input placeholder="{{respuestas.codigo}}" > </ion-input>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+        
+        <ion-item no-lines>
+          {{item.tipo}}
+       </ion-item>
+      </div>
+
+
 
     </div>
 

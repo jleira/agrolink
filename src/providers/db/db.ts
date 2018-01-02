@@ -171,6 +171,18 @@ export class DbProvider {
                 requerido INTEGER,
                 codigorespuesta INTEGER
                     );`, {})
+      }).then(() => {
+        return this.database.executeSql(
+          `CREATE TABLE IF NOT EXISTS respuestastabla (
+            codigo INTEGER,
+            nombre TEXT,
+            valor INTEGER,
+            constante TEXT,
+            tipo INTEGER,
+            preguntaid INTEGER,
+            codigorespuestapadre INTEGER,
+            FOREIGN KEY(preguntaid) REFERENCES preguntastabla(preguntaid)
+                    );`, {})
       }).catch((err) => console.log("error detected creating tables", err));
   }
   private isReady() {
@@ -776,6 +788,19 @@ export class DbProvider {
       });
   }
 
+  
+  guardarrespuestatabla(codigo, nombre, valor, constante, tipo, preguntaid, codigorespuestapadre) {
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(`INSERT INTO respuestastabla (codigo, nombre, valor, constante, tipo, preguntaid, codigorespuestapadre) VALUES (?, ?, ?, ?, ?, ?, ?);`,
+          [codigo, nombre, valor, constante, tipo, preguntaid, codigorespuestapadre]);
+      });
+  }
+
+
+
+
+
   guardarprueba() {
     return this.isReady()
       .then(() => {
@@ -1110,5 +1135,48 @@ export class DbProvider {
       });
   }
 //                 INTEGER,
+preguntastablaporid(preguntaid){
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM preguntastabla WHERE preguntapadre = ${preguntaid}`, []).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todo.respuesta=[];
+            todos.push(todo);
+          }
+        } else {
+          let todo;
+          todo = false;
+          todos = todo;
+        }
+        return todos;
+      })
+    })
+
+}
+respuestasapreguntastablas(codigorespuestapadre){
+  return this.isReady(
+  ).then(() => {
+    return this.database.executeSql(`SELECT * FROM respuestastabla WHERE codigorespuestapadre = ${codigorespuestapadre}`, []).then((data) => {
+      let todos = [];
+      if (data.rows.length) {
+        for (let i = 0; i < data.rows.length; i++) {
+          let todo = data.rows.item(i);
+          todo.respuesta=[];
+          todos.push(todo);
+        }
+      } else {
+        let todo;
+        todo = false;
+        todos = todo;
+      }
+      return todos;
+    })
+  })
+
+}
+
 
 }
