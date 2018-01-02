@@ -7,6 +7,7 @@ import { SERVER_URL } from "../../config";
 import { Storage } from "@ionic/storage";
 import { DbProvider } from '../db/db';
 
+
 @Injectable()
 export class FormulariosProvider {
   form: any;
@@ -65,22 +66,22 @@ export class FormulariosProvider {
                     let pregunt = pr.pregunta.codigo;
 
                     if (preg === null) {
-                      this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '', pr.pregunta.adjuntos, '');
 
                       if (pr.pregunta.cataTipeCodigo.codigo === 3007) {//pregunta tipo tabla
 
                         //http://localhost:10080/Agrolink/api/questions/findPreguntasOfTable/{codigoPreguntaTabla}
                         this.authHttp.get(`${SERVER_URL}/api/questions/findPreguntasOfTable/${pr.pregunta.codigo}`).subscribe(
                           preguntatabla => {
+//                            console.log(preguntatabla);
                             this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '', pr.pregunta.adjuntos, preguntatabla.json()['header']['cuerpo']);
-                            //    console.log(JSON.parse(atob(preguntatabla.json()['header']['cuerpo'])));
+                              
                             //  console.log(preguntatabla.json());
 
                             preguntatabla.json().preguntaTabla.forEach(element => {
                               //      console.log(`preguntapasreid: ${element.preguntaTablaId.codigoPreguntaPadre.codigo} - preguntaid: ${element.preguntaTablaId.codigoPregunta.codigo}
                               //     - enunciado: ${element.preguntaTablaId.codigoPregunta.enunciado} - fila: ${element.fila} - tipo: ${element.preguntaTablaId.codigoPregunta.cataTipeCodigo.codigo} 
                               //     -estado: 0 -requerido: ${element.preguntaTablaId.codigoPregunta.requerido} - codigorespuesta: ${element.preguntaTablaId.codigoPregunta.respCodigo.codigo}`);
-
+                              //console.log(element.preguntaTablaId.codigoPregunta.enunciado );
                               this.database.guardarpreguntatabla(
                                 element.preguntaTablaId.codigoPreguntaPadre.codigo,
                                 element.preguntaTablaId.codigoPregunta.codigo,
@@ -107,6 +108,9 @@ export class FormulariosProvider {
 
                           }
                         );
+                      }else{
+                        this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '', pr.pregunta.adjuntos, '');
+
                       }
                     } else {
 

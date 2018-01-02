@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http} from '@angular/http';
+import { Http, Headers, RequestOptions} from '@angular/http';
 import 'rxjs/add/operator/map';
 import {ReplaySubject, Observable} from "rxjs";
 import {Storage} from "@ionic/storage";
@@ -46,7 +46,13 @@ export class AuthProvider {
 /*/
     }
     login(values: any): Observable<any> {
-      return this.http.post(`${apiUrl}/login`, '{"identificador":"'+values.username+'","clave":"'+values.password+'"}')
+      console.log(values);
+      let headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      headers.append('X-Agrolink-Tenant', values.empresa);
+let options = new RequestOptions({ headers: headers });
+
+      return this.http.post(`${apiUrl}api/login`, '{"identificador":"'+values.username+'","clave":"'+values.password+'"}', options)
    .map(response => (
     response.headers.get('authorization').substring(7)
 )).map(jwt => this.handleJwtResponse(jwt));

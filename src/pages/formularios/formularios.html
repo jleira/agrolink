@@ -293,7 +293,7 @@
         <!--seleccion nmultiple con unica respuesta -->
         <ion-item>
           <ion-label style="color:#000000">{{item.enunciado}}</ion-label>
-          <ion-select (ionChange)="guardar3001($event, item.codigo ,item.codigorespuesta)">
+          <ion-select (ionChange)="guardar3001($event, item.codigo ,item.codigorespuesta)" okText="Seleccionar" cancelText="Cancelar">
             <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
           </ion-select>
         </ion-item>
@@ -457,20 +457,36 @@
         </div>
       </div>
       <div *ngIf="item.tipo==3007">
-        <!--tabla -->
+        <br>
+        <ion-label style="color:black">{{item.enunciado}}</ion-label>
+          <!--tabla -->
         <ion-grid>
-            <ion-row *ngFor="let encabezado of item.encabezado">
-                <ion-col *ngFor="let columnas of encabezado.columnas" >
+            <ion-row *ngFor="let encabezado of item.encabezado"   nowrap >
+                <ion-col *ngFor="let columnas of encabezado.columnas"  style="border: 1px solid gray;text-align: center">
                     {{columnas.enunciado}}
                 </ion-col>
             </ion-row>
-        </ion-grid>
-        <ion-grid>
-            <ion-row >
-                <ion-col *ngFor="let respuestas of item.respuestas"  >
-                    <ion-input placeholder="{{respuestas.codigo}}" > </ion-input>
+            <ion-row  nowrap justify-content-center>
+                <ion-col *ngFor="let respuestas of item.respuestas" style="border: 1px solid gray;text-align: center"  >
+                    
+                  <div *ngIf="respuestas.tipo==210001">
+                    <ion-datetime  displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar"  (ionChange)="guardarfecha()" ></ion-datetime >
+                  </div>
+                  <div *ngIf="respuestas.tipo==210002">
+                      <ion-input  type="number" (Change)="guardarnumero()" ></ion-input>
+                  </div>
+                  <div *ngIf="respuestas.tipo==210003">
+                      <ion-input  type="text" (Change)="guardar3003()" ></ion-input>
+                  </div>
+                  <div *ngIf="respuestas.tipo==210004" style="margin-top:15px">
+                    <ion-checkbox ></ion-checkbox>
+                   
+                     
+                  </div>
+
                 </ion-col>
             </ion-row>
+        
         </ion-grid>
         
         <ion-item no-lines>

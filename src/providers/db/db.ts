@@ -1123,10 +1123,15 @@ export class DbProvider {
         }).then(() => {
           return this.database.executeSql(
             `DROP TABLE IF EXISTS preguntastabla;`, {})
-        });;
+        }).then(() => {
+          return this.database.executeSql(
+            `DROP TABLE IF EXISTS respuestastabla;`, {})
+        });
+
     })
   }
 
+  
   guardarpreguntatabla(preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido,codigorespuesta ) {
     return this.isReady()
       .then(() => {

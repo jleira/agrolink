@@ -25,11 +25,17 @@
       <ion-item class="error-message" no-lines *ngIf="password.errors?.required && password.dirty" >
        <p style="color:red" >Contraseña Requerida</p>
       </ion-item>
+      <br>
 
+      <ion-item  no-lines>
+        <ion-label >Empresa</ion-label>
+        <ion-select  [(ngModel)]="empresa" name="empresa" okText="Seleccionar" cancelText="Cancelar">
+          <ion-option *ngFor="let opciones of empresas">{{opciones.schemaName}}</ion-option>
+        </ion-select>
+      </ion-item>
       <div padding>
         <button ion-button color="secondary" style="border: 1px green solid;" block type="submit" [disabled]="!form.valid">Entrar</button>
       </div>
-
 
     </ion-list>
   </form>

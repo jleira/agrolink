@@ -5,6 +5,10 @@ import { PerfilProvider } from '../../providers/perfil/perfil';
 import { RegionProvider } from '../../providers/region/region';
 import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
+import { Http} from '@angular/http';
+import {SERVER_URL} from "../../config";
+let apiUrl = SERVER_URL;
+
 
 @IonicPage()
 @Component({
@@ -15,8 +19,9 @@ export class LoginPage {
   loading: any;
   loginData = { username: '', password: '' };
   data: any; 
+  empresas:any;
 
-  constructor(
+  constructor(public http: Http,
     public authService: AuthProvider,
     public loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
@@ -25,6 +30,22 @@ export class LoginPage {
     public uproductiva: UproductivaProvider,
     public formularios: FormulariosProvider
   ) {
+    let loading = this.loadingCtrl.create({
+      spinner: 'bubbles',
+      content: 'Validando datos...'
+    });
+
+    loading.present();
+    this.http.get(`${apiUrl}/api/accounts/name`).subscribe((data)=>{
+      this.empresas=data.json();
+      loading.dismiss();
+
+    });
+
+//
+//Agrolink/api/accounts/name
+//return this.http.post(`${apiUrl}/login`, '{"identificador":"'+values.username+'","clave":"'+values.password+'"}')
+
   }
   login(value: any) {
     let loading = this.loadingCtrl.create({

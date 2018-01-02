@@ -91,7 +91,6 @@ export class FormulariosPage {
       this.up = this.navParams.get('up');
       this.grupo = this.navParams.get('gruponombre');
       this.rutaimg = this.file.externalDataDirectory + `${this.up}/${this.grupoidselected.toString()}`;
-      console.log(this.rutaimg);
       this.formulario.preguntasgrupo(this.grupoidselected).then(preguntasg => {
         this.items = preguntasg;
         let r = [];
@@ -105,7 +104,6 @@ export class FormulariosPage {
           this.items.forEach(element => {
 if(element.tipo==3007){
   element.encabezado=JSON.parse(atob(element.encabezado));
-//  console.log(element.encabezado);
 this.formulario.preguntasconrespuestastabla(element.codigo).then((data)=>{
   data.forEach(pregunta => {
     return this.formulario.respuestastablas(pregunta.codigorespuesta).then((respu)=>{
