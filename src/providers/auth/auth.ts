@@ -46,7 +46,6 @@ export class AuthProvider {
 /*/
     }
     login(values: any): Observable<any> {
-      console.log(values);
       let headers = new Headers();
       headers.append('Content-Type', 'application/json');
       headers.append('X-Agrolink-Tenant', values.empresa);

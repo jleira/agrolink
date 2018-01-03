@@ -105,7 +105,7 @@
                 <ion-label>
                   {{item.enunciado}}
                 </ion-label>
-                <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar" [(ngModel)]="opciones.respuesta" (ionChange)="guardarfecha(opciones, item.codigo, item.codigorespuesta, $event)"></ion-datetime>
+                <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar" [(ngModel)]="opciones.respuesta" (ionChange)="guardarfecha(opciones, item.codigo, item.codigorespuesta, opciones.respuesta)"></ion-datetime>
               </ion-item>
               <div *ngIf="item.archivo===1">
                 <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>
@@ -168,7 +168,7 @@
                 <ion-label stacked>
                   {{item.enunciado}}
                 </ion-label>
-                <ion-input type="number" [(ngModel)]="opciones.respuesta" (Change)="guardarnumero(opciones, item.codigo, item.codigorespuesta, opciones.respuesta)"></ion-input>
+                <ion-input type="number" [(ngModel)]="opciones.respuesta" (change)="guardarnumero(opciones, item.codigo, item.codigorespuesta, opciones.respuesta)"></ion-input>
               </ion-item>
               <div *ngIf="item.archivo===1">
                 <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>
@@ -231,7 +231,7 @@
                 <ion-label stacked>
                   {{item.enunciado}}
                 </ion-label>
-                <ion-input type="text" [(ngModel)]="opciones.respuesta" (Change)="guardar3003(opciones, item.codigo, item.codigorespuesta, opciones.respuesta)"></ion-input>
+                <ion-input type="text" [(ngModel)]="opciones.respuesta" (change)="guardar3003(opciones, item.codigo, item.codigorespuesta, opciones.respuesta)"></ion-input>
               </ion-item>
               <div *ngIf="item.archivo===1">
                 <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>
@@ -457,7 +457,7 @@
         </div>
       </div>
       <div *ngIf="item.tipo==3007">
-        <br>
+      
         <ion-label style="color:black">{{item.enunciado}}</ion-label>
           <!--tabla -->
         <ion-grid>
@@ -466,32 +466,32 @@
                     {{columnas.enunciado}}
                 </ion-col>
             </ion-row>
-            <ion-row  nowrap justify-content-center>
-                <ion-col *ngFor="let respuestas of item.respuestas" style="border: 1px solid gray;text-align: center"  >
-                    
-                  <div *ngIf="respuestas.tipo==210001">
-                    <ion-datetime  displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar"  (ionChange)="guardarfecha()" ></ion-datetime >
-                  </div>
-                  <div *ngIf="respuestas.tipo==210002">
-                      <ion-input  type="number" (Change)="guardarnumero()" ></ion-input>
-                  </div>
-                  <div *ngIf="respuestas.tipo==210003">
-                      <ion-input  type="text" (Change)="guardar3003()" ></ion-input>
-                  </div>
-                  <div *ngIf="respuestas.tipo==210004" style="margin-top:15px">
-                    <ion-checkbox ></ion-checkbox>
-                   
-                     
-                  </div>
-
-                </ion-col>
+            <ion-row  nowrap justify-content-center *ngFor="let preguntas of item.preguntas" >
+                <ion-col style="border: 1px solid gray;text-align: center;vertical-align: middle" *ngIf="preguntas.observacion==1" col-auto>{{preguntas.enunciado}}</ion-col>
+              
+                  <ion-col  *ngFor="let respuestas of preguntas.respuesta" style="border: 1px solid gray;text-align: center;vertical-align: middle"  >
+                      <div *ngIf="respuestas.tipo==210000" >
+                       {{respuestas.constante}}
+                      </div>
+                      <div *ngIf="respuestas.tipo==210001">
+                        <ion-datetime  displayFormat="YYYY-MM-DD" cancelText="Cancelar" [(ngModel)]="respuestas.respuesta" doneText="Guardar" (ionChange)="guardarfechapadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)" ></ion-datetime >
+                      </div>
+                      <div *ngIf="respuestas.tipo==210002">
+                          <ion-input  type="number" [(ngModel)]="respuestas.respuesta"  (change)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)" ></ion-input>
+                      </div>
+                      <div *ngIf="respuestas.tipo==210003">
+                          <ion-input  type="text" [(ngModel)]="respuestas.respuesta"  (change)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)" ></ion-input>
+                      </div>
+                      <div *ngIf="respuestas.tipo==210004" style="margin-top:15px">
+                        <ion-checkbox [(ngModel)]="respuestas.respuesta"  (ionChange)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)" ></ion-checkbox>
+                      </div>    
+                    </ion-col>
+             
             </ion-row>
         
         </ion-grid>
         
-        <ion-item no-lines>
-          {{item.tipo}}
-       </ion-item>
+
       </div>
 
 

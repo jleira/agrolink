@@ -29,10 +29,12 @@
 
       <ion-item  no-lines>
         <ion-label >Empresa</ion-label>
-        <ion-select  [(ngModel)]="empresa" name="empresa" okText="Seleccionar" cancelText="Cancelar">
+        <ion-select  name="empresa" okText="Seleccionar" cancelText="Cancelar" ngModel required #empresa="ngModel"
+        [class.invalid]="empresa.errors && empresa.dirty">
           <ion-option *ngFor="let opciones of empresas">{{opciones.schemaName}}</ion-option>
         </ion-select>
       </ion-item>
+      
       <div padding>
         <button ion-button color="secondary" style="border: 1px green solid;" block type="submit" [disabled]="!form.valid">Entrar</button>
       </div>

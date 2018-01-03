@@ -169,7 +169,8 @@ export class DbProvider {
                 tipo INTEGER,
                 estado INTEGER,
                 requerido INTEGER,
-                codigorespuesta INTEGER
+                codigorespuesta INTEGER,
+                observacion INTEGER
                     );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -183,6 +184,24 @@ export class DbProvider {
             codigorespuestapadre INTEGER,
             FOREIGN KEY(preguntaid) REFERENCES preguntastabla(preguntaid)
                     );`, {})
+      }).then(() => {
+        return this.database.executeSql(
+          `CREATE TABLE IF NOT EXISTS respuestasguardadastabla (
+                    id INTEGER PRIMARY KEY,
+                    unidadproductiva TEXT,
+                    grupo INTEGER,
+                    preguntapadre INTERGER,
+                    preguntaid INTEGER,
+                    respuestascodigo INTEGER, 
+                    codigorespuesta TEXT,
+                    valorrespuesta TEXT,
+                    valor TEXT,
+                    observacion TEXT,
+                    ruta TEXT,
+                    tipoformulario INTEGER
+
+
+                  );`, {})
       }).catch((err) => console.log("error detected creating tables", err));
   }
   private isReady() {
@@ -855,7 +874,7 @@ export class DbProvider {
         if (data.rows.length) {
           for (let i = 0; i < data.rows.length; i++) {
             let todo = data.rows.item(i);
-
+            todo.preguntas=[];
             todo.respuestas = [];
             todo.identificador = 'respuesta' + i;
             todos.push(todo);
@@ -984,9 +1003,9 @@ export class DbProvider {
 
               return this.database.executeSql(
                 `INSERT INTO respuestasguardadas 
-          (unidadproductiva, grupo, respuestascodigo ,pregunta, codigorespuesta, valorrespuesta, valor, observacion , tipoformulario)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-                [unidadp, grup, respuestascodigo, preguntaid, codigoresp, valorresp, valortext, '', tipoformulario]);
+          (unidadproductiva, grupo, respuestascodigo ,pregunta, codigorespuesta, valorrespuesta, valor , tipoformulario)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
+                [unidadp, grup, respuestascodigo, preguntaid, codigoresp, valorresp, valortext, tipoformulario]);
 
             } else {
               return this.database.executeSql(
@@ -1126,17 +1145,20 @@ export class DbProvider {
         }).then(() => {
           return this.database.executeSql(
             `DROP TABLE IF EXISTS respuestastabla;`, {})
+        }).then(() => {
+          return this.database.executeSql(
+            `DROP TABLE IF EXISTS respuestasguardadastabla;`, {})
         });
 
     })
   }
-
+//
   
-  guardarpreguntatabla(preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido,codigorespuesta ) {
+  guardarpreguntatabla(preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido,codigorespuesta,observacion) {
     return this.isReady()
       .then(() => {
-        return this.database.executeSql(`INSERT INTO preguntastabla (preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido,codigorespuesta ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
-          [preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido,codigorespuesta ]);
+        return this.database.executeSql(`INSERT INTO preguntastabla (preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido,codigorespuesta,observacion ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+          [preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido,codigorespuesta,observacion ]);
       });
   }
 //                 INTEGER,
@@ -1180,7 +1202,82 @@ respuestasapreguntastablas(codigorespuestapadre){
       return todos;
     })
   })
+}
 
+guardarrespuestaporpreguntatabla(unidadp, grup, respuestascodigo,preguntapadre, preguntaid, codigoresp, valorresp, valortext, tipoformulario) {
+  let up = unidadp;
+  let gr = grup;
+  let pr = preguntaid;
+  let tipop = tipoformulario;
+  let ppadre=preguntapadre;
+  let cres=codigoresp;
+  return this.isReady()
+    .then(() => {
+      return this.database.executeSql
+        (`SELECT * FROM respuestasguardadastabla WHERE unidadproductiva = (?)  AND grupo =(?) AND preguntaid =(?) AND tipoformulario =(?) AND preguntapadre=(?) AND codigorespuesta=(?)`,
+        [up, gr, pr, tipop, ppadre, cres]).then((data) => {
+          let id;
+          if (data.rows.length > 0) {
+            id = data.rows.item(0).id;
+          } else {
+            id = false;
+          }
+          return id;
+        }).then((idseleccion) => {
+
+          if (idseleccion == false) {
+
+            return this.database.executeSql(
+              `INSERT INTO respuestasguardadastabla 
+        (unidadproductiva, grupo, respuestascodigo ,preguntapadre ,preguntaid, codigorespuesta, valorrespuesta, valor , tipoformulario)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+
+              [unidadp, grup, respuestascodigo,preguntapadre, preguntaid, codigoresp, valorresp, valortext, tipoformulario]);
+
+          } else {
+            return this.database.executeSql(
+              `UPDATE respuestasguardadastabla SET codigorespuesta = (?), valorrespuesta = (?), valor =(?) WHERE id=${idseleccion} ;`,
+              [codigoresp, valorresp, valortext]);
+          }
+        })
+    }).catch(err=>console.log(err));
+
+}
+
+respuestasguardadastabla(unidadp, grupo, preguntapadre,preguntaid,codigorespuesta,tipoformulario){
+  let up = unidadp;
+  let gr = grupo;
+  let pr = preguntaid;
+  let tipop = tipoformulario;
+  let ppadre=preguntapadre;
+  let cres=codigorespuesta;
+
+  return this.isReady()
+  .then(() => {
+    return this.database.executeSql(`SELECT valor FROM respuestasguardadastabla WHERE 
+    unidadproductiva = (?)  AND 
+    grupo =(?) AND 
+    preguntaid =(?) AND 
+    tipoformulario =(?) AND 
+    preguntapadre=(?) AND 
+    codigorespuesta=(?)`,
+    [up, 
+      gr, 
+      pr, 
+      tipop, 
+      ppadre, 
+      cres]).then((data)=>{
+      let todos = [];
+        if (data.rows.length) {
+            todos= data.rows.item(0).valor;
+        } else {
+          let todo;
+          todo = false;
+          todos = todo;
+        }
+        return todos;
+    });
+  });
 }
 
 

@@ -102,23 +102,29 @@ export class FormulariosPage {
           this.resp = data;
 
           this.items.forEach(element => {
-if(element.tipo==3007){
-  element.encabezado=JSON.parse(atob(element.encabezado));
-this.formulario.preguntasconrespuestastabla(element.codigo).then((data)=>{
-  data.forEach(pregunta => {
-    return this.formulario.respuestastablas(pregunta.codigorespuesta).then((respu)=>{
-      element.respuestas=respu;
-      console.log(element);
-   }); 
-  });
-return this.items;  
-},(err)=>{
-  console.log(err);
+            if (element.tipo == 3007) {
 
-}).then((data)=>{
+              element.encabezado = JSON.parse(atob(element.encabezado));
+              this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
+                data.forEach(pregunta => {
+                  return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up,this.grupoidselected,element.codigo,this.tipocuestionario).then((respu) => {
+                    //      element.respuestas=respu; up, grupo,preguntapadre,preguntaid, tipo
+                    pregunta.respuesta = respu;
+                    // console.log(element);
+                  });
+                });
+                element.preguntas = data;
 
-});
-}
+
+                return this.items;
+              }, (err) => {
+                console.log(err);
+
+              }).then((data) => {
+
+              });
+
+            }
             let vr: any;
             this.resp.forEach(element2 => {
               if (element2.preguntaid == element.codigo) {
@@ -132,12 +138,10 @@ return this.items;
             this.final = this.items;
             loading.dismiss();
             this.prueba2 = JSON.stringify(this.final);
+            console.log(this.final);
             return this.final;
           });
-
-
       });
-
     }
   }
 
@@ -146,8 +150,9 @@ return this.items;
 
 
   //nuevas funciones
-  guardarfecha(valor, preguntaid, respcodigo, $event) {
-    this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, $event.year + '-' + $event.month + '-' + $event.day, this.tipocuestionario);
+  guardarfecha(valor, preguntaid, respcodigo, event) {
+    console.log(event);
+    this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, event, this.tipocuestionario);
   }
   guardar3003(valor, preguntaid, respcodigo, respuestafinal) {
     this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, respuestafinal, this.tipocuestionario);
@@ -269,9 +274,9 @@ return this.items;
         )).then((ok) => {
           console.log(JSON.stringify(ok));
         }, (err) => { console.log(JSON.stringify(err)) });
-      }).then(()=>{
+      }).then(() => {
         return this.recargaritem().then(() => { }, () => { });
-      }).then(()=>{
+      }).then(() => {
         loading.dismiss();
       });
       //      console.log(imageData);
@@ -318,9 +323,9 @@ return this.items;
         }).then(() => {
           return this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imgname, this.tipocuestionario).then(() => { }, () => { });
         }).then(() => {
-          return this.recargaritem().then(() => { }, () => { }).then(() => {},()=>{});
-          }).then(()=>{
-            loading.dismiss();
+          return this.recargaritem().then(() => { }, () => { }).then(() => { }, () => { });
+        }).then(() => {
+          loading.dismiss();
         });
       }).catch(error => {
         console.error('error', error);
@@ -411,5 +416,15 @@ return this.items;
     });
   }
 
+  chec(event){
+    console.log(event);
+  }
+  guardarfechapadre(valor, preguntapadre,preguntaid , fecha) {
+   // console.log(valor, preguntapadre, preguntaid, $event.year + '-' + $event.month + '-' + $event.day)
+    this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.respuestapadre, preguntaid, preguntapadre,valor.codigo, valor.valor, fecha, this.tipocuestionario);
+  }
+  guardarpadre(valor, preguntapadre,preguntaid , event){
+    this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.respuestapadre, preguntaid, preguntapadre,valor.codigo, valor.valor, event, this.tipocuestionario);
+  }
 
 }
