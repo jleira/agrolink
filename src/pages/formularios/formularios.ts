@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, LoadingController, PopoverController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, LoadingController, PopoverController, ModalController } from 'ionic-angular';
 import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
 import { observeOn } from 'rxjs/operators/observeOn';
@@ -7,6 +7,7 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 import { File, DirectoryEntry } from '@ionic-native/file';
 import { retry } from 'rxjs/operator/retry';
 import { ImagePage } from './imagenes';
+import { NuevanoconformidadPage } from './noconformidad';
 
 /**
  * Generated class for the FormulariosPage page.
@@ -37,9 +38,10 @@ export class FormulariosPage {
   grupoidselected: any;
   rutaimg: any;
   tipocuestionario;
-
+tipo;
 
   constructor(
+    public modalCtrl: ModalController,
     public navCtrl: NavController,
     public navParams: NavParams,
     public uproductiva: UproductivaProvider,
@@ -77,6 +79,7 @@ export class FormulariosPage {
     } else if (this.caso == 3) {//auditoria
 
       this.up = this.navParams.get('up');
+      this.tipo=this.navParams.get('tipo');
       let casot = this.navParams.get('tipo');
       return this.formulario.gruposbase(casot).then(gps => {
         this.items = gps;
@@ -143,15 +146,25 @@ export class FormulariosPage {
           });
       });
     }
+    else if(this.caso == 5){
+      this.up = this.navParams.get('up');
+      this.tipo=this.navParams.get('tipo');
+//      console.log('no conformidad',this.up, this.tipo);
+      loading.dismiss();
+    }
   }
 
 
+  agregarnoconformidad(){
+    console.log(this.up, this.tipo);
+    let modal = this.modalCtrl.create(NuevanoconformidadPage,{'up': this.up, 'tipo':this.tipo});
+    modal.present();
 
+  }
 
 
   //nuevas funciones
   guardarfecha(valor, preguntaid, respcodigo, event) {
-    console.log(event);
     this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, event, this.tipocuestionario);
   }
   guardar3003(valor, preguntaid, respcodigo, respuestafinal) {
@@ -194,6 +207,11 @@ export class FormulariosPage {
       this.navCtrl.push(FormulariosPage, {
         caso: 3, tipo: tipop, up: upva
       });
+    });
+  }
+  noconformidades(up, tipo) {
+      this.navCtrl.push(FormulariosPage, {
+        caso: 5, tipo: tipo, up: up
     });
   }
 

@@ -12,6 +12,7 @@ import { UpdetallesPage} from '../pages/updetalles/updetalles';
 import { FiltroupPage} from '../pages/filtroup/filtroup';
 import { FormulariosPage} from '../pages/formularios/formularios';
 import { ImagePage} from '../pages/formularios/imagenes';
+import { NuevanoconformidadPage} from '../pages/formularios/noconformidad';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -36,6 +37,7 @@ import { File } from '@ionic-native/file';
 
 
 
+
 export function authHttpServiceFactory(http: Http, options: RequestOptions, storage: Storage) {
   const authConfig = new AuthConfig({
     tokenGetter: (() => storage.get('jwt')),
@@ -54,7 +56,8 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     UpdetallesPage,
     FiltroupPage,
     FormulariosPage,
-    ImagePage
+    ImagePage,
+    NuevanoconformidadPage
     ],
   imports: [
     BrowserModule,
@@ -78,7 +81,8 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     UpdetallesPage,
     FiltroupPage,
     FormulariosPage,
-    ImagePage
+    ImagePage,
+    NuevanoconformidadPage
   ],
   providers: [
     StatusBar,

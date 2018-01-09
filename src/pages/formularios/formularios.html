@@ -21,7 +21,10 @@
     <div *ngIf="caso == 4">
       <ion-title>{{grupo}} - UNIDAD {{up}}</ion-title>
     </div>
-  </ion-navbar>
+    <div *ngIf="caso == 5">
+        <ion-title>NO CONFORMIDADES - UNIDAD {{up}}</ion-title>
+      </div>
+    </ion-navbar>
 </ion-header>
 
 
@@ -68,22 +71,36 @@
   </div>
   <div *ngIf="caso == 3">
     <div *ngFor="let item of items">
-      <ion-card style="border-top:2px solid mediumseagreen">
+      <ion-card style="border-top:2px solid mediumseagreen" >
         <button ion-item (click)="mostrarpreguntas(item.idgrupobase,item.nombre )">
-          <ion-row>
-            <ion-col col-6 text-center> {{item.nombre}}
-              <br>
+          <ion-row text-wrap>
+            <ion-col col-12 text-center> <h3><strong>{{item.nombre}}</strong> </h3>
+              
             </ion-col>
-            <ion-col col-6 text-center> {{item.textoayuda}}</ion-col>
+            <ion-col col-12 text-center  > <h6>
+                {{item.textoayuda}} </h6></ion-col>
           </ion-row>
         </button>
       </ion-card>
-
-    </div>
+  </div>
+  <ion-card style="border-top:2px solid mediumseagreen" >
+      <button ion-item  (click)="noconformidades(up, tipo)">
+        <ion-row text-wrap>
+          <ion-col col-12 text-center> <h3><strong>NO CONFORMIDADES</strong> </h3>
+            
+          </ion-col>
+          <ion-col col-12 text-center  > <h6>Son los problemas encontrados alo largo de la promotoria u auditoria, tambien encontramos 
+              no conformidades de periodos anteriores con el fin de cerrarlas o ver su avance
+               </h6></ion-col>
+        </ion-row>
+      </button>
+    </ion-card>
   </div>
 
   <div *ngIf="caso == 4">
-
+      <ion-fab bottom right >
+          <button ion-fab mini color="danger"><ion-icon name="add" ></ion-icon></button>
+         </ion-fab>
 
 
     <div *ngFor="let item of final">
@@ -500,6 +517,12 @@
 
   </div>
 
+  <div *ngIf="caso == 5">
+      <ion-fab bottom right (click)="agregarnoconformidad()" >
+          <button ion-fab mini color="danger"><ion-icon name="add" ></ion-icon></button>
+         </ion-fab>
+
+  </div>
 
 
 
