@@ -28,7 +28,7 @@ export class UnidadproductivaPage {
   regiones:any;
   
   constructor(
-    public uproductiva: UproductivaProvider ,
+    public uproductiva: UproductivaProvider,
     public region: RegionProvider,
     public navCtrl: NavController,
     public navParams: NavParams,

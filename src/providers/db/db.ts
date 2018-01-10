@@ -3,8 +3,7 @@ import { Platform } from 'ionic-angular';
 import 'rxjs/add/operator/map';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Http } from '@angular/http';
-import { SERVER_URL } from "../../config"
+
 
 @Injectable()
 export class DbProvider {
@@ -14,8 +13,7 @@ export class DbProvider {
 
   constructor(
     private platform: Platform,
-    private sqlite: SQLite,
-    public http: Http
+    private sqlite: SQLite
   ) {
     this.platform.ready().then(() => {
       this.sqlite.create({
@@ -87,6 +85,7 @@ export class DbProvider {
             localizacion_latitude TEXT,
             terminado INTEGER,
             tipo INTEGER,
+            idAsignacion,
             IdProductor INTEGER,
             FOREIGN KEY(regionId) REFERENCES regiones(id)
             );`, {})
@@ -263,13 +262,13 @@ export class DbProvider {
           [id, nombre, identificacion, telefono, annoIngreso, UltimaAplicacion]);
       });
   }
-  agregarunidadproductiva(idUnidadProductiva, nombre, fechaIngreso, regionId, localizacion_longitude, localizacion_latitude, IdProductor, tipo) {
+  agregarunidadproductiva(idUnidadProductiva, nombre, fechaIngreso, regionId, localizacion_longitude, localizacion_latitude, IdProductor, tipo, idAsignacion) {
     return this.isReady()
       .then(() => {
 
         return this.database.executeSql(`INSERT INTO unidades_productivas
-                (idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor, terminado, tipo ) VALUES (?, ?,?,?,?,?,?,?,?);`,
-          [idUnidadProductiva, nombre, fechaIngreso, regionId, localizacion_longitude, localizacion_latitude, IdProductor, 0, tipo]);
+                (idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor, terminado, tipo,idAsignacion ) VALUES (?, ?,?,?,?,?,?,?,?, ?);`,
+          [idUnidadProductiva, nombre, fechaIngreso, regionId, localizacion_longitude, localizacion_latitude, IdProductor, 0, tipo,idAsignacion]);
       });
   }
 
@@ -943,7 +942,7 @@ export class DbProvider {
   todasuproductivas() {
     return this.isReady()
       .then(() => {
-        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado from unidades_productivas`, []).then((data) => {
+        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, tipo, terminado, idAsignacion from unidades_productivas`, []).then((data) => {
           let todas = [];
           for (let i = 0; i < data.rows.length; i++) {
             let todo = data.rows.item(i);

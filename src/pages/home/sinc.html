@@ -1,0 +1,49 @@
+<ion-header  >
+    <ion-toolbar class="cyan" color="secondary">
+      <ion-title>
+       No conformidad
+      </ion-title>
+      <ion-buttons start>
+        <button ion-button (click)="dismiss()">
+          Guardar
+        </button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content fullscreen >
+      <ion-item>
+          <ion-label>Unidades para auditoria</ion-label>
+      
+          <ion-select multiple (ionChange)="comprobarunidades(1002,$event)">
+            <div *ngFor="let categoria of up">
+              <ion-option *ngIf="categoria.tipo==1002" [value]="categoria">{{categoria.nombre}}</ion-option>
+              <ion-option *ngIf="categoria.tipo==1003" [value]="categoria">{{categoria.nombre}}</ion-option>
+            </div>
+      
+          </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Unidades para promotoria</ion-label>
+      
+        <ion-select multiple (ionChange)="comprobarunidades(1001,$event)">
+          <div *ngFor="let categoria of up">
+            <ion-option *ngIf="categoria.tipo==1001" [value]="categoria">{{categoria.nombre}}</ion-option>
+            <ion-option *ngIf="categoria.tipo==1003" [value]="categoria">{{categoria.nombre}}</ion-option>
+          </div>
+      
+        </ion-select>
+      </ion-item>
+       
+  <ion-item>
+    <ion-label floating>Descripcion corta</ion-label>
+    <ion-input ></ion-input>
+  </ion-item>
+ 
+  <ion-item>
+    <ion-label stacked>detalle</ion-label>
+    <ion-textarea  ></ion-textarea >
+  </ion-item>
+
+ 
+     </ion-content>

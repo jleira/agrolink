@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import {Storage} from "@ionic/storage";
-import { Nav, Platform } from 'ionic-angular';
+import { Nav, Platform, ModalController } from 'ionic-angular';
 import { UnidadproductivaPage } from '../unidadproductiva/unidadproductiva';
 import { FormulariosPage }  from '../formularios/formularios';
-
+import {  EnviardatosPage } from './sinc';
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
@@ -16,6 +16,7 @@ export class HomePage {
   paises:any;
   productor:any;
   constructor(
+    public modalCtrl: ModalController,
     public navCtrl: NavController, 
     private readonly storage: Storage  ) {
     this.storage.get('nombre').then( (decoded) =>
@@ -57,10 +58,17 @@ abririmagen(ruta){
       this.navCtrl.push(FormulariosPage,{caso:2});
     } else if (caso==3) {
       this.navCtrl.setRoot(UnidadproductivaPage);
-    }
-
+    }else if (caso==4) {
+      console.log('enviar datos');
+      this.agregarnoconformidad();
   }
 
+  }
+  agregarnoconformidad(){
+    let modal = this.modalCtrl.create(EnviardatosPage,{'up': 1, 'tipo':2});
+    modal.present();
+
+  }
 
 
 }

@@ -185,7 +185,8 @@ guardarunidades(value){
         long,
         lat,
         element.unidadProductiva['productor']['idProductor'],
-        tipo
+        tipo,
+        element.idAsignacion
       ).then(
         (ok)=>{
           this.validarproductor(element.unidadProductiva['productor']['idProductor']).then(
