@@ -60,16 +60,17 @@ tipo;
       spinner: 'bubbles',
       content: 'Cargando informacion...'
     });
-    loading.present();
+
 
     if (this.caso == 1) {//auditoria
-
+      loading.present();
 
       this.uproductiva.llamaruproductivasap(1002).then((data: any) => {
         this.items = data;
         loading.dismiss();
       });
     } else if (this.caso == 2) {//promotoria
+      loading.present();
       this.uproductiva.llamaruproductivasap(1001).then((data: any) => {
         this.items = data;
 
@@ -77,7 +78,7 @@ tipo;
 
       });
     } else if (this.caso == 3) {//auditoria
-
+      loading.present();
       this.up = this.navParams.get('up');
       this.tipo=this.navParams.get('tipo');
       let casot = this.navParams.get('tipo');
@@ -85,9 +86,9 @@ tipo;
         this.items = gps;
         loading.dismiss();
         return this.items;
-
       });
     } else if (this.caso == 4) {//promotoria
+      loading.present();
       this.tipocuestionario = this.navParams.get('tipo');
       this.grupoidselected = this.navParams.get('grupo');
 
@@ -147,8 +148,13 @@ tipo;
       });
     }
     else if(this.caso == 5){
+      loading.present();
       this.up = this.navParams.get('up');
       this.tipo=this.navParams.get('tipo');
+      this.formulario.noconformidades(this.up, this.tipo).then((data)=>{
+        this.items=data;
+        console.log(this.items);
+      });
 //      console.log('no conformidad',this.up, this.tipo);
       loading.dismiss();
     }

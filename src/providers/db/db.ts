@@ -201,6 +201,26 @@ export class DbProvider {
 
 
                   );`, {})
+      }).then(() => {
+        return this.database.executeSql(
+          `CREATE TABLE IF NOT EXISTS noconformidades (
+                    id INTEGER PRIMARY KEY,
+                    unidadproductiva TEXT,
+                    tipo INTEGER,
+                    categoria INTEGER,
+                    descripcion TEXT,
+                    detalle TEXT,
+                    fechacreacion TEXT, 
+                    fechaposiblecierre TEXT, 
+                    estado INTEGER,
+                    fechafinalizado, TEXT
+                  );`, {})
+      }).then(() => {
+        return this.database.executeSql(
+          `CREATE TABLE IF NOT EXISTS listacategoria (
+                    id INTEGER,
+                    nombre TEXT
+                  );`, {})
       }).catch((err) => console.log("error detected creating tables", err));
   }
   private isReady() {
@@ -1147,8 +1167,14 @@ export class DbProvider {
         }).then(() => {
           return this.database.executeSql(
             `DROP TABLE IF EXISTS respuestasguardadastabla;`, {})
+        }).then(() => {
+          return this.database.executeSql(
+            `DROP TABLE IF EXISTS noconformidades;`, {})
+        }).then(() => {
+          return this.database.executeSql(
+            `DROP TABLE IF EXISTS listacategoria;`, {})
         });
-
+        
     })
   }
 //
@@ -1277,6 +1303,58 @@ respuestasguardadastabla(unidadp, grupo, preguntapadre,preguntaid,codigorespuest
         return todos;
     });
   });
+}
+
+agregarcategoria(id, nombre) {
+  return this.isReady()
+    .then(() => {
+      return this.database.executeSql(`INSERT INTO listacategoria 
+              (id, nombre) VALUES (?,?);`,
+        [id, nombre]);
+    });
+}
+categorias(){
+  return this.isReady(
+  ).then(() => {
+    return this.database.executeSql(`SELECT * FROM listacategoria `, []).then((data) => {
+      let todos = [];
+      if (data.rows.length) {
+        for (let i = 0; i < data.rows.length; i++) {
+          let todo = data.rows.item(i);
+          todos.push(todo);
+        }
+      }
+      return todos;
+    })
+  })
+
+}
+
+agregarnoconformidad(unidadproductiva,tipo_formulario, categoria,detalle, descripcion,  fechacreacion, fechaposiblecierre, estado) {
+  return this.isReady()
+    .then(() => {
+      return this.database.executeSql(`INSERT INTO noconformidades 
+              (unidadproductiva,tipo, categoria, descripcion, detalle, fechacreacion, fechaposiblecierre, estado) VALUES (?,?,?,?,?,?,?,?);`,
+        [unidadproductiva,tipo_formulario, categoria, descripcion,detalle, fechacreacion, fechaposiblecierre, estado]);
+    });
+}
+noconformidades(unidadproductiva,tipo_formulario){
+  return this.isReady(
+  ).then(() => {
+    return this.database.executeSql(`SELECT * FROM noconformidades  WHERE unidadproductiva = (?)  AND  tipo =(?) `, [unidadproductiva,tipo_formulario]).then((data) => {
+      let todos = [];
+      if (data.rows.length) {
+        for (let i = 0; i < data.rows.length; i++) {
+          let todo = data.rows.item(i);
+          todos.push(todo);
+        }
+      }else{
+        todos=null;
+      }
+      return todos;
+    })
+  })
+
 }
 
 

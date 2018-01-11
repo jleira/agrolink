@@ -70,6 +70,7 @@ export class LoginPage {
         this.uproductiva.descargarunidadesproductivas();
         this.uproductiva.descargarunidadesproductivasasignadas();
        this.formularios.descargarformularios();
+       this.formularios.descargarcategorias();
 
       },
       (err) => {

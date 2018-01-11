@@ -72,9 +72,9 @@ export class FormulariosProvider {
                         //http://localhost:10080/Agrolink/api/questions/findPreguntasOfTable/{codigoPreguntaTabla}
                         this.authHttp.get(`${SERVER_URL}/api/questions/findPreguntasOfTable/${pr.pregunta.codigo}`).subscribe(
                           preguntatabla => {
-                           
+
                             this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '', pr.pregunta.adjuntos, preguntatabla.json()['header']['cuerpo']);
-                              
+
                             //  console.log(preguntatabla.json());
 
                             preguntatabla.json().preguntaTabla.forEach(element => {
@@ -82,50 +82,75 @@ export class FormulariosProvider {
                               //     - enunciado: ${element.preguntaTablaId.codigoPregunta.enunciado} - fila: ${element.fila} - tipo: ${element.preguntaTablaId.codigoPregunta.cataTipeCodigo.codigo} 
                               //     -estado: 0 -requerido: ${element.preguntaTablaId.codigoPregunta.requerido} - codigorespuesta: ${element.preguntaTablaId.codigoPregunta.respCodigo.codigo}`);
                               //console.log(element.preguntaTablaId.codigoPregunta.enunciado );
-                              if (element.observacion===true){
-                                element.observacion=1;
-                              }else{
-                                element.observacion=0;
-                              }
-                              this.database.guardarpreguntatabla(
-                                element.preguntaTablaId.codigoPreguntaPadre.codigo,
-                                element.preguntaTablaId.codigoPregunta.codigo,
-                                element.preguntaTablaId.codigoPregunta.enunciado,
-                                element.fila,
-                                element.preguntaTablaId.codigoPregunta.cataTipeCodigo.codigo,
-                                0,
-                                element.preguntaTablaId.codigoPregunta.requerido,
-                                element.preguntaTablaId.codigoPregunta.respCodigo.codigo,
-                              element.observacion).then(() => {
-                                  element.preguntaTablaId.codigoPregunta.respCodigo.valores.forEach(respuestastabla => {
+                              if (element.observacion === true) {
+                                element.observacion = 1;
+                                this.database.guardarpreguntatabla(
+                                  element.preguntaTablaId.codigoPreguntaPadre.codigo,
+                                  element.preguntaTablaId.codigoPregunta.codigo,
+                                  element.preguntaTablaId.codigoPregunta.enunciado,
+                                  element.fila,
+                                  element.preguntaTablaId.codigoPregunta.cataTipeCodigo.codigo,
+                                  0,
+                                  element.preguntaTablaId.codigoPregunta.requerido,
+                                  element.preguntaTablaId.codigoPregunta.respCodigo.codigo,
+                                  element.observacion).then(() => {
+                                    element.preguntaTablaId.codigoPregunta.respCodigo.valores.forEach(respuestastabla => {
 
-                                    this.database.guardarrespuestatabla(
-                                      respuestastabla.codigo,
-                                      respuestastabla.nombre,
-                                      respuestastabla.valor,
-                                      respuestastabla.valorConstante,
-                                      respuestastabla.tipoDato,
-                                      element.preguntaTablaId.codigoPregunta.codigo,
-                                      respuestastabla.respCodigo);
-                                  });
-                                }
-                                );
+                                      this.database.guardarrespuestatabla(
+                                        respuestastabla.codigo,
+                                        respuestastabla.nombre,
+                                        respuestastabla.valor,
+                                        respuestastabla.valorConstante,
+                                        respuestastabla.tipoDato,
+                                        element.preguntaTablaId.codigoPregunta.codigo,
+                                        respuestastabla.respCodigo);
+                                    });
+                                  }
+                                  );
+                              } else {
+                                element.observacion = 0;
+                                this.database.guardarpreguntatabla(
+                                  element.preguntaTablaId.codigoPreguntaPadre.codigo,
+                                  element.preguntaTablaId.codigoPregunta.codigo,
+                                  element.preguntaTablaId.codigoPregunta.enunciado,
+                                  element.fila,
+                                  element.preguntaTablaId.codigoPregunta.cataTipeCodigo.codigo,
+                                  0,
+                                  element.preguntaTablaId.codigoPregunta.requerido,
+                                  element.preguntaTablaId.codigoPregunta.respCodigo.codigo,
+                                  element.observacion).then(() => {
+                                    element.preguntaTablaId.codigoPregunta.respCodigo.valores.forEach(respuestastabla => {
+
+                                      this.database.guardarrespuestatabla(
+                                        respuestastabla.codigo,
+                                        respuestastabla.nombre,
+                                        respuestastabla.valor,
+                                        respuestastabla.valorConstante,
+                                        respuestastabla.tipoDato,
+                                        element.preguntaTablaId.codigoPregunta.codigo,
+                                        respuestastabla.respCodigo);
+                                    });
+                                  }
+                                  );
+                              }
+                              
+
                             });
 
                           }
                         );
-                      }else{
+                      } else {
                         this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '', pr.pregunta.adjuntos, '');
 
                       }
                     } else {
                       if (pr.pregunta.cataTipeCodigo.codigo === 3007) {
-                       
+
                         this.authHttp.get(`${SERVER_URL}/api/questions/findPreguntasOfTable/${pr.pregunta.codigo}`).subscribe(
                           preguntatabla => {
-                           
+
                             this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '', pr.pregunta.adjuntos, preguntatabla.json()['header']['cuerpo']);
-                              
+
                             //  console.log(preguntatabla.json());
 
                             preguntatabla.json().preguntaTabla.forEach(element => {
@@ -142,7 +167,7 @@ export class FormulariosProvider {
                                 0,
                                 element.preguntaTablaId.codigoPregunta.requerido,
                                 element.preguntaTablaId.codigoPregunta.respCodigo.codigo,
-                              element.observacion).then(() => {
+                                element.observacion).then(() => {
                                   element.preguntaTablaId.codigoPregunta.respCodigo.valores.forEach(respuestastabla => {
 
                                     this.database.guardarrespuestatabla(
@@ -160,24 +185,24 @@ export class FormulariosProvider {
 
                           }
                         );
-                      }else{
-                      this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo, pr.pregunta.adjuntos, '');
+                      } else {
+                        this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo, pr.pregunta.adjuntos, '');
 
-                      this.authHttp.get(`${SERVER_URL}/api/answers/find/${pr.pregunta.respCodigo.codigo}`).subscribe(
-                        respuestas => {
-                          respuestas.json().valores.forEach(resp => {
-                            this.database.guardarrespuesta(resp.codigo, resp.nombre, resp.valor, resp.tipoDato, pregunt, respuestas.json().codigo).then(
-                              (ok) => {
-                                //console.log('ok',JSON.stringify(ok))
-                              }, (orr) => {
-                                //  console.log('orr',JSON.stringify(orr))
-                              });
-                          });
-                        }
-                      );
+                        this.authHttp.get(`${SERVER_URL}/api/answers/find/${pr.pregunta.respCodigo.codigo}`).subscribe(
+                          respuestas => {
+                            respuestas.json().valores.forEach(resp => {
+                              this.database.guardarrespuesta(resp.codigo, resp.nombre, resp.valor, resp.tipoDato, pregunt, respuestas.json().codigo).then(
+                                (ok) => {
+                                  //console.log('ok',JSON.stringify(ok))
+                                }, (orr) => {
+                                  //  console.log('orr',JSON.stringify(orr))
+                                });
+                            });
+                          }
+                        );
 
 
-                    }
+                      }
 
                     }
 
@@ -221,7 +246,7 @@ export class FormulariosProvider {
         let da: any;
         da = dt;
         this.items.forEach(respuestas => {
-          if (da != false) {            
+          if (da != false) {
             da.forEach(valores => {
               if (respuestas.preguntaid == valores.pregunta) {
                 respuestas.observacion = valores.observacion;
@@ -270,7 +295,7 @@ export class FormulariosProvider {
   }
 
   guardar3001(unidadp, grup, codigopararespuestas, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario) {
-    this.database.guardarrespuestaporpregunta(unidadp, grup, codigopararespuestas, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario).catch((err)=>{console.log(err)});
+    this.database.guardarrespuestaporpregunta(unidadp, grup, codigopararespuestas, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario).catch((err) => { console.log(err) });
 
   }
   guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion, tipof) {
@@ -284,59 +309,95 @@ export class FormulariosProvider {
   }
 
 
-  preguntasconrespuestastabla(preguntaid){
+  preguntasconrespuestastabla(preguntaid) {
     return this.database.preguntastablaporid(preguntaid).then((dt) => {
       this.items = dt;
       return this.items;
-    })  
+    })
   }
 
-  respuestastablas(codigorespuesta, up, grupo,preguntapadre, tipo){
-    return this.database.respuestasapreguntastablas(codigorespuesta).then((data)=>{
-      this.items=data;
+  respuestastablas(codigorespuesta, up, grupo, preguntapadre, tipo) {
+    return this.database.respuestasapreguntastablas(codigorespuesta).then((data) => {
+      this.items = data;
       return this.items;
-    }).then(()=>{
+    }).then(() => {
       this.items.forEach(element => {
-      
-        return this.database.respuestasguardadastabla(up, grupo, preguntapadre,element.preguntaid,element.codigo,tipo).then((respuesta)=>{
-          let respues=respuesta;
-          element.respuesta=respuesta;
-          if(element.tipo==210001){
-            if(!respuesta){
-              element.respuesta='';
-            }else{
-              element.respuesta=respuesta;
+
+        return this.database.respuestasguardadastabla(up, grupo, preguntapadre, element.preguntaid, element.codigo, tipo).then((respuesta) => {
+          let respues = respuesta;
+          element.respuesta = respuesta;
+          if (element.tipo == 210001) {
+            if (!respuesta) {
+              element.respuesta = '';
+            } else {
+              element.respuesta = respuesta;
             }
 
-          }else if(element.tipo==210002){
-            if(!respuesta){
-              element.respuesta='';
-            }else{
-              element.respuesta=parseInt(respues.toString());
+          } else if (element.tipo == 210002) {
+            if (!respuesta) {
+              element.respuesta = '';
+            } else {
+              element.respuesta = parseInt(respues.toString());
 
             }
-          }else if(element.tipo==210003){
-            if(!respuesta){
-              element.respuesta='';
-            }else{
-              element.respuesta=respuesta;
-            }}else if(element.tipo==210004){
-            element.respuesta=respuesta;
+          } else if (element.tipo == 210003) {
+            if (!respuesta) {
+              element.respuesta = '';
+            } else {
+              element.respuesta = respuesta;
+            }
+          } else if (element.tipo == 210004) {
+            element.respuesta = respuesta;
           }
-        });        
+        });
       });
-return this.items;
-    }).catch((err)=>{
+      return this.items;
+    }).catch((err) => {
       console.log(err);
     });
 
   }
-guardarpreguntatabla(unidadp, grup, codigopararespuestas, preguntapadre, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario){
-  this.database.guardarrespuestaporpreguntatabla(unidadp, grup, codigopararespuestas,preguntapadre, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario);
+  guardarpreguntatabla(unidadp, grup, codigopararespuestas, preguntapadre, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario) {
+    this.database.guardarrespuestaporpreguntatabla(unidadp, grup, codigopararespuestas, preguntapadre, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario);
 
-}
-guardarrespuestatabla(up, grupoidselected, codrespuesta, preguntaid, preguntapadre,valorcodigo, valorvalor, valor, tipocuestionario){
-  this.database.guardarrespuestaporpreguntatabla(up, grupoidselected, codrespuesta,preguntapadre, preguntaid,valorcodigo, valorvalor, valor, tipocuestionario);
-}
+  }
+  guardarrespuestatabla(up, grupoidselected, codrespuesta, preguntaid, preguntapadre, valorcodigo, valorvalor, valor, tipocuestionario) {
+    this.database.guardarrespuestaporpreguntatabla(up, grupoidselected, codrespuesta, preguntapadre, preguntaid, valorcodigo, valorvalor, valor, tipocuestionario);
+  }
+//  this.up, this.tipo,values.categoria,values.detalle, values.descripcion, year+ '-' +month + '-' + day, values.fecha ,0
+  guardarnoconformidades(unidadproductiva,tipo_formulario, categoria,detalle, descripcion, fechacreacion, fechaposiblecierre, estado){
+    return this.database.agregarnoconformidad(unidadproductiva,tipo_formulario, categoria,detalle, descripcion, fechacreacion, fechaposiblecierre, estado).then((dt) => {
+      this.items = dt;
+      return this.items;
+    },err=>{console.log(err)})
+  }
+  noconformidades(unidadproductiva,tipo_formulario){
+    return this.database.noconformidades(unidadproductiva,tipo_formulario).then((data)=>{
+      this.items=data;
+      return this.items;
+    })
+  }
+
+  descargarcategorias(){
+    this.storage.get('jwt').then(jwt => {
+
+      this.authHttp.get(`${SERVER_URL}/api/catalogValues/findByCatalog/22`).subscribe(
+        categoria=>{
+          console.log(categoria.json());
+          categoria.json().forEach(element => {
+//              console.log(element.codigo, element. campo2);
+              this.database.agregarcategoria(element.codigo, element. campo2);
+          });
+        }
+      );
+    });
+  }
+
+  categoria(){
+    return this.database.categorias().then((dt) => {
+      this.items = dt;
+      return this.items;
+    },err=>{console.log(err)})
+  }
 
 }

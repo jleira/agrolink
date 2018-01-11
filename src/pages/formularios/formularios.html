@@ -29,6 +29,24 @@
 
 
 <ion-content>
+    <ion-fab bottom right  *ngIf="caso == 4">
+        <button ion-fab mini color="danger"><ion-icon name="add" ></ion-icon></button>
+       </ion-fab>
+       <ion-fab bottom right  *ngIf="caso == 5" (click)="agregarnoconformidad()">
+          <button ion-fab mini color="danger"><ion-icon name="add" ></ion-icon></button>
+         </ion-fab>
+
+         <div  *ngIf="caso == 5">
+               
+                <button ion-item *ngFor="let item of items">
+                    <h2>{{item.descripcion}}</h2>
+                    <p>{{item.detalle}}</p>
+                 
+                </button>
+
+
+        </div>
+
   <div *ngIf="caso < 3">
     <div *ngFor="let item of items">
       <ion-card *ngIf="item.terminado === 1" style="border-top:2px solid mediumseagreen">
@@ -98,10 +116,6 @@
   </div>
 
   <div *ngIf="caso == 4">
-      <ion-fab bottom right >
-          <button ion-fab mini color="danger"><ion-icon name="add" ></ion-icon></button>
-         </ion-fab>
-
 
     <div *ngFor="let item of final">
 
@@ -517,12 +531,7 @@
 
   </div>
 
-  <div *ngIf="caso == 5">
-      <ion-fab bottom right (click)="agregarnoconformidad()" >
-          <button ion-fab mini color="danger"><ion-icon name="add" ></ion-icon></button>
-         </ion-fab>
-
-  </div>
+  
 
 
 

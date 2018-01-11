@@ -1,34 +1,59 @@
-<ion-header  >
-    <ion-toolbar class="cyan" color="secondary">
-      <ion-title>
-       No conformidad
-      </ion-title>
-      <ion-buttons start>
-        <button ion-button (click)="dismiss()">
-          Guardar
-        </button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
-  
-  <ion-content fullscreen >
-  <ion-item>
-    <ion-label floating>Descripcion corta</ion-label>
-    <ion-input ></ion-input>
-  </ion-item>
- 
-  <ion-item>
-    <ion-label stacked>detalle</ion-label>
-    <ion-textarea  ></ion-textarea >
-  </ion-item>
-<ion-item>
-    <ion-label>categoria</ion-label>
+<ion-header>
+  <ion-toolbar class="cyan" color="secondary">
+    <ion-title>
+      No conformidad
+    </ion-title>
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">
+        Cerrar
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-    <ion-select>
-      <ion-option *ngFor="let   categoria of categorias" [value]="categoria.id">{{categoria.note}}</ion-option>
-  
-    </ion-select>
-</ion-item>
- 
- 
-     </ion-content>
+<ion-content fullscreen>
+  <form #form="ngForm" (ngSubmit)="noconformidad(form.value)" novalidate>
+    <ion-item>
+      <ion-label floating>Descripcion corta</ion-label>
+      <ion-input type="text" name='descripcion' ngModel required #descripcion="ngModel" [class.invalid]="descripcion.errors && descripcion.dirty"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" no-lines *ngIf="descripcion.errors?.required && descripcion.dirty">
+      <p style="color:red">Descripcion Corta Requerido </p>
+    </ion-item>
+
+    <ion-item text-wrap>
+      <ion-label stacked>detalle</ion-label>
+      <ion-textarea text-wrap type="text" name='detalle' ngModel required #detalle="ngModel" [class.invalid]="detalle.errors && detalle.dirty"></ion-textarea>
+    </ion-item>
+    <ion-item class="error-message" no-lines *ngIf="detalle.errors?.required && detalle.dirty">
+      <p style="color:red">Detalle Requerido </p>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>categoria</ion-label>
+      <ion-select name="categoria" okText="Seleccionar" cancelText="Cancelar" ngModel required #categoria="ngModel" [class.invalid]="categoria.errors && categoria.dirty">
+        <ion-option *ngFor="let   categoria of categorias" [value]="categoria.id">{{categoria.nombre}}</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item class="error-message" no-lines *ngIf="categoria.errors?.required && categoria.dirty">
+      <p style="color:red">categoria Requerida </p>
+    </ion-item>
+
+    <ion-item text-wrap no-lines>
+        <ion-label>
+          Fecha de posible solucion
+        </ion-label>
+        <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar" name="fecha" ngModel required #fecha="ngModel"  [class.invalid]="fecha.errors && fecha.dirty"></ion-datetime>
+      </ion-item>
+      <ion-item class="error-message" no-lines *ngIf="fecha.errors?.required && fecha.dirty">
+          <p style="color:red">Fecha de posible solucion Requerida </p>
+        </ion-item>
+    
+
+    <div padding>
+      <button ion-button color="secondary" style="border: 1px green solid;" block type="submit" [disabled]="!form.valid">Registrar</button>
+    </div>
+
+  </form>
+
+</ion-content>
