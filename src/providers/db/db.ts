@@ -221,6 +221,14 @@ export class DbProvider {
                     id INTEGER,
                     nombre TEXT
                   );`, {})
+      }).then(() => {
+        return this.database.executeSql(
+          `CREATE TABLE IF NOT EXISTS tareas (
+                    id INTEGER PRIMARY KEY,
+                    noconformidad INTEGER,
+                    nombre TEXT,
+                    detalle TEXT
+                  );`, {})
       }).catch((err) => console.log("error detected creating tables", err));
   }
   private isReady() {
@@ -1172,6 +1180,9 @@ export class DbProvider {
             `DROP TABLE IF EXISTS noconformidades;`, {})
         }).then(() => {
           return this.database.executeSql(
+            `DROP TABLE IF EXISTS tareas;`, {})
+        }).then(() => {
+          return this.database.executeSql(
             `DROP TABLE IF EXISTS listacategoria;`, {})
         });
         
@@ -1336,8 +1347,68 @@ agregarnoconformidad(unidadproductiva,tipo_formulario, categoria,detalle, descri
       return this.database.executeSql(`INSERT INTO noconformidades 
               (unidadproductiva,tipo, categoria, descripcion, detalle, fechacreacion, fechaposiblecierre, estado) VALUES (?,?,?,?,?,?,?,?);`,
         [unidadproductiva,tipo_formulario, categoria, descripcion,detalle, fechacreacion, fechaposiblecierre, estado]);
-    });
+    }).then((ok)=>
+    {
+
+      return ok.insertId;
+    }).catch(()=>{
+    return false});
 }
+
+agregartarea(noconformidad, nombre, detalle) {
+  return this.isReady()
+    .then(() => {
+      return this.database.executeSql(`INSERT INTO tareas 
+              (noconformidad, nombre, detalle) VALUES (?,?,?);`,
+        [noconformidad, nombre, detalle]);
+    }).catch(()=>{
+    return false});
+}
+tareas(noconformidad){
+  return this.isReady(
+  ).then(() => {
+    return this.database.executeSql(`SELECT * FROM tareas WHERE noconformidad = (?)`, [noconformidad]).then((data) => {
+      let todos = [];
+      if (data.rows.length) {
+        for (let i = 0; i < data.rows.length; i++) {
+          let todo = data.rows.item(i);
+          todos.push(todo);
+        }
+      }else{
+        todos=null;
+      }
+      return todos;
+    })
+  })
+}
+tareasporid(id){
+  return this.isReady(
+  ).then(() => {
+    return this.database.executeSql(`SELECT * FROM tareas WHERE id = (?)`, [id]).then((data) => {
+      let todos = [];
+      if (data.rows.length) {
+          let todo = data.rows.item(0);
+          todos=todo;
+      }else{
+        todos=null;
+      }
+      return todos;
+    })
+  })
+}
+
+editartarea(id,columna,valor){
+  let identificador=id;
+  let columnae=columna;
+  let valore=valor;
+  return this.isReady(
+  ).then(() => {
+    return this.database.executeSql(
+      `UPDATE tareas SET ${columnae} = '${valore}' WHERE id=${identificador} ;`,
+      []);
+  })
+}
+
 noconformidades(unidadproductiva,tipo_formulario){
   return this.isReady(
   ).then(() => {
@@ -1356,6 +1427,38 @@ noconformidades(unidadproductiva,tipo_formulario){
   })
 
 }
+noconformidadid(id){
+  let identificador=id;
+  return this.isReady(
+  ).then(() => {
+    return this.database.executeSql(`SELECT * FROM noconformidades  WHERE id = (?)`, [identificador]).then((data) => {
+      let todos = [];
+      if (data.rows.length) {
+        for (let i = 0; i < data.rows.length; i++) {
+          let todo = data.rows.item(i);
+          todos.push(todo);
+        }
+      }else{
+        todos=null;
+      }
+      return todos;
+    })
+  })
+}
+
+editarnoconformidad(id,columna,valor){
+  let identificador=id;
+  let columnae=columna;
+  let valore=valor;
+  return this.isReady(
+  ).then(() => {
+    console.log(`UPDATE noconformidades SET ${columnae} = '${valore}' WHERE id=${identificador} ;`);
+    return this.database.executeSql(
+      `UPDATE noconformidades SET ${columnae} = '${valore}' WHERE id=${identificador} ;`,
+      []);
+  })
+}
+
 
 
 }

@@ -161,9 +161,15 @@ tipo;
   }
 
 
-  agregarnoconformidad(){
-    console.log(this.up, this.tipo);
-    let modal = this.modalCtrl.create(NuevanoconformidadPage,{'up': this.up, 'tipo':this.tipo});
+  agregarnoconformidad(id){
+    let cas;
+    if (id==0){
+      cas=false;
+    }else{
+      cas= id;
+    }
+
+    let modal = this.modalCtrl.create(NuevanoconformidadPage,{'up': this.up, 'tipo':this.tipo, 'id':cas});
     modal.present();
 
   }

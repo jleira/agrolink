@@ -400,4 +400,43 @@ export class FormulariosProvider {
     },err=>{console.log(err)})
   }
 
+  noconformidadid(id){
+    return this.database.noconformidadid(id).then((dt) => {
+      this.items = dt;
+      return this.items;
+    },err=>{console.log(err)})
+  }
+  editarnoconformidad(id,columna,valor){
+    return this.database.editarnoconformidad(id,columna,valor).then((dt) => {
+      this.items = dt;
+      return this.items;
+    },err=>{console.log(err)})
+  }
+
+  agregartarea(noconformidad,nombre,detalle){
+    return this.database.agregartarea(noconformidad,nombre,detalle).then((dt)=>{
+      this.items = dt;
+      return this.items;
+    },err=>{console.log(err)})
+  }
+
+  tareas(noconformidad){
+    return this.database.tareas(noconformidad).then((dt)=>{
+      this.items = dt;
+      return this.items;
+    },err=>{console.log(err)})
+  }
+  tareasporid(id){
+    return this.database.tareasporid(id).then((dt)=>{
+      this.items = dt;
+      return this.items;
+    },err=>{console.log(err)})
+  }
+  tareaseditar(id,columna,valor){
+    return this.database.editartarea(id,columna,valor).then((dt)=>{
+      this.items = dt;
+      return this.items;
+    },err=>{console.log(err)})
+  }
+
 }

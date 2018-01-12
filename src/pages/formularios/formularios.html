@@ -32,19 +32,15 @@
     <ion-fab bottom right  *ngIf="caso == 4">
         <button ion-fab mini color="danger"><ion-icon name="add" ></ion-icon></button>
        </ion-fab>
-       <ion-fab bottom right  *ngIf="caso == 5" (click)="agregarnoconformidad()">
+       <ion-fab bottom right  *ngIf="caso == 5" (click)="agregarnoconformidad(0)">
           <button ion-fab mini color="danger"><ion-icon name="add" ></ion-icon></button>
          </ion-fab>
 
-         <div  *ngIf="caso == 5">
-               
-                <button ion-item *ngFor="let item of items">
+         <div  *ngIf="caso == 5">               
+                <button ion-item *ngFor="let item of items" (click)="agregarnoconformidad(item.id)">
                     <h2>{{item.descripcion}}</h2>
                     <p>{{item.detalle}}</p>
-                 
                 </button>
-
-
         </div>
 
   <div *ngIf="caso < 3">
