@@ -227,7 +227,14 @@ export class DbProvider {
                     id INTEGER PRIMARY KEY,
                     noconformidad INTEGER,
                     nombre TEXT,
-                    detalle TEXT
+                    detalle TEXT,
+                    encargado TEXT,
+                    fechaposibleculminacion TEXT,
+                    estado INTEGER,
+                    fechacreacion TEXT,
+                    fechacierrereal TEXT
+
+
                   );`, {})
       }).catch((err) => console.log("error detected creating tables", err));
   }
@@ -1355,12 +1362,12 @@ agregarnoconformidad(unidadproductiva,tipo_formulario, categoria,detalle, descri
     return false});
 }
 
-agregartarea(noconformidad, nombre, detalle) {
+agregartarea(noconformidad, nombre, detalle,encargado,fecha,estado,fechacreacion) {
   return this.isReady()
     .then(() => {
       return this.database.executeSql(`INSERT INTO tareas 
-              (noconformidad, nombre, detalle) VALUES (?,?,?);`,
-        [noconformidad, nombre, detalle]);
+              (noconformidad, nombre, detalle,encargado,fechaposibleculminacion, estado, fechacreacion) VALUES (?,?,?,?,?,?,?);`,
+        [noconformidad, nombre, detalle,encargado,fecha, estado, fechacreacion]);
     }).catch(()=>{
     return false});
 }
@@ -1397,15 +1404,13 @@ tareasporid(id){
   })
 }
 
-editartarea(id,columna,valor){
+editartarea(id, nombre, detalle,encargado,fecha,estado, fechacierrereal){
   let identificador=id;
-  let columnae=columna;
-  let valore=valor;
   return this.isReady(
   ).then(() => {
     return this.database.executeSql(
-      `UPDATE tareas SET ${columnae} = '${valore}' WHERE id=${identificador} ;`,
-      []);
+      `UPDATE tareas SET nombre=(?), detalle=(?),encargado=(?),fechaposibleculminacion=(?),estado=(?), fechacierrereal=(?) WHERE id=${identificador} ;`,
+      [nombre, detalle,encargado,fecha,estado, fechacierrereal]);
   })
 }
 

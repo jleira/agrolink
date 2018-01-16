@@ -12,8 +12,8 @@
 </ion-header>
 
 <ion-content fullscreen>
-  {{pruebahtml}}
-  <form #form="ngForm" (ngSubmit)="noconformidad(form.value)" novalidate *ngIf="habilitartarea== false">
+
+  <form #form="ngForm" (ngSubmit)="noconformidad(form.value)" novalidate *ngIf="habilitarcreacion">
     <ion-item>
       <ion-label floating>Descripcion corta</ion-label>
       <ion-input type="text" name='descripcion' ngModel required #descripcion="ngModel" [class.invalid]="descripcion.errors && descripcion.dirty"></ion-input>
@@ -69,20 +69,88 @@
       <ion-input type="text" [(ngModel)]="descripcion" (change)="editarnoconformidad(id,'descripcion', descripcion)"></ion-input>
     </ion-item>
     <ion-item text-wrap no-lines>
-        <ion-label stacked>
-          detalle
-        </ion-label>
-        <ion-textarea rows="4"  [(ngModel)]="detalle" (change)="editarnoconformidad(id,'detalle', detalle)"></ion-textarea>        
-      </ion-item> 
+      <ion-label stacked>
+        detalle
+      </ion-label>
+      <ion-textarea rows="4" [(ngModel)]="detalle" (change)="editarnoconformidad(id,'detalle', detalle)"></ion-textarea>
+    </ion-item>
 
-      <ion-item text-wrap no-lines>
-          <ion-label stacked>
-            fecha limite de cierre
-          </ion-label>
-          <ion-datetime  displayFormat="YYYY-MM-DD" cancelText="Cancelar" [(ngModel)]="fecha" doneText="Guardar" (ionChange)="editarnoconformidad(id,'fechaposiblecierre', fecha)" ></ion-datetime >
-          </ion-item>
+    <ion-item text-wrap no-lines>
+      <ion-label stacked>
+        fecha limite de cierre
+      </ion-label>
+      <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" [(ngModel)]="fecha" doneText="Guardar" (ionChange)="editarnoconformidad(id,'fechaposiblecierre', fecha)"></ion-datetime>
+    </ion-item>
     <button ion-button color="secondary" (click)="agregartarea()">Agregar tarea</button>
+
+
   </div>
 
+  <div *ngIf="!habilitartarea">
+    <div *ngIf="!habilitarcreacion">
+      <ion-item text-wrap no-lines>
+        Identificador : {{id}}
+      </ion-item>
+      <ion-item text-wrap no-lines>
+        <h2>
+          descripcion
+        </h2>
+        <p>
+          {{descripcion}}
+        </p>
+      </ion-item>
+      <ion-item text-wrap no-lines>
+        <h2>
+          detalle
+        </h2>
+        <p>
+          {{detalle}}
+        </p>
+      </ion-item>
 
+      <ion-item text-wrap no-lines>
+        <h2>
+          Fecha estimada de cierre
+        </h2>
+        <p>
+          {{fecha}}
+        </p>
+
+      </ion-item>
+      <ion-item text-wrap no-lines>
+          <h2>
+            Fecha de cierre
+          </h2>
+          <p>
+            {{fechadecierre}}
+          </p>
+        </ion-item>
+        <ion-item text-wrap no-lines>
+            <h2>
+              Estado
+            </h2>
+            <p>
+              Finalizada
+            </p>
+    
+          </ion-item>
+    </div>
+  </div>
+  <ion-list>
+    <ion-label *ngIf="tareas">
+      Tareas
+    </ion-label>
+    <ion-item *ngFor="let item of tareas">
+      <h2>{{item.nombre}}</h2>
+      <p>{{item.detalle}}</p>
+      <ion-icon name="eye" item-end (click)="verdetalles(item)"></ion-icon>
+      <ion-icon name="create" *ngIf="item.estado==0" item-end (click)="editartarea(item)"></ion-icon>
+      <ion-icon name="checkbox" *ngIf="item.estado==0" item-end (click)="finalizartarea(item)"></ion-icon>
+      <ion-icon name="checkbox" *ngIf="item.estado==1" color="secondary" item-end></ion-icon>
+    </ion-item>
+  </ion-list>
+
+  <div padding *ngIf="habilitartarea">
+    <button ion-button color="secondary" style="border: 1px green solid;" block (click)="finalizarnoconformidad()">Finalizar no conformidad</button>
+  </div>
 </ion-content>

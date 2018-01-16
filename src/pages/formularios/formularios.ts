@@ -39,6 +39,7 @@ export class FormulariosPage {
   rutaimg: any;
   tipocuestionario;
 tipo;
+productor;
 
   constructor(
     public modalCtrl: ModalController,
@@ -82,12 +83,14 @@ tipo;
       this.up = this.navParams.get('up');
       this.tipo=this.navParams.get('tipo');
       let casot = this.navParams.get('tipo');
+      this.productor= this.navParams.get('productor');
       return this.formulario.gruposbase(casot).then(gps => {
         this.items = gps;
         loading.dismiss();
         return this.items;
       });
     } else if (this.caso == 4) {//promotoria
+      this.productor= this.navParams.get('productor');
       loading.present();
       this.tipocuestionario = this.navParams.get('tipo');
       this.grupoidselected = this.navParams.get('grupo');
@@ -148,6 +151,7 @@ tipo;
       });
     }
     else if(this.caso == 5){
+      this.productor= this.navParams.get('productor');
       loading.present();
       this.up = this.navParams.get('up');
       this.tipo=this.navParams.get('tipo');
@@ -169,7 +173,7 @@ tipo;
       cas= id;
     }
 
-    let modal = this.modalCtrl.create(NuevanoconformidadPage,{'up': this.up, 'tipo':this.tipo, 'id':cas});
+    let modal = this.modalCtrl.create(NuevanoconformidadPage,{'up': this.up, 'tipo':this.tipo, 'id':cas,'productor':this.productor});
     modal.present();
 
   }
@@ -209,7 +213,7 @@ tipo;
     this.formulario.guardarobservacion(this.up, this.grupoidselected, respcodigo, preguntaid, observacion, this.tipocuestionario);
   }
 
-  mostrargrupos(tipop, upva) {
+  mostrargrupos(tipop, upva, productor) {
     if (this.caso == 1) {
       tipop = 1002;
     } else {
@@ -217,13 +221,13 @@ tipo;
     }
     this.formulario.gruposbase(tipop).then(gps => {
       this.navCtrl.push(FormulariosPage, {
-        caso: 3, tipo: tipop, up: upva
+        caso: 3, tipo: tipop, up: upva, productor:productor
       });
     });
   }
   noconformidades(up, tipo) {
       this.navCtrl.push(FormulariosPage, {
-        caso: 5, tipo: tipo, up: up
+        caso: 5, tipo: tipo, up: up, productor:this.productor
     });
   }
 

@@ -413,8 +413,8 @@ export class FormulariosProvider {
     },err=>{console.log(err)})
   }
 
-  agregartarea(noconformidad,nombre,detalle){
-    return this.database.agregartarea(noconformidad,nombre,detalle).then((dt)=>{
+  agregartarea(noconformidad,nombre,detalle,encargado,fecha, estado, fechacreacion){
+    return this.database.agregartarea(noconformidad,nombre,detalle,encargado,fecha,estado,fechacreacion).then((dt)=>{
       this.items = dt;
       return this.items;
     },err=>{console.log(err)})
@@ -432,8 +432,8 @@ export class FormulariosProvider {
       return this.items;
     },err=>{console.log(err)})
   }
-  tareaseditar(id,columna,valor){
-    return this.database.editartarea(id,columna,valor).then((dt)=>{
+  tareaseditar(id, nombre, detalle,encargado,fecha,estado,fechacierrereal){
+    return this.database.editartarea(id, nombre, detalle,encargado,fecha,estado,fechacierrereal).then((dt)=>{
       this.items = dt;
       return this.items;
     },err=>{console.log(err)})

@@ -46,7 +46,7 @@
   <div *ngIf="caso < 3">
     <div *ngFor="let item of items">
       <ion-card *ngIf="item.terminado === 1" style="border-top:2px solid mediumseagreen">
-        <button ion-item (click)="mostrargrupos(item.tipo, item.idUnidadProductiva )">
+        <button ion-item (click)="mostrargrupos(item.tipo, item.idUnidadProductiva, item.productor )">
           <ion-row>
 
             <ion-col col-6 text-center> {{item.idUnidadProductiva}}
@@ -65,7 +65,7 @@
       </ion-card>
 
       <ion-card style="border-top:2px solid lightgray" *ngIf="item.terminado === 0">
-        <button ion-item (click)="mostrargrupos(item.tipo, item.idUnidadProductiva)">
+        <button ion-item (click)="mostrargrupos(item.tipo, item.idUnidadProductiva, item.productor)">
           <ion-row>
             <ion-col col-6 text-center> {{item.idUnidadProductiva}}
               <br>
