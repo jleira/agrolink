@@ -44,12 +44,23 @@
         <p>
             Ingrese aqui para realizar el precargado de los formularios
         </p>
-      </button> 
-    </ion-list>
-    <button ion-button button-block (click)="llamardb()">db</button>
+      </button>
+      <button ion-item (click)="casoespecial()" >
+        <ion-icon name="color-wand" item-start></ion-icon>
+      <h3 style="font-weight:bold">Casos especiales</h3>
+      <p>
+        Esta seccion es reservada para crear nuevas unidades productivas, y llenar sus respectivas encuestas.
+      </p>
+    </button> 
+    <button ion-item  (click)="casoespecial()">
+      <ion-icon name="leaf" item-start></ion-icon>
+    <h3 style="font-weight:bold">Casos especiales</h3>
     <p>
-      {{productor}}
+      Esta seccion es reservada para crear nuevas unidades productivas, y llenar sus respectivas encuestas.
     </p>
+  </button> 
+    </ion-list>
+    
 <!--  
     <ion-card *ngFor="let item of productor" >
       

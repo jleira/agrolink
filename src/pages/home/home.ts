@@ -3,6 +3,7 @@ import { NavController } from 'ionic-angular';
 import {Storage} from "@ionic/storage";
 import { Nav, Platform, ModalController } from 'ionic-angular';
 import { UnidadproductivaPage } from '../unidadproductiva/unidadproductiva';
+import { CasoespecialPage } from '../casoespecial/casoespecial';
 import { FormulariosPage }  from '../formularios/formularios';
 import {  EnviardatosPage } from './sinc';
 @Component({
@@ -69,6 +70,8 @@ abririmagen(ruta){
     modal.present();
 
   }
-
+  casoespecial(){
+    this.navCtrl.push(CasoespecialPage,{caso:1});
+  }
 
 }

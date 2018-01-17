@@ -28,6 +28,7 @@ export class DbProvider {
           );
         })
     });
+
   }
   creartablas() {
     return this.createTables();
@@ -926,6 +927,7 @@ export class DbProvider {
   }
 
   respuestasporpregunta(pregunta) {
+//    console.log(pregunta);
     let ids = pregunta.join();
     return this.isReady(
     ).then(() => {

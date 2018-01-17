@@ -38,8 +38,8 @@ export class FormulariosPage {
   grupoidselected: any;
   rutaimg: any;
   tipocuestionario;
-tipo;
-productor;
+  tipo;
+  productor;
 
   constructor(
     public modalCtrl: ModalController,
@@ -81,16 +81,16 @@ productor;
     } else if (this.caso == 3) {//auditoria
       loading.present();
       this.up = this.navParams.get('up');
-      this.tipo=this.navParams.get('tipo');
+      this.tipo = this.navParams.get('tipo');
       let casot = this.navParams.get('tipo');
-      this.productor= this.navParams.get('productor');
+      this.productor = this.navParams.get('productor');
       return this.formulario.gruposbase(casot).then(gps => {
         this.items = gps;
         loading.dismiss();
         return this.items;
       });
     } else if (this.caso == 4) {//promotoria
-      this.productor= this.navParams.get('productor');
+      this.productor = this.navParams.get('productor');
       loading.present();
       this.tipocuestionario = this.navParams.get('tipo');
       this.grupoidselected = this.navParams.get('grupo');
@@ -100,24 +100,28 @@ productor;
       this.rutaimg = this.file.externalDataDirectory + `${this.up}/${this.grupoidselected.toString()}`;
       this.formulario.preguntasgrupo(this.grupoidselected).then(preguntasg => {
         this.items = preguntasg;
+//        console.log(this.items);
         let r = [];
         this.items.forEach(element => {
           r.push(element.codigo);
         });
         this.resp = r;
+
         return this.formulario.respuestasporpreguntas(this.resp, this.up, this.grupoidselected, this.tipocuestionario).then(data => {
           this.resp = data;
-
+//          console.log(data);
           this.items.forEach(element => {
             if (element.tipo == 3007) {
 
               element.encabezado = JSON.parse(atob(element.encabezado));
+              console.log(element.encabezado);
+              let filas=element.encabezado.length;
+              let nuevoencabezado;
+
               this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
                 data.forEach(pregunta => {
-                  return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up,this.grupoidselected,element.codigo,this.tipocuestionario).then((respu) => {
-                    //      element.respuestas=respu; up, grupo,preguntapadre,preguntaid, tipo
+                  return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario).then((respu) => {
                     pregunta.respuesta = respu;
-                    // console.log(element);
                   });
                 });
                 element.preguntas = data;
@@ -133,11 +137,14 @@ productor;
 
             }
             let vr: any;
-            this.resp.forEach(element2 => {
-              if (element2.preguntaid == element.codigo) {
-                element.respuestas.push(element2);
-              }
-            });
+            if(this.resp){
+              this.resp.forEach(element2 => {
+                if (element2.preguntaid == element.codigo) {
+                  element.respuestas.push(element2);
+                }
+              });
+            }
+ 
           })
           this.resp = JSON.stringify(this.resp);
         }).
@@ -145,35 +152,35 @@ productor;
             this.final = this.items;
             loading.dismiss();
             this.prueba2 = JSON.stringify(this.final);
-            console.log(this.final);
+            //console.log(this.final);
             return this.final;
           });
       });
     }
-    else if(this.caso == 5){
-      this.productor= this.navParams.get('productor');
+    else if (this.caso == 5) {
+      this.productor = this.navParams.get('productor');
       loading.present();
       this.up = this.navParams.get('up');
-      this.tipo=this.navParams.get('tipo');
-      this.formulario.noconformidades(this.up, this.tipo).then((data)=>{
-        this.items=data;
+      this.tipo = this.navParams.get('tipo');
+      this.formulario.noconformidades(this.up, this.tipo).then((data) => {
+        this.items = data;
         console.log(this.items);
       });
-//      console.log('no conformidad',this.up, this.tipo);
+      //      console.log('no conformidad',this.up, this.tipo);
       loading.dismiss();
     }
   }
 
 
-  agregarnoconformidad(id){
+  agregarnoconformidad(id) {
     let cas;
-    if (id==0){
-      cas=false;
-    }else{
-      cas= id;
+    if (id == 0) {
+      cas = false;
+    } else {
+      cas = id;
     }
 
-    let modal = this.modalCtrl.create(NuevanoconformidadPage,{'up': this.up, 'tipo':this.tipo, 'id':cas,'productor':this.productor});
+    let modal = this.modalCtrl.create(NuevanoconformidadPage, { 'up': this.up, 'tipo': this.tipo, 'id': cas, 'productor': this.productor });
     modal.present();
 
   }
@@ -221,13 +228,13 @@ productor;
     }
     this.formulario.gruposbase(tipop).then(gps => {
       this.navCtrl.push(FormulariosPage, {
-        caso: 3, tipo: tipop, up: upva, productor:productor
+        caso: 3, tipo: tipop, up: upva, productor: productor
       });
     });
   }
   noconformidades(up, tipo) {
-      this.navCtrl.push(FormulariosPage, {
-        caso: 5, tipo: tipo, up: up, productor:this.productor
+    this.navCtrl.push(FormulariosPage, {
+      caso: 5, tipo: tipo, up: up, productor: this.productor
     });
   }
 
@@ -450,15 +457,15 @@ productor;
     });
   }
 
-  chec(event){
+  chec(event) {
     console.log(event);
   }
-  guardarfechapadre(valor, preguntapadre,preguntaid , fecha) {
-   // console.log(valor, preguntapadre, preguntaid, $event.year + '-' + $event.month + '-' + $event.day)
-    this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.respuestapadre, preguntaid, preguntapadre,valor.codigo, valor.valor, fecha, this.tipocuestionario);
+  guardarfechapadre(valor, preguntapadre, preguntaid, fecha) {
+    // console.log(valor, preguntapadre, preguntaid, $event.year + '-' + $event.month + '-' + $event.day)
+    this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.respuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, fecha, this.tipocuestionario);
   }
-  guardarpadre(valor, preguntapadre,preguntaid , event){
-    this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.respuestapadre, preguntaid, preguntapadre,valor.codigo, valor.valor, event, this.tipocuestionario);
+  guardarpadre(valor, preguntapadre, preguntaid, event) {
+    this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.respuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
   }
 
 }

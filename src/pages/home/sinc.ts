@@ -31,16 +31,23 @@ export class EnviardatosPage {
           let enviar=[];
           this.db.formularioid(tipo).then((formularioid) => {
             formulario = formularioid;
-            this.db.gruposbyid(formulario).then((grupo) => {
-              let grupos = grupo;
-              let preguntas = [];
-              grupos.forEach(grupoi => {
-                this.db.preguntasporgrupo(grupoi.idgrupobase).then((pregunta) => {
-                  preguntas.push(pregunta);
+            console.log(formulario);
+            if(formulario==null){
+              return false;
+            }else{
+              this.db.gruposbyid(formulario).then((grupo) => {
+                let grupos = grupo;
+                let preguntas = [];
+                grupos.forEach(grupoi => {
+                  this.db.preguntasporgrupo(grupoi.idgrupobase).then((pregunta) => {
+                    preguntas.push(pregunta);
+                  });
                 });
+              //  console.log(preguntas);
+
               });
-            //  console.log(preguntas);
-            });
+            }
+
           }).then((ok) => {
       
       

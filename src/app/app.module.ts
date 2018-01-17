@@ -11,6 +11,7 @@ import { UnidadproductivaPage } from '../pages/unidadproductiva/unidadproductiva
 import { UpdetallesPage} from '../pages/updetalles/updetalles';
 import { FiltroupPage} from '../pages/filtroup/filtroup';
 import { FormulariosPage} from '../pages/formularios/formularios';
+import { CasoespecialPage} from '../pages/casoespecial/casoespecial';
 import { ImagePage} from '../pages/formularios/imagenes';
 import { NuevanoconformidadPage} from '../pages/formularios/noconformidad';
 import { EnviardatosPage} from '../pages/home/sinc';
@@ -59,7 +60,10 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     FormulariosPage,
     ImagePage,
     NuevanoconformidadPage,
-    EnviardatosPage
+    EnviardatosPage,
+    CasoespecialPage
+
+
     ],
   imports: [
     BrowserModule,
@@ -85,7 +89,8 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     FormulariosPage,
     ImagePage,
     NuevanoconformidadPage,
-    EnviardatosPage
+    EnviardatosPage,
+    CasoespecialPage
   ],
   providers: [
     StatusBar,
