@@ -10,14 +10,18 @@ import { DbProvider } from '../../providers/db/db';
 export class EnviardatosPage {
   img: any;
   up: any;
+  decide: any;
   constructor(
     public uproductiva: UproductivaProvider,
     public viewCtrl: ViewController,
     public navParams: NavParams,
     public db: DbProvider
   ) {
-    this.uproductiva.llamaruproductivas().then((data) => {
+    this.uproductiva.llamarunidadesproductivasiniciadas().then((data) => {
       this.up = data;
+      if(this.up.length == 0){
+        this.up=false;
+      }
     });
   }
   dismiss() {

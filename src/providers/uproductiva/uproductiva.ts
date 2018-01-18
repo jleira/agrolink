@@ -118,6 +118,12 @@ llamaruproductivas(){
         return this.items;
       })
 }
+llamarunidadesproductivasiniciadas(){
+  return this.database.todasuproductivasiniciadas().then((data: any)=>{
+    this.items=data;
+    return this.items;
+  })
+}
 llamaruproductivasap(caso){
   return this.database.todasuproductivasap(caso).then((data: any)=>{
     this.items=data;

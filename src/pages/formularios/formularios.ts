@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, LoadingController, PopoverController, ModalController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, LoadingController, PopoverController, ModalController, ToastController } from 'ionic-angular';
 import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
 import { observeOn } from 'rxjs/operators/observeOn';
-import { Camera, CameraOptions } from '@ionic-native/camera';
-import { File, DirectoryEntry } from '@ionic-native/file';
 import { retry } from 'rxjs/operator/retry';
 import { ImagePage } from './imagenes';
 import { NuevanoconformidadPage } from './noconformidad';
+
+import { Camera, CameraOptions } from '@ionic-native/camera';
+import { File, DirectoryEntry } from '@ionic-native/file';
+import { Geolocation } from '@ionic-native/geolocation';
 
 /**
  * Generated class for the FormulariosPage page.
@@ -26,10 +28,6 @@ export class FormulariosPage {
   caso: any;
   items: any;
   respuestas;
-  prueba: any;
-  prueba2: any;
-  prueba3: any;
-  prueba4: any;
   resp: any;
   final: any;
   grupo: any;
@@ -40,8 +38,11 @@ export class FormulariosPage {
   tipocuestionario;
   tipo;
   productor;
+  datoguardar:any;
 
+  
   constructor(
+    private toastCtrl: ToastController,
     public modalCtrl: ModalController,
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -51,12 +52,13 @@ export class FormulariosPage {
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController,
     private file: File,
+    private geolocation: Geolocation,
     public popoverCtrl: PopoverController) {
     this.caso = navParams.get('caso');
+    console.log(this.caso);
   }
 
   ionViewDidLoad() {
-    this.prueba = [];
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
       content: 'Cargando informacion...'
@@ -90,14 +92,27 @@ export class FormulariosPage {
         return this.items;
       });
     } else if (this.caso == 4) {//promotoria
-      this.productor = this.navParams.get('productor');
       loading.present();
+      this.productor = this.navParams.get('productor');
       this.tipocuestionario = this.navParams.get('tipo');
+      this.tipo=this.tipocuestionario;
       this.grupoidselected = this.navParams.get('grupo');
-
       this.up = this.navParams.get('up');
       this.grupo = this.navParams.get('gruponombre');
       this.rutaimg = this.file.externalDataDirectory + `${this.up}/${this.grupoidselected.toString()}`;
+      let fechaentro;
+      fechaentro= new Date();
+
+      fechaentro= fechaentro.getFullYear()+'-'+fechaentro.getMonth()+'-'+fechaentro.getDate()+' '+fechaentro.getHours()+':'+fechaentro.getMinutes()+':00';
+      this.geolocation.getCurrentPosition().then((resp) => {
+        this.datoguardar=fechaentro+','+resp.coords.latitude.toString() +',' +resp.coords.longitude.toString();
+        console.log(this.datoguardar);
+      }).catch((error) => {
+  this.datoguardar=fechaentro+','+error.message +',' +error.message;
+   this.handleError('no se pudo acceder a la ubicacion del telefono '+ error.message);
+   console.log(this.datoguardar);
+ }).then(()=>{
+ });
       this.formulario.preguntasgrupo(this.grupoidselected).then(preguntasg => {
         this.items = preguntasg;
 //        console.log(this.items);
@@ -114,9 +129,6 @@ export class FormulariosPage {
             if (element.tipo == 3007) {
 
               element.encabezado = JSON.parse(atob(element.encabezado));
-              console.log(element.encabezado);
-              let filas=element.encabezado.length;
-              let nuevoencabezado;
 
               this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
                 data.forEach(pregunta => {
@@ -151,8 +163,7 @@ export class FormulariosPage {
           then(() => {
             this.final = this.items;
             loading.dismiss();
-            this.prueba2 = JSON.stringify(this.final);
-            //console.log(this.final);
+            console.log(this.final);
             return this.final;
           });
       });
@@ -164,7 +175,7 @@ export class FormulariosPage {
       this.tipo = this.navParams.get('tipo');
       this.formulario.noconformidades(this.up, this.tipo).then((data) => {
         this.items = data;
-        console.log(this.items);
+        console.log('no conformidades',this.items);
       });
       //      console.log('no conformidad',this.up, this.tipo);
       loading.dismiss();
@@ -189,31 +200,34 @@ export class FormulariosPage {
   //nuevas funciones
   guardarfecha(valor, preguntaid, respcodigo, event) {
     this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, event, this.tipocuestionario);
+    this.guardarubicacion(this.up,this.datoguardar);
   }
   guardar3003(valor, preguntaid, respcodigo, respuestafinal) {
     this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, respuestafinal, this.tipocuestionario);
-    console.log(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, respuestafinal, this.tipocuestionario);
+    this.guardarubicacion(this.up,this.datoguardar);
   }
 
   guardar3001(valor, preguntaid, respcodigo) {
     this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, valor.valor, this.tipocuestionario);
+    this.guardarubicacion(this.up,this.datoguardar);
   }
 
   guardar3006(valor, preguntaid, respcodigo, respuestafinal) {
     this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, respuestafinal, this.tipocuestionario);
+    this.guardarubicacion(this.up,this.datoguardar);
   }
   guardar3002(valor, preguntaid, respcodigo) {
 
     let codigosrespuestas: any = [];
     let valoresrespuesta: any = [];
-    this.prueba = JSON.stringify(valor);
-    valor.forEach(element => {
+     valor.forEach(element => {
       codigosrespuestas.push(element.codigo);
       valoresrespuesta.push(element.valor);
     });
     codigosrespuestas = codigosrespuestas.join('_');
     valoresrespuesta = valoresrespuesta.join('_');
     this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, codigosrespuestas, valoresrespuesta, valoresrespuesta, this.tipocuestionario);
+    this.guardarubicacion(this.up,this.datoguardar);
   }
 
   guardarobservacion(preguntaid, respcodigo, observacion) {
@@ -308,6 +322,7 @@ export class FormulariosPage {
           targetPath + `/${nombrecarpetapadre}/${idgrupo.toString()}`,
           imageData.replace(this.file.externalCacheDirectory, "")).then(() => {
             this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imageData.replace(this.file.externalCacheDirectory, ""), this.tipocuestionario);
+            this.guardarubicacion(this.up,this.datoguardar);
           }, () => { });
       }).then((ok
       ) => {
@@ -362,7 +377,9 @@ export class FormulariosPage {
         }).then(() => {
           return this.file.writeFile(targetPath + `${nombrecarpetapadre}/${idgrupo.toString()}/`, imgname, blob).then((ok) => { }, (err) => { });
         }).then(() => {
-          return this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imgname, this.tipocuestionario).then(() => { }, () => { });
+          return this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imgname, this.tipocuestionario).then(() => { 
+            this.guardarubicacion(this.up,this.datoguardar);
+          }, () => { });
         }).then(() => {
           return this.recargaritem().then(() => { }, () => { }).then(() => { }, () => { });
         }).then(() => {
@@ -420,14 +437,13 @@ export class FormulariosPage {
       spinner: 'bubbles',
       content: 'Cargando informacion...'
     });
-
+    this.productor = this.navParams.get('productor');
+    loading.present();
     this.tipocuestionario = this.navParams.get('tipo');
     this.grupoidselected = this.navParams.get('grupo');
-
     this.up = this.navParams.get('up');
     this.grupo = this.navParams.get('gruponombre');
     this.rutaimg = this.file.externalDataDirectory + `${this.up}/${this.grupoidselected.toString()}`;
-    console.log(this.rutaimg);
     return this.formulario.preguntasgrupo(this.grupoidselected).then(preguntasg => {
       this.items = preguntasg;
       let r = [];
@@ -438,23 +454,40 @@ export class FormulariosPage {
       return this.formulario.respuestasporpreguntas(this.resp, this.up, this.grupoidselected, this.tipocuestionario).then(data => {
         this.resp = data;
         this.items.forEach(element => {
+          if (element.tipo == 3007) {
+            element.encabezado = JSON.parse(atob(element.encabezado));
+            this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
+              data.forEach(pregunta => {
+                return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario).then((respu) => {
+                  pregunta.respuesta = respu;
+                });
+              });
+              element.preguntas = data;
+              return this.items;
+            }, (err) => {
+              console.log(err);
+            }).then((data) => {
+            });
+          }
           let vr: any;
-          this.resp.forEach(element2 => {
-            if (element2.preguntaid == element.codigo) {
-              element.respuestas.push(element2);
-            }
-          });
+          if(this.resp){
+            this.resp.forEach(element2 => {
+              if (element2.preguntaid == element.codigo) {
+                element.respuestas.push(element2);
+              }
+            });
+          }
+
         })
         this.resp = JSON.stringify(this.resp);
       }).
         then(() => {
           this.final = this.items;
-          this.prueba2 = JSON.stringify(this.final);
+          loading.dismiss();
           return this.final;
         });
-
-
     });
+    
   }
 
   chec(event) {
@@ -467,5 +500,42 @@ export class FormulariosPage {
   guardarpadre(valor, preguntapadre, preguntaid, event) {
     this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.respuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
   }
+//  guardarrespuestatabla(up, grupoidselected, codrespuesta, preguntaid, preguntapadre, valorcodigo, valorvalor, valor, tipocuestionario) {
+//    this.database.guardarrespuestaporpreguntatabla(up, grupoidselected, codrespuesta, preguntapadre, preguntaid, valorcodigo, valorvalor, valor, tipocuestionario); 
+//  }
+
+  guardarobservacionpadre($event,preguntapadre,preguntaid){
+    this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, null, preguntaid, preguntapadre, '', '', $event.target.value, this.tipocuestionario);
+  }
+
+
+  handleError(error: string) {
+    let message: string;
+    message = error;
+    const toast = this.toastCtrl.create({
+      message,
+      duration: 5000,
+      position: 'bottom'
+    });
+    toast.present();
+  }
+  guardarubicacion(unidad,valor){
+    if(valor==null){
+      let fechaentro:any= new Date();
+      fechaentro= fechaentro.getFullYear()+'-'+fechaentro.getMonth()+'-'+fechaentro.getDate()+' '+fechaentro.getHours()+':'+fechaentro.getMinutes()+':00';
+      this.datoguardar=fechaentro+',error,error';
+      valor=this.datoguardar;
+    }
+    this.handleError(this.datoguardar);
+    console.log('valor', valor);
+    let c;
+    if(this.tipocuestionario==1002){
+      c=2;
+    }else{
+      c=1;      
+    }
+    this.formulario.guardarubicacion(unidad,valor,c);
+  }
+
 
 }

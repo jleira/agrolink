@@ -22,26 +22,30 @@
       <ion-title>{{grupo}} - UNIDAD {{up}}</ion-title>
     </div>
     <div *ngIf="caso == 5">
-        <ion-title>NO CONFORMIDADES - UNIDAD {{up}}</ion-title>
-      </div>
-    </ion-navbar>
+      <ion-title>NO CONFORMIDADES - UNIDAD {{up}}</ion-title>
+    </div>
+  </ion-navbar>
 </ion-header>
 
 
 <ion-content>
-    <ion-fab bottom right  *ngIf="caso == 4" (click)="agregarnoconformidad(0)">
-        <button ion-fab mini color="danger"><ion-icon name="add" ></ion-icon></button>
-       </ion-fab>
-       <ion-fab bottom right  *ngIf="caso == 5" (click)="agregarnoconformidad(0)">
-          <button ion-fab mini color="danger"><ion-icon name="add" ></ion-icon></button>
-         </ion-fab>
+  <ion-fab bottom right *ngIf="caso == 4" (click)="agregarnoconformidad(0)">
+    <button ion-fab mini color="danger">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
+  <ion-fab bottom right *ngIf="caso == 5" (click)="agregarnoconformidad(0)">
+    <button ion-fab mini color="danger">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
 
-         <div  *ngIf="caso == 5">               
-                <button ion-item *ngFor="let item of items" (click)="agregarnoconformidad(item.id)">
-                    <h2>{{item.descripcion}}</h2>
-                    <p>{{item.detalle}}</p>
-                </button>
-        </div>
+  <div *ngIf="caso == 5">
+    <button ion-item *ngFor="let item of items" (click)="agregarnoconformidad(item.id)">
+      <h2>{{item.descripcion}}</h2>
+      <p>{{item.detalle}}</p>
+    </button>
+  </div>
 
   <div *ngIf="caso < 3">
     <div *ngFor="let item of items">
@@ -85,27 +89,37 @@
   </div>
   <div *ngIf="caso == 3">
     <div *ngFor="let item of items">
-      <ion-card style="border-top:2px solid mediumseagreen" >
+      <ion-card style="border-top:2px solid mediumseagreen">
         <button ion-item (click)="mostrarpreguntas(item.idgrupobase,item.nombre )">
           <ion-row text-wrap>
-            <ion-col col-12 text-center> <h3><strong>{{item.nombre}}</strong> </h3>
-              
+            <ion-col col-12 text-center>
+              <h3>
+                <strong>{{item.nombre}}</strong>
+              </h3>
+
             </ion-col>
-            <ion-col col-12 text-center  > <h6>
-                {{item.textoayuda}} </h6></ion-col>
+            <ion-col col-12 text-center>
+              <h6>
+                {{item.textoayuda}} </h6>
+            </ion-col>
           </ion-row>
         </button>
       </ion-card>
-  </div>
-  <ion-card style="border-top:2px solid mediumseagreen" >
-      <button ion-item  (click)="noconformidades(up, tipo)">
+    </div>
+    <ion-card style="border-top:2px solid mediumseagreen">
+      <button ion-item (click)="noconformidades(up, tipo)">
         <ion-row text-wrap>
-          <ion-col col-12 text-center> <h3><strong>NO CONFORMIDADES</strong> </h3>
-            
+          <ion-col col-12 text-center>
+            <h3>
+              <strong>NO CONFORMIDADES</strong>
+            </h3>
+
           </ion-col>
-          <ion-col col-12 text-center  > <h6>Son los problemas encontrados alo largo de la promotoria u auditoria, tambien encontramos 
-              no conformidades de periodos anteriores con el fin de cerrarlas o ver su avance
-               </h6></ion-col>
+          <ion-col col-12 text-center>
+            <h6>Son los problemas encontrados alo largo de la promotoria u auditoria, tambien encontramos no conformidades de
+              periodos anteriores con el fin de cerrarlas o ver su avance
+            </h6>
+          </ion-col>
         </ion-row>
       </button>
     </ion-card>
@@ -120,6 +134,8 @@
         <ion-item>
           <ion-label style="color:black">{{item.enunciado}}</ion-label>
         </ion-item>
+
+
       </div>
 
       <div *ngIf="item.tipo==3003">
@@ -162,6 +178,9 @@
               <ion-item>
                 <ion-label>{{item.enunciado}}</ion-label>
                 <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar" (ionChange)="guardarfecha(opciones, item.codigo, item.codigorespuesta, $event)"></ion-datetime>
+              </ion-item>
+              <ion-item class="error-message"  *ngIf="item.requerido==1">
+                <p style="color:red">Pregunta requerida</p>
               </ion-item>
               <div *ngIf="item.archivo===1">
                 <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>
@@ -249,6 +268,9 @@
                 </ion-item>
               </div>
             </div>
+            <ion-item class="error-message" no-lines |>
+              <p style="color:red">Pregunta requerida</p>
+            </ion-item>
 
           </div>
 
@@ -314,6 +336,9 @@
             </div>
           </div>
         </div>
+        <ion-item class="error-message" *ngIf="item.requerido==1">
+          <p style="color:red">Pregunta requerida</p>
+        </ion-item>
       </div>
 
       <div *ngIf="item.tipo==3001">
@@ -350,6 +375,9 @@
             </div>
           </div>
         </div>
+        <ion-item class="error-message"  *ngIf="item.requerido==1">
+          <p style="color:red">Pregunta requerida</p>
+        </ion-item>
       </div>
 
 
@@ -391,6 +419,9 @@
             </div>
           </div>
         </div>
+        <ion-item class="error-message"  *ngIf="item.requerido==1" >
+            <p style="color:red" >Pregunta requerida</p>
+           </ion-item>
       </div>
 
 
@@ -436,6 +467,9 @@
           </div>
 
         </div>
+        <ion-item class="error-message"  *ngIf="item.requerido==1" >
+            <p style="color:red" >Pregunta requerida</p>
+           </ion-item>
       </div>
 
 
@@ -482,42 +516,54 @@
           </div>
 
         </div>
+        <ion-item class="error-message"  *ngIf="item.requerido==1" >
+            <p style="color:red" >Pregunta requerida</p>
+           </ion-item>
       </div>
       <div *ngIf="item.tipo==3007">
-      
+       
         <ion-label style="color:black">{{item.enunciado}}</ion-label>
-          <!--tabla -->
+        <ion-item class="error-message" *ngIf="item.requerido==1" >
+            <p style="color:red" >Pregunta requerida</p>
+           </ion-item>
+
+        <!--tabla -->
         <ion-grid>
-            <ion-row *ngFor="let encabezado of item.encabezado"   nowrap >
-                <ion-col *ngFor="let columnas of encabezado.columnas"  style="border: 1px solid gray;text-align: center">
-                    {{columnas.enunciado}}
-                </ion-col>
-            </ion-row>
-            <ion-row  nowrap justify-content-center *ngFor="let preguntas of item.preguntas" >
-                <ion-col style="border: 1px solid gray;text-align: center;vertical-align: middle" *ngIf="preguntas.observacion==1" col-auto>{{preguntas.enunciado}}</ion-col>
-              
-                  <ion-col  *ngFor="let respuestas of preguntas.respuesta" style="border: 1px solid gray;text-align: center;vertical-align: middle"  >
-                      <div *ngIf="respuestas.tipo==210000" >
-                       {{respuestas.constante}}
-                      </div>
-                      <div *ngIf="respuestas.tipo==210001">
-                        <ion-datetime  displayFormat="YYYY-MM-DD" cancelText="Cancelar" [(ngModel)]="respuestas.respuesta" doneText="Guardar" (ionChange)="guardarfechapadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)" ></ion-datetime >
-                      </div>
-                      <div *ngIf="respuestas.tipo==210002">
-                          <ion-input  type="number" [(ngModel)]="respuestas.respuesta"  (change)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)" ></ion-input>
-                      </div>
-                      <div *ngIf="respuestas.tipo==210003">
-                          <ion-input  type="text" [(ngModel)]="respuestas.respuesta"  (change)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)" ></ion-input>
-                      </div>
-                      <div *ngIf="respuestas.tipo==210004" style="margin-top:15px">
-                        <ion-checkbox [(ngModel)]="respuestas.respuesta"  (ionChange)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)" ></ion-checkbox>
-                      </div>    
-                    </ion-col>
-             
-            </ion-row>
-        
+          <ion-row *ngFor="let encabezado of item.encabezado" nowrap>
+            <ion-col *ngFor="let columnas of encabezado.columnas" style="border: 1px solid gray;text-align: center">
+              {{columnas.enunciado}}
+            </ion-col>
+          </ion-row>
+          <ion-row nowrap justify-content-center *ngFor="let preguntas of item.preguntas">
+            <ion-col style="border: 1px solid gray;text-align: center;vertical-align: middle" *ngIf="preguntas.observacion==1" >{{preguntas.enunciado}}</ion-col>
+            <ion-col style="border: 1px solid gray;text-align: center;vertical-align: middle" *ngIf="preguntas.observacion==1"  >
+                <ion-input type="text" (change)="guardarobservacionpadre($event,preguntas.preguntapadre,preguntas.preguntaid)"></ion-input>
+            </ion-col>
+
+
+
+            <ion-col *ngFor="let respuestas of preguntas.respuesta" style="border: 1px solid gray;text-align: center;vertical-align: middle">
+              <div *ngIf="respuestas.tipo==210000">
+                {{respuestas.constante}}
+              </div>
+              <div *ngIf="respuestas.tipo==210001">
+                <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" [(ngModel)]="respuestas.respuesta" doneText="Guardar" (ionChange)="guardarfechapadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-datetime>
+              </div>
+              <div *ngIf="respuestas.tipo==210002">
+                <ion-input type="number" [(ngModel)]="respuestas.respuesta" (change)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-input>
+              </div>
+              <div *ngIf="respuestas.tipo==210003">
+                <ion-input type="text" [(ngModel)]="respuestas.respuesta" (change)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-input>
+              </div>
+              <div *ngIf="respuestas.tipo==210004" style="margin-top:15px">
+                <ion-checkbox [(ngModel)]="respuestas.respuesta" (ionChange)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-checkbox>
+              </div>
+            </ion-col>
+
+          </ion-row>
+
         </ion-grid>
-        
+
 
       </div>
 
@@ -527,7 +573,7 @@
 
   </div>
 
-  
+
 
 
 

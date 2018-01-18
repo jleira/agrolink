@@ -88,6 +88,10 @@ export class DbProvider {
             tipo INTEGER,
             idAsignacion,
             IdProductor INTEGER,
+            iniciopromotoria TEXT,
+            finpromotoria TEXT,
+            inicioauditoria TEXT,
+            finauditoria TEXT,
             FOREIGN KEY(regionId) REFERENCES regiones(id)
             );`, {})
       }).then(() => {
@@ -304,7 +308,7 @@ export class DbProvider {
 
         return this.database.executeSql(`INSERT INTO unidades_productivas
                 (idUnidadProductiva,nombre,fechaIngreso,regionId,localizacion_longitude,localizacion_latitude,IdProductor, terminado, tipo,idAsignacion ) VALUES (?, ?,?,?,?,?,?,?,?, ?);`,
-          [idUnidadProductiva, nombre, fechaIngreso, regionId, localizacion_longitude, localizacion_latitude, IdProductor, 0, tipo,idAsignacion]);
+          [idUnidadProductiva, nombre, fechaIngreso, regionId, localizacion_longitude, localizacion_latitude, IdProductor, 0, tipo, idAsignacion]);
       });
   }
 
@@ -842,7 +846,7 @@ export class DbProvider {
       });
   }
 
-  
+
   guardarrespuestatabla(codigo, nombre, valor, constante, tipo, preguntaid, codigorespuestapadre) {
     return this.isReady()
       .then(() => {
@@ -909,7 +913,7 @@ export class DbProvider {
         if (data.rows.length) {
           for (let i = 0; i < data.rows.length; i++) {
             let todo = data.rows.item(i);
-            todo.preguntas=[];
+            todo.preguntas = [];
             todo.respuestas = [];
             todo.identificador = 'respuesta' + i;
             todos.push(todo);
@@ -927,7 +931,7 @@ export class DbProvider {
   }
 
   respuestasporpregunta(pregunta) {
-//    console.log(pregunta);
+    //    console.log(pregunta);
     let ids = pregunta.join();
     return this.isReady(
     ).then(() => {
@@ -995,7 +999,25 @@ export class DbProvider {
         })
       })
   }
-
+  todasuproductivasiniciadas() {
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, tipo, terminado, idAsignacion from unidades_productivas WHERE terminado = 1`, []).then((data) => {
+          let todas = [];
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            this.nombreregion(todo.regionId).then((data: any) => {
+              todo.region = data;
+            });
+            this.nombreproductor(todo.IdProductor).then((data: any) => {
+              todo.productor = data;
+            });
+            todas.push(todo);
+          }
+          return todas;
+        })
+      })
+  }
   todasuproductivas2() {
     return this.isReady()
       .then(() => {
@@ -1042,7 +1064,6 @@ export class DbProvider {
           (unidadproductiva, grupo, respuestascodigo ,pregunta, codigorespuesta, valorrespuesta, valor , tipoformulario)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
                 [unidadp, grup, respuestascodigo, preguntaid, codigoresp, valorresp, valortext, tipoformulario]);
-
             } else {
               return this.database.executeSql(
                 `UPDATE respuestasguardadas SET codigorespuesta = (?), valorrespuesta = (?), valor =(?) WHERE id=${idseleccion} ;`,
@@ -1194,20 +1215,20 @@ export class DbProvider {
           return this.database.executeSql(
             `DROP TABLE IF EXISTS listacategoria;`, {})
         });
-        
+
     })
   }
-//
-  
-  guardarpreguntatabla(preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido,codigorespuesta,observacion) {
+  //
+
+  guardarpreguntatabla(preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido, codigorespuesta, observacion) {
     return this.isReady()
       .then(() => {
         return this.database.executeSql(`INSERT INTO preguntastabla (preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido,codigorespuesta,observacion ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-          [preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido,codigorespuesta,observacion ]);
+          [preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido, codigorespuesta, observacion]);
       });
   }
-//                 INTEGER,
-preguntastablaporid(preguntaid){
+  //                 INTEGER,
+  preguntastablaporid(preguntaid) {
     return this.isReady(
     ).then(() => {
       return this.database.executeSql(`SELECT * FROM preguntastabla WHERE preguntapadre = ${preguntaid}`, []).then((data) => {
@@ -1215,7 +1236,7 @@ preguntastablaporid(preguntaid){
         if (data.rows.length) {
           for (let i = 0; i < data.rows.length; i++) {
             let todo = data.rows.item(i);
-            todo.respuesta=[];
+            todo.respuesta = [];
             todos.push(todo);
           }
         } else {
@@ -1227,245 +1248,284 @@ preguntastablaporid(preguntaid){
       })
     })
 
-}
-respuestasapreguntastablas(codigorespuestapadre){
-  return this.isReady(
-  ).then(() => {
-    return this.database.executeSql(`SELECT * FROM respuestastabla WHERE codigorespuestapadre = ${codigorespuestapadre}`, []).then((data) => {
-      let todos = [];
-      if (data.rows.length) {
-        for (let i = 0; i < data.rows.length; i++) {
-          let todo = data.rows.item(i);
-          todo.respuesta=[];
-          todos.push(todo);
-        }
-      } else {
-        let todo;
-        todo = false;
-        todos = todo;
-      }
-      return todos;
-    })
-  })
-}
-
-guardarrespuestaporpreguntatabla(unidadp, grup, respuestascodigo,preguntapadre, preguntaid, codigoresp, valorresp, valortext, tipoformulario) {
-  let up = unidadp;
-  let gr = grup;
-  let pr = preguntaid;
-  let tipop = tipoformulario;
-  let ppadre=preguntapadre;
-  let cres=codigoresp;
-  return this.isReady()
-    .then(() => {
-      return this.database.executeSql
-        (`SELECT * FROM respuestasguardadastabla WHERE unidadproductiva = (?)  AND grupo =(?) AND preguntaid =(?) AND tipoformulario =(?) AND preguntapadre=(?) AND codigorespuesta=(?)`,
-        [up, gr, pr, tipop, ppadre, cres]).then((data) => {
-          let id;
-          if (data.rows.length > 0) {
-            id = data.rows.item(0).id;
-          } else {
-            id = false;
-          }
-          return id;
-        }).then((idseleccion) => {
-
-          if (idseleccion == false) {
-
-            return this.database.executeSql(
-              `INSERT INTO respuestasguardadastabla 
-        (unidadproductiva, grupo, respuestascodigo ,preguntapadre ,preguntaid, codigorespuesta, valorrespuesta, valor , tipoformulario)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-
-              [unidadp, grup, respuestascodigo,preguntapadre, preguntaid, codigoresp, valorresp, valortext, tipoformulario]);
-
-          } else {
-            return this.database.executeSql(
-              `UPDATE respuestasguardadastabla SET codigorespuesta = (?), valorrespuesta = (?), valor =(?) WHERE id=${idseleccion} ;`,
-              [codigoresp, valorresp, valortext]);
-          }
-        })
-    }).catch(err=>console.log(err));
-
-}
-
-respuestasguardadastabla(unidadp, grupo, preguntapadre,preguntaid,codigorespuesta,tipoformulario){
-  let up = unidadp;
-  let gr = grupo;
-  let pr = preguntaid;
-  let tipop = tipoformulario;
-  let ppadre=preguntapadre;
-  let cres=codigorespuesta;
-
-  return this.isReady()
-  .then(() => {
-    return this.database.executeSql(`SELECT valor FROM respuestasguardadastabla WHERE 
-    unidadproductiva = (?)  AND 
-    grupo =(?) AND 
-    preguntaid =(?) AND 
-    tipoformulario =(?) AND 
-    preguntapadre=(?) AND 
-    codigorespuesta=(?)`,
-    [up, 
-      gr, 
-      pr, 
-      tipop, 
-      ppadre, 
-      cres]).then((data)=>{
-      let todos = [];
+  }
+  respuestasapreguntastablas(codigorespuestapadre) {
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM respuestastabla WHERE codigorespuestapadre = ${codigorespuestapadre}`, []).then((data) => {
+        let todos = [];
         if (data.rows.length) {
-            todos= data.rows.item(0).valor;
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todo.respuesta = [];
+            todos.push(todo);
+          }
         } else {
           let todo;
           todo = false;
           todos = todo;
         }
         return todos;
-    });
-  });
-}
+      })
+    })
+  }
 
-agregarcategoria(id, nombre) {
-  return this.isReady()
-    .then(() => {
-      return this.database.executeSql(`INSERT INTO listacategoria 
+  guardarrespuestaporpreguntatabla(unidadp, grup, respuestascodigo, preguntapadre, preguntaid, codigoresp, valorresp, valortext, tipoformulario) {
+    let up = unidadp;
+    let gr = grup;
+    let pr = preguntaid;
+    let tipop = tipoformulario;
+    let ppadre = preguntapadre;
+    let cres = codigoresp;
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql
+          (`SELECT * FROM respuestasguardadastabla WHERE unidadproductiva = (?)  AND grupo =(?) AND preguntaid =(?) AND tipoformulario =(?) AND preguntapadre=(?) AND codigorespuesta=(?)`,
+          [up, gr, pr, tipop, ppadre, cres]).then((data) => {
+            let id;
+            if (data.rows.length > 0) {
+              id = data.rows.item(0).id;
+            } else {
+              id = false;
+            }
+            return id;
+          }).then((idseleccion) => {
+
+            if (idseleccion == false) {
+
+              return this.database.executeSql(
+                `INSERT INTO respuestasguardadastabla 
+        (unidadproductiva, grupo, respuestascodigo ,preguntapadre ,preguntaid, codigorespuesta, valorrespuesta, valor , tipoformulario)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+
+                [unidadp, grup, respuestascodigo, preguntapadre, preguntaid, codigoresp, valorresp, valortext, tipoformulario]);
+
+            } else {
+              return this.database.executeSql(
+                `UPDATE respuestasguardadastabla SET codigorespuesta = (?), valorrespuesta = (?), valor =(?) WHERE id=${idseleccion} ;`,
+                [codigoresp, valorresp, valortext]);
+            }
+          })
+      }).catch(err => console.log(err));
+
+  }
+
+  respuestasguardadastabla(unidadp, grupo, preguntapadre, preguntaid, codigorespuesta, tipoformulario) {
+    let up = unidadp;
+    let gr = grupo;
+    let pr = preguntaid;
+    let tipop = tipoformulario;
+    let ppadre = preguntapadre;
+    let cres = codigorespuesta;
+
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(`SELECT valor FROM respuestasguardadastabla WHERE 
+    unidadproductiva = (?)  AND 
+    grupo =(?) AND 
+    preguntaid =(?) AND 
+    tipoformulario =(?) AND 
+    preguntapadre=(?) AND 
+    codigorespuesta=(?)`,
+          [up,
+            gr,
+            pr,
+            tipop,
+            ppadre,
+            cres]).then((data) => {
+              let todos = [];
+              if (data.rows.length) {
+                todos = data.rows.item(0).valor;
+              } else {
+                let todo;
+                todo = false;
+                todos = todo;
+              }
+              return todos;
+            });
+      });
+  }
+
+  agregarcategoria(id, nombre) {
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(`INSERT INTO listacategoria 
               (id, nombre) VALUES (?,?);`,
-        [id, nombre]);
-    });
-}
-categorias(){
-  return this.isReady(
-  ).then(() => {
-    return this.database.executeSql(`SELECT * FROM listacategoria `, []).then((data) => {
-      let todos = [];
-      if (data.rows.length) {
-        for (let i = 0; i < data.rows.length; i++) {
-          let todo = data.rows.item(i);
-          todos.push(todo);
+          [id, nombre]);
+      });
+  }
+  categorias() {
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM listacategoria `, []).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todos.push(todo);
+          }
         }
-      }
-      return todos;
+        return todos;
+      })
     })
-  })
 
-}
+  }
 
-agregarnoconformidad(unidadproductiva,tipo_formulario, categoria,detalle, descripcion,  fechacreacion, fechaposiblecierre, estado) {
-  return this.isReady()
-    .then(() => {
-      return this.database.executeSql(`INSERT INTO noconformidades 
+  agregarnoconformidad(unidadproductiva, tipo_formulario, categoria, detalle, descripcion, fechacreacion, fechaposiblecierre, estado) {
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(`INSERT INTO noconformidades 
               (unidadproductiva,tipo, categoria, descripcion, detalle, fechacreacion, fechaposiblecierre, estado) VALUES (?,?,?,?,?,?,?,?);`,
-        [unidadproductiva,tipo_formulario, categoria, descripcion,detalle, fechacreacion, fechaposiblecierre, estado]);
-    }).then((ok)=>
-    {
+          [unidadproductiva, tipo_formulario, categoria, descripcion, detalle, fechacreacion, fechaposiblecierre, estado]);
+      }).then((ok) => {
 
-      return ok.insertId;
-    }).catch(()=>{
-    return false});
-}
+        return ok.insertId;
+      }).catch(() => {
+        return false
+      });
+  }
 
-agregartarea(noconformidad, nombre, detalle,encargado,fecha,estado,fechacreacion) {
-  return this.isReady()
-    .then(() => {
-      return this.database.executeSql(`INSERT INTO tareas 
+  agregartarea(noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion) {
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(`INSERT INTO tareas 
               (noconformidad, nombre, detalle,encargado,fechaposibleculminacion, estado, fechacreacion) VALUES (?,?,?,?,?,?,?);`,
-        [noconformidad, nombre, detalle,encargado,fecha, estado, fechacreacion]);
-    }).catch(()=>{
-    return false});
-}
-tareas(noconformidad){
-  return this.isReady(
-  ).then(() => {
-    return this.database.executeSql(`SELECT * FROM tareas WHERE noconformidad = (?)`, [noconformidad]).then((data) => {
-      let todos = [];
-      if (data.rows.length) {
-        for (let i = 0; i < data.rows.length; i++) {
-          let todo = data.rows.item(i);
-          todos.push(todo);
+          [noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion]);
+      }).catch(() => {
+        return false
+      });
+  }
+  tareas(noconformidad) {
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM tareas WHERE noconformidad = (?)`, [noconformidad]).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todos.push(todo);
+          }
+        } else {
+          todos = null;
         }
-      }else{
-        todos=null;
-      }
-      return todos;
+        return todos;
+      })
     })
-  })
-}
-tareasporid(id){
-  return this.isReady(
-  ).then(() => {
-    return this.database.executeSql(`SELECT * FROM tareas WHERE id = (?)`, [id]).then((data) => {
-      let todos = [];
-      if (data.rows.length) {
+  }
+  tareasporid(id) {
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM tareas WHERE id = (?)`, [id]).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
           let todo = data.rows.item(0);
-          todos=todo;
-      }else{
-        todos=null;
-      }
-      return todos;
-    })
-  })
-}
-
-editartarea(id, nombre, detalle,encargado,fecha,estado, fechacierrereal){
-  let identificador=id;
-  return this.isReady(
-  ).then(() => {
-    return this.database.executeSql(
-      `UPDATE tareas SET nombre=(?), detalle=(?),encargado=(?),fechaposibleculminacion=(?),estado=(?), fechacierrereal=(?) WHERE id=${identificador} ;`,
-      [nombre, detalle,encargado,fecha,estado, fechacierrereal]);
-  })
-}
-
-noconformidades(unidadproductiva,tipo_formulario){
-  return this.isReady(
-  ).then(() => {
-    return this.database.executeSql(`SELECT * FROM noconformidades  WHERE unidadproductiva = (?)  AND  tipo =(?) `, [unidadproductiva,tipo_formulario]).then((data) => {
-      let todos = [];
-      if (data.rows.length) {
-        for (let i = 0; i < data.rows.length; i++) {
-          let todo = data.rows.item(i);
-          todos.push(todo);
+          todos = todo;
+        } else {
+          todos = null;
         }
-      }else{
-        todos=null;
-      }
-      return todos;
+        return todos;
+      })
     })
-  })
+  }
 
-}
-noconformidadid(id){
-  let identificador=id;
-  return this.isReady(
-  ).then(() => {
-    return this.database.executeSql(`SELECT * FROM noconformidades  WHERE id = (?)`, [identificador]).then((data) => {
-      let todos = [];
-      if (data.rows.length) {
-        for (let i = 0; i < data.rows.length; i++) {
-          let todo = data.rows.item(i);
-          todos.push(todo);
+  editartarea(id, nombre, detalle, encargado, fecha, estado, fechacierrereal) {
+    let identificador = id;
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(
+        `UPDATE tareas SET nombre=(?), detalle=(?),encargado=(?),fechaposibleculminacion=(?),estado=(?), fechacierrereal=(?) WHERE id=${identificador} ;`,
+        [nombre, detalle, encargado, fecha, estado, fechacierrereal]);
+    })
+  }
+
+  noconformidades(unidadproductiva, tipo_formulario) {
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM noconformidades  WHERE unidadproductiva = (?)  AND  tipo =(?) `, [unidadproductiva, tipo_formulario]).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todos.push(todo);
+          }
+        } else {
+          todos = null;
         }
-      }else{
-        todos=null;
-      }
-      return todos;
+        return todos;
+      })
     })
-  })
-}
 
-editarnoconformidad(id,columna,valor){
-  let identificador=id;
-  let columnae=columna;
-  let valore=valor;
-  return this.isReady(
-  ).then(() => {
-    console.log(`UPDATE noconformidades SET ${columnae} = '${valore}' WHERE id=${identificador} ;`);
-    return this.database.executeSql(
-      `UPDATE noconformidades SET ${columnae} = '${valore}' WHERE id=${identificador} ;`,
-      []);
-  })
-}
+  }
+  noconformidadid(id) {
+    let identificador = id;
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM noconformidades  WHERE id = (?)`, [identificador]).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todos.push(todo);
+          }
+        } else {
+          todos = null;
+        }
+        return todos;
+      })
+    })
+  }
 
+  editarnoconformidad(id, columna, valor) {
+    let identificador = id;
+    let columnae = columna;
+    let valore = valor;
+    return this.isReady(
+    ).then(() => {
+      console.log(`UPDATE noconformidades SET ${columnae} = '${valore}' WHERE id=${identificador} ;`);
+      return this.database.executeSql(
+        `UPDATE noconformidades SET ${columnae} = '${valore}' WHERE id=${identificador} ;`,
+        []);
+    })
+  }
 
+  guardarubicacion(idUnidadProductiva, datoaguardar, caso) {
+    console.log('ese es el dato', datoaguardar);
+    let idseleccion = idUnidadProductiva;
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(`SELECT * from unidades_productivas WHERE  idUnidadProductiva =  (?)`, [idseleccion])
+          .then((data) => {
+            let todo = data.rows.item(0);
+            console.log(todo);
+            if (caso == 1) {//promotoria
+                if (todo.iniciopromotoria===null) {
+                  console.log('1');
+                return this.database.executeSql(
+                  `UPDATE unidades_productivas SET iniciopromotoria = (?) , terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' ;`,
+                  [datoaguardar]).then((datae) => { console.log(datae); return data; }).catch(err => { console.log(err); return err; });
+              } else {
+                console.log('2');
 
+                return this.database.executeSql(
+                  `UPDATE unidades_productivas SET finpromotoria = (?),terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' ;`,
+                  [datoaguardar]).then((datae) => { console.log(datae) }).catch(err => { console.log(err); return err; });
+              }
+            } else {
+              if (todo.inicioauditoria===null) {
+                console.log('3');
+                
+                return this.database.executeSql(
+                  `UPDATE unidades_productivas SET inicioauditoria = (?), terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' ;`,
+                  [datoaguardar]).then((datae) => { console.log(datae); return datae; }).catch(err => { console.log(err); return err });
+              } else {
+                console.log('4');
+
+                return this.database.executeSql(
+                  `UPDATE unidades_productivas SET finauditoria = (?),terminado = 1  WHERE idUnidadProductiva = '${idseleccion}' ;`,
+                  [datoaguardar]).then((datae) => { console.log(data); return datae; }).catch(err => { console.log(err); return err });
+              }
+            }
+          })
+      })
+  }
 }

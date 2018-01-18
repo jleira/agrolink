@@ -52,15 +52,14 @@ export class FormulariosProvider {
 
                   preguntas.json().forEach(pr => {
                     //console.log('llego2',pr.pregunta.codigo);
-                    if(pr.pregunta.codigo==51){
-                      console.log(element2.idGrupoBase,pr);
-                    }
+                    
                     let requerido;
-                    if (pr.requerido) {
+                    if (pr.pregunta.requerido==true) {
                       requerido = 1;
                     } else {
                       requerido = 0;
                     }
+
                     if (pr.pregunta.adjuntos === true) {
                       pr.pregunta.adjuntos = 1;
                     }
@@ -119,6 +118,7 @@ export class FormulariosProvider {
                           }
                         );
                       } else {
+                        console.log(pr);
                         this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '', pr.pregunta.adjuntos, '');
 
                       }
@@ -342,6 +342,7 @@ export class FormulariosProvider {
   }
   guardarrespuestatabla(up, grupoidselected, codrespuesta, preguntaid, preguntapadre, valorcodigo, valorvalor, valor, tipocuestionario) {
     this.database.guardarrespuestaporpreguntatabla(up, grupoidselected, codrespuesta, preguntapadre, preguntaid, valorcodigo, valorvalor, valor, tipocuestionario);
+    
   }
   guardarnoconformidades(unidadproductiva,tipo_formulario, categoria,detalle, descripcion, fechacreacion, fechaposiblecierre, estado){
     return this.database.agregarnoconformidad(unidadproductiva,tipo_formulario, categoria,detalle, descripcion, fechacreacion, fechaposiblecierre, estado).then((dt) => {
@@ -414,6 +415,9 @@ export class FormulariosProvider {
       this.items = dt;
       return this.items;
     },err=>{console.log(err)})
+  }
+  guardarubicacion(unidad,valor,caso){
+    this.database.guardarubicacion(unidad,valor,caso);
   }
 
 }

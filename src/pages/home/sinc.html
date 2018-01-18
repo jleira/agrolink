@@ -5,14 +5,14 @@
       </ion-title>
       <ion-buttons start>
         <button ion-button (click)="dismiss()">
-          Guardar
+          Cerrar
         </button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
   
   <ion-content fullscreen >
-      <ion-item>
+      <ion-item *ngIf="up">
           <ion-label>Unidades para auditoria</ion-label>
       
           <ion-select multiple (ionChange)="comprobarunidades(1002,$event)">
@@ -23,7 +23,7 @@
       
           </ion-select>
       </ion-item>
-      <ion-item>
+      <ion-item *ngIf="up">
         <ion-label>Unidades para promotoria</ion-label>
       
         <ion-select multiple (ionChange)="comprobarunidades(1001,$event)">
@@ -35,15 +35,10 @@
         </ion-select>
       </ion-item>
        
-  <ion-item>
-    <ion-label floating>Descripcion corta</ion-label>
-    <ion-input ></ion-input>
-  </ion-item>
- 
-  <ion-item>
-    <ion-label stacked>detalle</ion-label>
-    <ion-textarea  ></ion-textarea >
-  </ion-item>
+<ion-item *ngIf="!up">
+  No se ha iniciado ningun formulario
+</ion-item>
+
 
  
      </ion-content>

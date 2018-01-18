@@ -36,7 +36,7 @@ import { FormulariosProvider } from '../providers/formularios/formularios';
 
 import { Camera } from '@ionic-native/camera';
 import { File } from '@ionic-native/file';
-
+import { Geolocation } from '@ionic-native/geolocation';
 
 
 
@@ -62,8 +62,6 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     NuevanoconformidadPage,
     EnviardatosPage,
     CasoespecialPage
-
-
     ],
   imports: [
     BrowserModule,
@@ -109,7 +107,8 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     DbProvider,
     FormulariosProvider,
     Camera,
-    File
+    File,
+    Geolocation
   ]
 })
 export class AppModule {}
