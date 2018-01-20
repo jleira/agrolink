@@ -118,8 +118,8 @@ llamaruproductivas(){
         return this.items;
       })
 }
-llamarunidadesproductivasiniciadas(){
-  return this.database.todasuproductivasiniciadas().then((data: any)=>{
+llamarunidadesproductivasiniciadas(tipo){
+  return this.database.todasuproductivasiniciadas(tipo).then((data: any)=>{
     this.items=data;
     return this.items;
   })

@@ -60,7 +60,6 @@ abririmagen(ruta){
     } else if (caso==3) {
       this.navCtrl.setRoot(UnidadproductivaPage);
     }else if (caso==4) {
-      console.log('enviar datos');
       this.agregarnoconformidad();
   }
 

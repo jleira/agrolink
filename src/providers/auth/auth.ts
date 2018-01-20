@@ -11,13 +11,6 @@ import { DbProvider } from '../db/db';
 
 let apiUrl = SERVER_URL;
 
-
-/*
-  Generated class for the AuthProvider provider. 
-
-  See https://angular.io/guide/dependency-injection for more info on providers
-  and Angular DI.
-*/
 @Injectable()
 export class AuthProvider {
   authUser = new ReplaySubject<any>(1);
@@ -31,20 +24,8 @@ export class AuthProvider {
       this.storage.get('jwt').then(jwt => {        
           this.authUser.next(jwt);          
       });
-/* 
-        if (jwt && !this.jwtHelper.isTokenExpired(jwt)) {
-          this.authHttp.get(`${apiUrl}/autenticate`)
-            .subscribe(() => this.authUser.next(jwt),
-              (err) => this.storage.remove('jwt').then(() => this.authUser.next(null)));
-          // OR
-          // this.authUser.next(jwt);
-        }
-        else {
-          this.storage.remove('jwt').then(() => this.authUser.next(null));
-        }
-      });
-/*/
     }
+
     login(values: any): Observable<any> {
       let headers = new Headers();
       headers.append('Content-Type', 'application/json');
@@ -54,14 +35,30 @@ let options = new RequestOptions({ headers: headers });
       return this.http.post(`${apiUrl}api/login`, '{"identificador":"'+values.username+'","clave":"'+values.password+'"}', options)
    .map(response => (
     response.headers.get('authorization').substring(7)
-)).map(jwt => this.handleJwtResponse(jwt));
+)).map(jwt => this.handleJwtResponse(jwt,values.empresa));
     }
-    private handleJwtResponse(jwt: string) {
+
+    login2(usuario, pass, empresa): Observable<any> {
+      let headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      headers.append('X-Agrolink-Tenant', empresa);
+let options = new RequestOptions({ headers: headers });
+      return this.http.post(`${apiUrl}api/login`, '{"identificador":"'+usuario+'","clave":"'+ pass+'"}', options)
+   .map(response => {
+     response.headers.get('authorization').substring(7);
+      console.log(response);
+  return response.headers.get('authorization').substring(7);}).map(jwt => this.handleJwtResponse2(jwt));
+    }
+    private handleJwtResponse2(jwt: string) {
+      return this.storage.set('jwt', jwt).then(() => jwt);
+    }
+
+    private handleJwtResponse(jwt: string,empresa) {
       return this.storage.set('jwt', jwt)
         .then(() => {
           this.database.creartablas().then(()=>{},()=>{});
           return this.authHttp.get(`${SERVER_URL}/api/users/findMyData/`).subscribe(
-            data =>  this.guardarinfo(data.json()),
+            data =>  this.guardarinfo(data.json(),empresa),
             err =>{console.log(err);
           }
           )
@@ -82,9 +79,10 @@ let options = new RequestOptions({ headers: headers });
       this.storage.remove('identificacion');
       this.storage.remove('mail');
       this.storage.remove('reload');
+      this.storage.remove('empresa');
       
     }
-    guardarinfo(value){
+    guardarinfo(value,empresa){
       this.storage.set('codigo', value['codigo']);
       this.storage.set('nombre', value['nombre']);
       this.storage.set('identificador', value['identificador']);
@@ -93,6 +91,7 @@ let options = new RequestOptions({ headers: headers });
       this.storage.set('tipo_id', value['cataTiidCodigo']['campo2']);
       this.storage.set('identificacion', value['numeroIdentificacion']);
       this.storage.set('mail', value['correoElectronico']);
+      this.storage.set('empresa',empresa);
     }
 }
 

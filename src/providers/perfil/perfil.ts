@@ -30,7 +30,26 @@ guardarinfo(value){
   this.storage.set('codigo', value['codigo']);
   this.storage.set('nombre', value['nombre']);
   this.storage.set('identificador', value['identificador']);
-  this.storage.set('roll', value['roles']);
+  let roles='';
+  if(value.roles.length>0){
+    value.roles.forEach(element => {
+      if(element==1){
+        roles='Administrador' + roles;
+      } 
+      if(element == 2){
+        roles=' - Auditor' + roles;
+      }
+      if(element == 3 ){
+        roles=' - Promotor' + roles;
+      }      
+    });
+    this.storage.set('roll', roles);
+     } 
+     else{
+    this.storage.set('roll', 'Sin rol asignada');
+  }
+  
+
   //this.storage.set('roll', 'Auditor Interno');
   this.storage.set('tipo_id', value['cataTiidCodigo']['campo2']);
   this.storage.set('identificacion', value['numeroIdentificacion']);

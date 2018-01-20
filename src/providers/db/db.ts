@@ -215,7 +215,8 @@ export class DbProvider {
                     categoria INTEGER,
                     descripcion TEXT,
                     detalle TEXT,
-                    fechacreacion TEXT, 
+                    fechacreacion TEXT,
+                    heredada INTEGER,
                     fechaposiblecierre TEXT, 
                     estado INTEGER,
                     fechafinalizado, TEXT
@@ -234,11 +235,11 @@ export class DbProvider {
                     nombre TEXT,
                     detalle TEXT,
                     encargado TEXT,
-                    fechaposibleculminacion TEXT,
+                    heredada INTEGER,
+                    fechaPautadaCierre TEXT,
                     estado INTEGER,
-                    fechacreacion TEXT,
-                    fechacierrereal TEXT
-
+                    fechaCreacion TEXT,
+                    fechaRealCierre TEXT
 
                   );`, {})
       }).catch((err) => console.log("error detected creating tables", err));
@@ -930,8 +931,30 @@ export class DbProvider {
     })
   }
 
+  preguntasporgruporequeridas(grupo) {
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT codigo, enunciado,tipo  FROM preguntas WHERE grupoid =  ${grupo} AND requerido = 1`, []).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todos.push(todo);
+          }
+        } else {
+          let todo;
+          todo = null;
+          todos = todo;
+        }
+        return todos;
+      })
+
+
+    })
+  }
+
+
   respuestasporpregunta(pregunta) {
-    //    console.log(pregunta);
     let ids = pregunta.join();
     return this.isReady(
     ).then(() => {
@@ -999,23 +1022,18 @@ export class DbProvider {
         })
       })
   }
-  todasuproductivasiniciadas() {
+  todasuproductivasiniciadas(caso) {
     return this.isReady()
       .then(() => {
-        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, tipo, terminado, idAsignacion from unidades_productivas WHERE terminado = 1`, []).then((data) => {
+        return this.database.executeSql(`SELECT * from unidades_productivas WHERE tipo IN (${caso},1003) AND terminado = 1`, []).then((data) => {
           let todas = [];
+
           for (let i = 0; i < data.rows.length; i++) {
             let todo = data.rows.item(i);
-            this.nombreregion(todo.regionId).then((data: any) => {
-              todo.region = data;
-            });
-            this.nombreproductor(todo.IdProductor).then((data: any) => {
-              todo.productor = data;
-            });
             todas.push(todo);
           }
           return todas;
-        })
+        }, err => { })
       })
   }
   todasuproductivas2() {
@@ -1389,7 +1407,7 @@ export class DbProvider {
     return this.isReady()
       .then(() => {
         return this.database.executeSql(`INSERT INTO tareas 
-              (noconformidad, nombre, detalle,encargado,fechaposibleculminacion, estado, fechacreacion) VALUES (?,?,?,?,?,?,?);`,
+              (noconformidad, nombre, detalle,encargado,fechaPautadaCierre, estado, fechaCreacion) VALUES (?,?,?,?,?,?,?);`,
           [noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion]);
       }).catch(() => {
         return false
@@ -1433,7 +1451,7 @@ export class DbProvider {
     return this.isReady(
     ).then(() => {
       return this.database.executeSql(
-        `UPDATE tareas SET nombre=(?), detalle=(?),encargado=(?),fechaposibleculminacion=(?),estado=(?), fechacierrereal=(?) WHERE id=${identificador} ;`,
+        `UPDATE tareas SET nombre=(?), detalle=(?),encargado=(?),fechaPautadaCierre=(?),estado=(?), fechaRealCierre=(?) WHERE id=${identificador} ;`,
         [nombre, detalle, encargado, fecha, estado, fechacierrereal]);
     })
   }
@@ -1481,7 +1499,6 @@ export class DbProvider {
     let valore = valor;
     return this.isReady(
     ).then(() => {
-      console.log(`UPDATE noconformidades SET ${columnae} = '${valore}' WHERE id=${identificador} ;`);
       return this.database.executeSql(
         `UPDATE noconformidades SET ${columnae} = '${valore}' WHERE id=${identificador} ;`,
         []);
@@ -1489,43 +1506,148 @@ export class DbProvider {
   }
 
   guardarubicacion(idUnidadProductiva, datoaguardar, caso) {
-    console.log('ese es el dato', datoaguardar);
     let idseleccion = idUnidadProductiva;
     return this.isReady()
       .then(() => {
         return this.database.executeSql(`SELECT * from unidades_productivas WHERE  idUnidadProductiva =  (?)`, [idseleccion])
           .then((data) => {
             let todo = data.rows.item(0);
-            console.log(todo);
             if (caso == 1) {//promotoria
-                if (todo.iniciopromotoria===null) {
-                  console.log('1');
+              if (todo.iniciopromotoria === null) {
                 return this.database.executeSql(
-                  `UPDATE unidades_productivas SET iniciopromotoria = (?) , terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' ;`,
-                  [datoaguardar]).then((datae) => { console.log(datae); return data; }).catch(err => { console.log(err); return err; });
+                  `UPDATE unidades_productivas SET iniciopromotoria = (?), finpromotoria = (?) , terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' ;`,
+                  [datoaguardar, datoaguardar]).then((datae) => { return data; }).catch(err => { return err; });
               } else {
-                console.log('2');
-
                 return this.database.executeSql(
                   `UPDATE unidades_productivas SET finpromotoria = (?),terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' ;`,
-                  [datoaguardar]).then((datae) => { console.log(datae) }).catch(err => { console.log(err); return err; });
+                  [datoaguardar]).then((datae) => { }).catch(err => { return err; });
               }
             } else {
-              if (todo.inicioauditoria===null) {
-                console.log('3');
-                
+              if (todo.inicioauditoria === null) {
                 return this.database.executeSql(
-                  `UPDATE unidades_productivas SET inicioauditoria = (?), terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' ;`,
-                  [datoaguardar]).then((datae) => { console.log(datae); return datae; }).catch(err => { console.log(err); return err });
+                  `UPDATE unidades_productivas SET inicioauditoria = (?), terminado = 1, finauditoria = (?) WHERE idUnidadProductiva = '${idseleccion}' ;`,
+                  [datoaguardar, datoaguardar]).then((datae) => { return datae; }).catch(err => { return err });
               } else {
-                console.log('4');
-
                 return this.database.executeSql(
                   `UPDATE unidades_productivas SET finauditoria = (?),terminado = 1  WHERE idUnidadProductiva = '${idseleccion}' ;`,
-                  [datoaguardar]).then((datae) => { console.log(data); return datae; }).catch(err => { console.log(err); return err });
+                  [datoaguardar]).then((datae) => { return datae; }).catch(err => { return err });
               }
             }
           })
       })
   }
-}
+
+  verficarrespuestas(up, grupo, pregunta, tipo, tipopregunta) {
+    return this.isReady(
+    ).then(() => {
+      if (tipopregunta == 3007) {
+        return this.database.executeSql(`SELECT id FROM respuestasguardadastabla WHERE unidadproductiva = (?)  AND grupo =(?) AND preguntapadre=(?) AND tipoformulario =(?)`, [up, grupo, pregunta, tipo]).then((data) => {
+          let tiene;
+          if (data.rows.length) {
+            tiene = true;
+          } else {
+            tiene = false;
+          }
+          return tiene;
+        })
+      } else {
+        return this.database.executeSql(`SELECT id FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND pregunta=(?) AND tipoformulario =(?)`, [up, grupo, pregunta, tipo]).then((data) => {
+          let tiene;
+          if (data.rows.length) {
+            tiene = true;
+          } else {
+            tiene = false;
+          }
+          return tiene;
+        })
+      }
+
+    }).catch((err) => { console.log(err) })
+
+  }
+
+
+  respuestasparaunidad(unidad, tipoformulario) {
+    let upi = unidad;
+    let tipoe = tipoformulario;
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?) AND tipoformulario =(?)`, [upi, tipoformulario]).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todos.push(todo);
+          }
+        } else {
+          let todo;
+          todo = null;
+          todos = todo;
+        }
+        return todos;
+      })
+    })
+
+  }
+
+  respuestastablaparaunidad(unidad, tipoformulario) {
+    let upi = unidad;
+    let tipoe = tipoformulario;
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM respuestasguardadastabla WHERE unidadproductiva = (?) AND tipoformulario =(?)`, [upi, tipoformulario]).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            if (data.rows.item(i).valor == "" || data.rows.item(i).valor == "false") {
+            } else {
+              let todo = data.rows.item(i);
+              todos.push(todo);
+            }
+          }
+        } else {
+          let todo;
+          todo = null;
+          todos = todo;
+        }
+        return todos;
+      })
+    })
+  }
+
+
+  noconformidad(unidad, tipoformulario) {
+    let upi = unidad;
+    let tipoe = tipoformulario;
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM noconformidades WHERE unidadproductiva = (?) AND tipo =(?)`, [upi, tipoformulario]).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todos.push(todo);
+          }
+        } else {
+          let todo;
+          todo = null;
+          todos = todo;
+        }
+        return todos;
+      })
+    })
+  }
+
+  cambiarestado(idUnidadProductiva, tipo,terminado) {
+    let idseleccion = idUnidadProductiva;
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(
+          `UPDATE unidades_productivas SET tipo = (?), terminado = (?) WHERE idUnidadProductiva = '${idseleccion}' ;`,
+          [tipo,terminado]).then((datae) => { return datae; }).catch(err => { return err; });
+      })
+
+  }
+
+
+}//                     unidadproductiva TEXT,tipo INTEGER,

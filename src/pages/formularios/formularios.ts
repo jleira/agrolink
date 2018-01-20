@@ -103,7 +103,7 @@ export class FormulariosPage {
       let fechaentro;
       fechaentro= new Date();
 
-      fechaentro= fechaentro.getFullYear()+'-'+fechaentro.getMonth()+'-'+fechaentro.getDate()+' '+fechaentro.getHours()+':'+fechaentro.getMinutes()+':00';
+      fechaentro= fechaentro.getFullYear()+'-'+("0" + (fechaentro.getMonth() + 1)).slice(-2)+'-'+("0" + fechaentro.getDate()).slice(-2)+' '+fechaentro.getHours()+':'+fechaentro.getMinutes()+':00';
       this.geolocation.getCurrentPosition().then((resp) => {
         this.datoguardar=fechaentro+','+resp.coords.latitude.toString() +',' +resp.coords.longitude.toString();
         console.log(this.datoguardar);
@@ -494,16 +494,18 @@ export class FormulariosPage {
     console.log(event);
   }
   guardarfechapadre(valor, preguntapadre, preguntaid, fecha) {
-    // console.log(valor, preguntapadre, preguntaid, $event.year + '-' + $event.month + '-' + $event.day)
-    this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.respuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, fecha, this.tipocuestionario);
+    console.log(valor, preguntapadre, preguntaid);
+    if(fecha==""){
+    }else{
+      this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, fecha, this.tipocuestionario);
+    }
   }
   guardarpadre(valor, preguntapadre, preguntaid, event) {
-    this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.respuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
+    if(event==""){
+      this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
+    }else{
+    }
   }
-//  guardarrespuestatabla(up, grupoidselected, codrespuesta, preguntaid, preguntapadre, valorcodigo, valorvalor, valor, tipocuestionario) {
-//    this.database.guardarrespuestaporpreguntatabla(up, grupoidselected, codrespuesta, preguntapadre, preguntaid, valorcodigo, valorvalor, valor, tipocuestionario); 
-//  }
-
   guardarobservacionpadre($event,preguntapadre,preguntaid){
     this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, null, preguntaid, preguntapadre, '', '', $event.target.value, this.tipocuestionario);
   }
@@ -522,7 +524,7 @@ export class FormulariosPage {
   guardarubicacion(unidad,valor){
     if(valor==null){
       let fechaentro:any= new Date();
-      fechaentro= fechaentro.getFullYear()+'-'+fechaentro.getMonth()+'-'+fechaentro.getDate()+' '+fechaentro.getHours()+':'+fechaentro.getMinutes()+':00';
+      fechaentro= fechaentro.getFullYear()+'-'+("0" + (fechaentro.getMonth() + 1)).slice(-2)+'-'+("0" + fechaentro.getDate()).slice(-2)+' '+fechaentro.getHours()+':'+fechaentro.getMinutes()+':00';
       this.datoguardar=fechaentro+',error,error';
       valor=this.datoguardar;
     }

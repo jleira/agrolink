@@ -69,7 +69,10 @@ export class LoginPage {
         this.region.obtenerregiones();
         this.uproductiva.descargarunidadesproductivas();
         this.uproductiva.descargarunidadesproductivasasignadas();
-       this.formularios.descargarformularios();
+        let form=this.formularios.descargarformularios();
+        if(!form){
+          this.handleError2('No se encontro formulario habilitado');
+        }
        this.formularios.descargarcategorias();
 
       },
@@ -96,6 +99,18 @@ export class LoginPage {
     toast.present();
   }
 
+  handleError2(mensaje:string) {
+    let message: string;
+    message=mensaje;
+
+    const toast = this.toastCtrl.create({
+      message,
+      duration: 5000,
+      position: 'bottom'
+    });
+
+    toast.present();
+  }
 
 
 }

@@ -12,33 +12,41 @@
   </ion-header>
   
   <ion-content fullscreen >
-      <ion-item *ngIf="up">
-          <ion-label>Unidades para auditoria</ion-label>
+      <ion-item *ngIf="upp">
+          <ion-label>Unidades para promotoria</ion-label>
       
-          <ion-select multiple (ionChange)="comprobarunidades(1002,$event)">
-            <div *ngFor="let categoria of up">
-              <ion-option *ngIf="categoria.tipo==1002" [value]="categoria">{{categoria.nombre}}</ion-option>
-              <ion-option *ngIf="categoria.tipo==1003" [value]="categoria">{{categoria.nombre}}</ion-option>
+          <ion-select multiple (ionChange)="comprobarunidades(1001,$event)">
+            <div *ngFor="let categoria of upp">
+              <ion-option [value]="categoria">{{categoria.nombre}}</ion-option>
+
             </div>
       
           </ion-select>
       </ion-item>
-      <ion-item *ngIf="up">
-        <ion-label>Unidades para promotoria</ion-label>
+      <ion-item *ngIf="upa">
+        <ion-label>Unidades para auditoria</ion-label>
       
-        <ion-select multiple (ionChange)="comprobarunidades(1001,$event)">
-          <div *ngFor="let categoria of up">
-            <ion-option *ngIf="categoria.tipo==1001" [value]="categoria">{{categoria.nombre}}</ion-option>
-            <ion-option *ngIf="categoria.tipo==1003" [value]="categoria">{{categoria.nombre}}</ion-option>
+        <ion-select multiple (ionChange)="comprobarunidades(1002,$event)">
+          <div *ngFor="let categoria of upa">
+            <ion-option  [value]="categoria">{{categoria.nombre}}</ion-option>
+
           </div>
       
         </ion-select>
       </ion-item>
-       
-<ion-item *ngIf="!up">
-  No se ha iniciado ningun formulario
-</ion-item>
+<div *ngIf="!habilitarenvio">
+    <ion-item no-lines>
+        <label>Pregunta sin responder </label>
+        </ion-item>
+  <ion-item *ngFor="let pregunta of preguntassinresponder" text-wrap (click)="abrirpagina(pregunta)">
+      <h2>{{pregunta.preguntaid.enunciado}}</h2>
+      <p>
+        {{pregunta.up.nombre}}- {{pregunta.grupo.nombre}}
+      </p>
+      </ion-item>
 
-
- 
+</div>
+<div padding *ngIf="habilitarenvio">
+    <button ion-button color="secondary" style="border: 1px green solid;" block (click)="enviarunidadesseleccionadas()">Enviar</button>
+  </div>
      </ion-content>

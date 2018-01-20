@@ -78,8 +78,8 @@ export class NuevanoconformidadPage {
   }
   noconformidad(values) {
     let dt = new Date();
-    let month = dt.getMonth() + 1;
-    let day = dt.getDate();
+    let month = ("0" + (dt.getMonth() + 1)).slice(-2);
+    let day = ("0" + dt.getDate()).slice(-2);
     let year = dt.getFullYear();
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
