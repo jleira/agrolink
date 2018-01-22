@@ -1,7 +1,7 @@
 <ion-header  >
     <ion-toolbar class="cyan" color="secondary">
       <ion-title>
-       No conformidad
+    Enviar Formularios diligenciados
       </ion-title>
       <ion-buttons start>
         <button ion-button (click)="dismiss()">
@@ -12,7 +12,16 @@
   </ion-header>
   
   <ion-content fullscreen >
-      <ion-item *ngIf="upp">
+      <ion-item>
+          <ion-label>Tipo de formulario</ion-label>
+          <ion-select (ionChange)="habilitartipo($event)">
+              <ion-option  [value]="1001" *ngIf="auditor">Promotoria</ion-option>        
+              <ion-option  [value]="1002" *ngIf="promotor">Auditoria</ion-option>        
+
+          </ion-select>
+        </ion-item>
+  
+      <ion-item *ngIf="promotorseleccionado">
           <ion-label>Unidades para promotoria</ion-label>
       
           <ion-select multiple (ionChange)="comprobarunidades(1001,$event)">
@@ -23,7 +32,7 @@
       
           </ion-select>
       </ion-item>
-      <ion-item *ngIf="upa">
+      <ion-item *ngIf="auditorseleccionado">
         <ion-label>Unidades para auditoria</ion-label>
       
         <ion-select multiple (ionChange)="comprobarunidades(1002,$event)">

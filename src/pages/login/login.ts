@@ -42,10 +42,6 @@ export class LoginPage {
 
     });
 
-//
-//Agrolink/api/accounts/name
-//return this.http.post(`${apiUrl}/login`, '{"identificador":"'+values.username+'","clave":"'+values.password+'"}')
-
   }
   login(value: any) {
     let loading = this.loadingCtrl.create({
@@ -54,27 +50,16 @@ export class LoginPage {
     });
 
     loading.present();
-    this.authService
-      .login(value).finally(() => {
-        this.perfil.getinfo().then(()=>{
-          loading.dismiss();
- 
-        });
-      })
-      .subscribe(() => {
-//        this.perfil.getinfo();
-        this.region.obtenerpaises();
+    this.authService.login(value).finally(() => {}).subscribe(() => {
+       this.region.obtenerpaises();
         this.region.obtenerdepartamentos();
         this.region.obtenermunicipios();
         this.region.obtenerregiones();
         this.uproductiva.descargarunidadesproductivas();
         this.uproductiva.descargarunidadesproductivasasignadas();
-        let form=this.formularios.descargarformularios();
-        if(!form){
-          this.handleError2('No se encontro formulario habilitado');
-        }
-       this.formularios.descargarcategorias();
-
+        this.formularios.descargarformularios();
+        this.formularios.descargarcategorias();
+        loading.dismiss();
       },
       (err) => {
         this.handleError(err);

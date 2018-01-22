@@ -1,9 +1,3 @@
-<!--
-  Generated template for the FormulariosPage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
   <ion-navbar color="secondary">
     <button ion-button menuToggle>
@@ -48,9 +42,14 @@
   </div>
 
   <div *ngIf="caso < 3">
+    <ion-item-divider text-wrap>
+      <h2>Unidades pendientes</h2>
+      <p>Son aquellas en las que no se ha iniciado el llenado del formulario</p>
+    </ion-item-divider>
+
     <div *ngFor="let item of items">
-      <ion-card *ngIf="item.terminado === 1" style="border-top:2px solid mediumseagreen">
-        <button ion-item (click)="mostrargrupos(item.tipo, item.idUnidadProductiva, item.productor )">
+      <ion-card *ngIf="item.terminado === 0">
+        <button ion-item (click)="mostrargrupos(item.tipo, item, item.productor )">
           <ion-row>
 
             <ion-col col-6 text-center> {{item.idUnidadProductiva}}
@@ -66,30 +65,64 @@
           </ion-row>
 
         </button>
-      </ion-card>
-
-      <ion-card style="border-top:2px solid lightgray" *ngIf="item.terminado === 0">
-        <button ion-item (click)="mostrargrupos(item.tipo, item.idUnidadProductiva, item.productor)">
-          <ion-row>
-            <ion-col col-6 text-center> {{item.idUnidadProductiva}}
-              <br>
-            </ion-col>
-            <ion-col col-6 text-center> {{item.nombre}}</ion-col>
-            <ion-col col-6 text-center>
-              <span> {{item.region}} </span>
-            </ion-col>
-            <ion-col col-6 text-center>
-              <span> {{item.productor}} </span>
-            </ion-col>
-          </ion-row>
-        </button>
-
       </ion-card>
     </div>
+    <ion-item-divider text-wrap>
+        <h2>Unidades Iniciadas</h2>
+        <p>Son aquellas en las que no se ha iniciado el llenado del formulario pero no se ha enviado al administrador</p>
+      </ion-item-divider>
+    <div *ngFor="let item of items">
+
+      <ion-card *ngIf="item.terminado === 1" style="border-top:2px solid yellow">
+        <button ion-item (click)="mostrargrupos(item.tipo, item, item.productor )">
+          <ion-row>
+
+            <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+              <br>
+            </ion-col>
+            <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+            <ion-col col-6 text-center>
+              <span> {{item.region}} </span>
+            </ion-col>
+            <ion-col col-6 text-center>
+              <span> {{item.productor}} </span>
+            </ion-col>
+          </ion-row>
+
+        </button>
+      </ion-card>
+    </div>
+    <ion-item-divider text-wrap>
+        <h2>Unidades enviadas</h2>
+        <p>Son aquellas enviada, no se pueden editar</p>
+      </ion-item-divider>
+
+      <div *ngFor="let item of items">
+      <ion-card *ngIf="item.terminado === 2" style="border-top:2px solid mediumseagreen">
+        <button ion-item (click)="mostrargrupos(item.tipo, item, item.productor )">
+          <ion-row>
+
+            <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+              <br>
+            </ion-col>
+            <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+            <ion-col col-6 text-center>
+              <span> {{item.region}} </span>
+            </ion-col>
+            <ion-col col-6 text-center>
+              <span> {{item.productor}} </span>
+            </ion-col>
+          </ion-row>
+
+        </button>
+      </ion-card>
+    </div>
+
+
   </div>
   <div *ngIf="caso == 3">
     <div *ngFor="let item of items">
-      <ion-card style="border-top:2px solid mediumseagreen">
+      <ion-card >
         <button ion-item (click)="mostrarpreguntas(item.idgrupobase,item.nombre )">
           <ion-row text-wrap>
             <ion-col col-12 text-center>
@@ -106,8 +139,8 @@
         </button>
       </ion-card>
     </div>
-    <ion-card style="border-top:2px solid mediumseagreen">
-      <button ion-item (click)="noconformidades(up, tipo)">
+    <ion-card style="border-top:2px solid red">
+      <button ion-item (click)="noconformidades(unidadproductiva, tipo)">
         <ion-row text-wrap>
           <ion-col col-12 text-center>
             <h3>
@@ -116,8 +149,8 @@
 
           </ion-col>
           <ion-col col-12 text-center>
-            <h6>Son los problemas encontrados alo largo de la promotoria u auditoria, tambien encontramos no conformidades de
-              periodos anteriores con el fin de cerrarlas o ver su avance
+            <h6>Son los problemas encontrados alo largo de la promotoria o auditoria, tambien encontramos no conformidades de
+              periodos anteriores con el fin de cerrarlas o ver su avance.
             </h6>
           </ion-col>
         </ion-row>
@@ -179,7 +212,7 @@
                 <ion-label>{{item.enunciado}}</ion-label>
                 <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar" (ionChange)="guardarfecha(opciones, item.codigo, item.codigorespuesta, $event)"></ion-datetime>
               </ion-item>
-              <ion-item class="error-message"  *ngIf="item.requerido==1">
+              <ion-item class="error-message" *ngIf="item.requerido==1">
                 <p style="color:red">Pregunta requerida</p>
               </ion-item>
               <div *ngIf="item.archivo===1">
@@ -375,7 +408,7 @@
             </div>
           </div>
         </div>
-        <ion-item class="error-message"  *ngIf="item.requerido==1">
+        <ion-item class="error-message" *ngIf="item.requerido==1">
           <p style="color:red">Pregunta requerida</p>
         </ion-item>
       </div>
@@ -419,9 +452,9 @@
             </div>
           </div>
         </div>
-        <ion-item class="error-message"  *ngIf="item.requerido==1" >
-            <p style="color:red" >Pregunta requerida</p>
-           </ion-item>
+        <ion-item class="error-message" *ngIf="item.requerido==1">
+          <p style="color:red">Pregunta requerida</p>
+        </ion-item>
       </div>
 
 
@@ -467,9 +500,9 @@
           </div>
 
         </div>
-        <ion-item class="error-message"  *ngIf="item.requerido==1" >
-            <p style="color:red" >Pregunta requerida</p>
-           </ion-item>
+        <ion-item class="error-message" *ngIf="item.requerido==1">
+          <p style="color:red">Pregunta requerida</p>
+        </ion-item>
       </div>
 
 
@@ -516,16 +549,16 @@
           </div>
 
         </div>
-        <ion-item class="error-message"  *ngIf="item.requerido==1" >
-            <p style="color:red" >Pregunta requerida</p>
-           </ion-item>
+        <ion-item class="error-message" *ngIf="item.requerido==1">
+          <p style="color:red">Pregunta requerida</p>
+        </ion-item>
       </div>
       <div *ngIf="item.tipo==3007">
-       
+
         <ion-label style="color:black">{{item.enunciado}}</ion-label>
-        <ion-item class="error-message" *ngIf="item.requerido==1" >
-            <p style="color:red" >Pregunta requerida</p>
-           </ion-item>
+        <ion-item class="error-message" *ngIf="item.requerido==1">
+          <p style="color:red">Pregunta requerida</p>
+        </ion-item>
 
         <!--tabla -->
         <ion-grid>
@@ -535,9 +568,9 @@
             </ion-col>
           </ion-row>
           <ion-row nowrap justify-content-center *ngFor="let preguntas of item.preguntas">
-            <ion-col style="border: 1px solid gray;text-align: center;vertical-align: middle" *ngIf="preguntas.observacion==1" >{{preguntas.enunciado}}</ion-col>
-            <ion-col style="border: 1px solid gray;text-align: center;vertical-align: middle" *ngIf="preguntas.observacion==1"  >
-                <ion-input type="text" (change)="guardarobservacionpadre($event,preguntas.preguntapadre,preguntas.preguntaid)"></ion-input>
+            <ion-col style="border: 1px solid gray;text-align: center;vertical-align: middle" *ngIf="preguntas.observacion==1">{{preguntas.enunciado}}</ion-col>
+            <ion-col style="border: 1px solid gray;text-align: center;vertical-align: middle" *ngIf="preguntas.observacion==1">
+              <ion-input type="text" (change)="guardarobservacionpadre($event,preguntas.preguntapadre,preguntas.preguntaid)"></ion-input>
             </ion-col>
 
 

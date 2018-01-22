@@ -1,46 +1,156 @@
-
 <ion-header>
   <ion-navbar color="secondary">
-    <button ion-button menuToggle >
+    <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
     <ion-title>Unidades Productivas</ion-title>
     <ion-buttons start>
-        <button ion-button (click)="showPrompt()">
-            <ion-icon name="options"></ion-icon>
-        </button>
-        </ion-buttons>
+      <button ion-button (click)="showPrompt()">
+        <ion-icon name="options"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 
-<ion-content  >
-<div *ngFor="let item of items">
+<ion-content>
+  <div *ngIf="promotor">
 
-<ion-card  *ngIf="item.terminado === 1"  style="border-top:2px solid mediumseagreen">
-  <button ion-item (click)="abrirdetalles(item.idUnidadProductiva)">
-      <ion-row>
-           
-      <ion-col col-6 text-center>  {{item.idUnidadProductiva}} <br></ion-col>  
-      <ion-col col-6 text-center> {{item.nombre}}</ion-col>
-      <ion-col col-6 text-center><span> {{item.region}} </span></ion-col>
-      <ion-col col-6 text-center><span> {{item.productor}} </span></ion-col>
-    </ion-row>                
-    
-  </button>
-</ion-card>
+    <ion-list-header>
+      Unidades para promotoria
+    </ion-list-header>
+    <div *ngFor="let item of items">
+      <div *ngIf="item.tipo==1001">
+        <!--promotoria-->
+        <ion-card *ngIf="item.terminado === 1" style="border-top:2px solid yellow">
+          <button ion-item (click)="abrirdetalles(item.idUnidadProductiva)">
+            <ion-row>
 
-<ion-card  style="border-top:2px solid lightgray" *ngIf="item.terminado === 0"  >
-    <button ion-item (click)="abrirdetalles(item.idUnidadProductiva)">
-        <ion-row>
-      <ion-col col-6 text-center>  {{item.idUnidadProductiva}} <br></ion-col>  
-      <ion-col col-6 text-center> {{item.nombre}}</ion-col>
-      <ion-col col-6 text-center><span> {{item.region}} </span></ion-col>
-      <ion-col col-6 text-center><span> {{item.productor}} </span></ion-col>
-      </ion-row>
-  </button>
-    
-</ion-card>
+              <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+                <br>
+              </ion-col>
+              <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+              <ion-col col-6 text-center>
+                <span> {{item.region}} </span>
+              </ion-col>
+              <ion-col col-6 text-center>
+                <span> {{item.productor}} </span>
+              </ion-col>
+            </ion-row>
+
+          </button>
+        </ion-card>
+        <ion-card *ngIf="item.terminado === 2" style="border-top:2px solid mediumseagreen">
+          <button ion-item (click)="abrirdetalles(item.idUnidadProductiva)">
+            <ion-row>
+
+              <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+                <br>
+              </ion-col>
+              <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+              <ion-col col-6 text-center>
+                <span> {{item.region}} </span>
+              </ion-col>
+              <ion-col col-6 text-center>
+                <span> {{item.productor}} </span>
+              </ion-col>
+            </ion-row>
+
+          </button>
+        </ion-card>
+        <ion-card style="border-top:2px solid lightgray" *ngIf="item.terminado === 0">
+          <button ion-item (click)="abrirdetalles(item.idUnidadProductiva)">
+            <ion-row>
+              <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+                <br>
+              </ion-col>
+              <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+              <ion-col col-6 text-center>
+                <span> {{item.region}} </span>
+              </ion-col>
+              <ion-col col-6 text-center>
+                <span> {{item.productor}} </span>
+              </ion-col>
+            </ion-row>
+          </button>
+
+        </ion-card>
+
+      </div>
+
+    </div>
+<div *ngIf="auditor">
+
+  <ion-list-header>
+    Unidades para Auditoria
+  </ion-list-header>
+
+  <div *ngFor="let item of items">
+
+    <div *ngIf="item.tipo==1002">
+      <!--promotoria-->
+
+      <ion-card *ngIf="item.terminado === 1" style="border-top:2px solid yellow">
+        <button ion-item (click)="abrirdetalles(item.idUnidadProductiva)">
+          <ion-row>
+
+            <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+              <br>
+            </ion-col>
+            <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+            <ion-col col-6 text-center>
+              <span> {{item.region}} </span>
+            </ion-col>
+            <ion-col col-6 text-center>
+              <span> {{item.productor}} </span>
+            </ion-col>
+          </ion-row>
+
+        </button>
+      </ion-card>
+      <ion-card *ngIf="item.terminado === 2" style="border-top:2px solid mediumseagreen">
+        <button ion-item (click)="abrirdetalles(item.idUnidadProductiva)">
+          <ion-row>
+
+            <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+              <br>
+            </ion-col>
+            <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+            <ion-col col-6 text-center>
+              <span> {{item.region}} </span>
+            </ion-col>
+            <ion-col col-6 text-center>
+              <span> {{item.productor}} </span>
+            </ion-col>
+          </ion-row>
+
+        </button>
+      </ion-card>
+      <ion-card style="border-top:2px solid lightgray" *ngIf="item.terminado === 0">
+        <button ion-item (click)="abrirdetalles(item.idUnidadProductiva)">
+          <ion-row>
+            <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+              <br>
+            </ion-col>
+            <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+            <ion-col col-6 text-center>
+              <span> {{item.region}} </span>
+            </ion-col>
+            <ion-col col-6 text-center>
+              <span> {{item.productor}} </span>
+            </ion-col>
+          </ion-row>
+        </button>
+
+      </ion-card>
+
+    </div>
+
+
+  </div>
+
 </div>
+
+  </div>
 
 
 

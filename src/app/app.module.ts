@@ -20,7 +20,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AuthProvider } from '../providers/auth/auth';
 import { PerfilProvider } from '../providers/perfil/perfil';
-
+import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
 
 import {Http, HttpModule, RequestOptions} from '@angular/http';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
@@ -108,7 +108,8 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     FormulariosProvider,
     Camera,
     File,
-    Geolocation
+    Geolocation,
+    FileTransfer
   ]
 })
 export class AppModule {}

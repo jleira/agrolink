@@ -42,9 +42,14 @@
 
           <ion-item *ngIf="data.terminado === 1" >
             <h2>Estado </h2>
-            <p><ion-icon name="checkbox"  style="color:mediumseagreen" item-end></ion-icon> Unidad productiva terminada</p>
+            <p><ion-icon name="checkbox"  style="color:yellow" item-end></ion-icon> Unidad productiva iniciada</p>
         </ion-item>
-          
+        <ion-item *ngIf="data.terminado === 2" >
+                <h2>Estado </h2>
+                <p><ion-icon name="checkbox"  style="color:mediumseagreen" item-end></ion-icon> Unidad productiva terminada</p>
+            </ion-item>
+              
+
         <ion-item *ngIf="data.terminado === 0" >
               <h2>Estado </h2>
             <p><ion-icon name="square-outline" style="color:gray" item-end> Unidad productiva pendiente</ion-icon></p>

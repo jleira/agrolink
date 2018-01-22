@@ -5,6 +5,8 @@ import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { RegionProvider } from '../../providers/region/region';
 import { UpdetallesPage} from '../updetalles/updetalles';
 import { FiltroupPage} from '../filtroup/filtroup';
+import {Storage} from "@ionic/storage";
+
 
 @IonicPage()
 @Component({
@@ -26,7 +28,9 @@ export class UnidadproductivaPage {
   departamentos:any;
   municipios:any;
   regiones:any;
-  
+  auditor=false;
+  promotor=false;
+ 
   constructor(
     public uproductiva: UproductivaProvider,
     public region: RegionProvider,
@@ -35,9 +39,25 @@ export class UnidadproductivaPage {
     public loadingCtrl: LoadingController, 
     private toastCtrl: ToastController,
     public modalCtrl: ModalController,
-    public popoverCtrl: PopoverController) {
+    public popoverCtrl: PopoverController,
+    private readonly storage: Storage
+  ) {
       this.searchControl = new FormControl();
       this.reg="prueba";
+      this.auditor=false;
+      this.promotor=false;
+      this.storage.get('roll').then( roll =>
+        {
+            if(roll){
+              if(roll.indexOf("Auditor")>-1){
+                this.auditor=true;
+              }
+              if(roll.indexOf("Promotor")>-1){
+                this.promotor=true;      
+              }      
+            }
+        }
+      );
   }
 
   ionViewDidLoad() {

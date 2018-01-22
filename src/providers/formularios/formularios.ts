@@ -6,24 +6,37 @@ import { JwtHelper, AuthHttp, AuthConfig } from "angular2-jwt";
 import { SERVER_URL } from "../../config";
 import { Storage } from "@ionic/storage";
 import { DbProvider } from '../db/db';
-
+import { ToastController, LoadingController } from 'ionic-angular';
+import { File, DirectoryEntry } from '@ionic-native/file';
+import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
 
 @Injectable()
 export class FormulariosProvider {
   form: any;
   grupos: any;
   items: any;
-
+  rutaimg;
+  fileTransfer:FileTransferObject = this.transfer.create();
   constructor(
     public http: Http, jwtHelper: JwtHelper,
     private readonly authHttp: AuthHttp,
     private readonly storage: Storage,
-    public database: DbProvider
+    public database: DbProvider,
+    private file: File,
+    private transfer: FileTransfer,
+    public toastCtrl:ToastController,
+    public loadingCtrl: LoadingController
   ) {
 
   }
 
   descargarformularios() {
+    let loading = this.loadingCtrl.create({
+      spinner: 'bubbles',
+      content: 'descargando Formularios'
+    });
+
+    loading.present();
     this.storage.get('jwt').then(jwt => {
       this.authHttp.get(`${SERVER_URL}/api/inquiries/findByPeriodoUser`).subscribe(
         data => {
@@ -181,12 +194,15 @@ export class FormulariosProvider {
                   }
                 );
               });
+          
+              loading.dismiss();
               this.authHttp.post(`${SERVER_URL}/api/inquiries/changeStatus/${element.codigo}`,'CLOSED').subscribe((responde)=>{
                 console.log(responde);
-              });
+              },err=>this.handleError(err));
             });
           }else{
-           return false; 
+           this.handleError('No existe formulario asignado');      
+          loading.dismiss();
           }
 
         })
@@ -421,6 +437,8 @@ export class FormulariosProvider {
         console.log(data);
         if (data.status == 200) {
           this.cambiarunidadproductiva(up, tipo);
+          this.handleError('Formulario para la unidad '+up.nombre+' Enviado exitosamente');
+
          return true;
         }else{
           return false;
@@ -430,21 +448,49 @@ export class FormulariosProvider {
   }
 
   cambiarunidadproductiva(up, tipo) {
-        if(up.tipo==1003){
-      if(tipo==1001){
-        tipo=1002;
-      }else{
-        tipo=1001;
-      }
-           }
-        this.database.cambiarestado(up.idUnidadProductiva,tipo,2);
-
+        this.database.cambiarestado(up.idUnidadProductiva,up.tipo,2).then(()=>{},()=>{
+          this.handleError('No se puedo editar la unidad '+up.nombre+' a finalizada');
+        });
       }
     
       enviarfoto(pregunta){
         return this.storage.get('jwt').then((jwt)=>{
-
+          this.rutaimg = this.file.externalDataDirectory + `${pregunta.unidadproductiva}/${pregunta.grupo.toString()}`;
+          console.log(this.rutaimg, pregunta);
         })
       }
 
+      
+      enviarfotoprueba(ruta,imgname){
+        return this.storage.get('jwt').then((jwt)=>{
+          let options: FileUploadOptions = {
+            fileKey: 'file',
+            fileName: imgname.replace(".png",""),
+            headers: {
+              'Authorization': 'Bearer '+ jwt,
+               'Content-Type': undefined
+           },
+           mimeType: 'image/*',
+         }
+       
+         return this.fileTransfer.upload(ruta+'/'+imgname, `${SERVER_URL}api/photoupload/`, options)
+          .then((data) => {
+            return JSON.stringify(data);
+          }, (err) => {
+            return JSON.stringify(err);
+          })          
+
+        })
+      
+      }
+      handleError(error: string) {
+        let message: string;
+        message = error;
+        const toast = this.toastCtrl.create({
+          message,
+          duration: 5000,
+          position: 'bottom'
+        });
+        toast.present();
+      }
 }

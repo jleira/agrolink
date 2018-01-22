@@ -23,6 +23,7 @@ export class PerfilPage {
   id: string;
   correo: string;
   usuario: string;
+  empresa: string;
 
   constructor(
     public navCtrl: NavController,
@@ -56,10 +57,12 @@ export class PerfilPage {
       {this.usuario = d_usuario;
       },
     );
+    this.storage.get('empresa').then( d_nombre =>
+      {this.nombre = d_nombre;
+      },
+    );
   }
   logout() {
     this.auth.logout();
   } 
-
- 
 }

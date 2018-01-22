@@ -42,7 +42,7 @@
 
     <ion-item text-wrap no-lines>
       <ion-label>
-        Fecha de posible solucion
+        Fecha Pautada de cierre
       </ion-label>
       <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar" name="fecha" ngModel required #fecha="ngModel"
         [class.invalid]="fecha.errors && fecha.dirty"></ion-datetime>
@@ -77,7 +77,7 @@
 
     <ion-item text-wrap no-lines>
       <ion-label stacked>
-        fecha limite de cierre
+Fecha pautada de cierre
       </ion-label>
       <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" [(ngModel)]="fecha" doneText="Guardar" (ionChange)="editarnoconformidad(id,'fechaposiblecierre', fecha)"></ion-datetime>
     </ion-item>

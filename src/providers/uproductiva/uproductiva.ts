@@ -165,7 +165,7 @@ guardarunidades(value){
       let tipo;
       let lat;
       let long;
-
+ 
   
       if(element.unidadProductiva['localizacion']==null){
         lat=null;
@@ -176,46 +176,142 @@ guardarunidades(value){
       };
       if (element.auditor.codigo===micodigo && element.promotor.codigo===micodigo){
         tipo =1003;
+        this.database.agregarunidadproductiva(
+          element.unidadProductiva['idUnidadProductiva'],
+          element.unidadProductiva['nombre'],
+          element.unidadProductiva['fechaIngreso'],
+          element.unidadProductiva['region']['idRegion'],
+          long,
+          lat,
+          element.unidadProductiva['productor']['idProductor'],
+          1001,
+          element.idAsignacion
+        ).then(
+          (ok)=>{
+            this.validarproductor(element.unidadProductiva['productor']['idProductor']).then(
+              (data:any)=>{
+                if(data==0){
+                  this.database.agregarproductor(
+                    element.unidadProductiva['productor']['idProductor'],
+                    element.unidadProductiva['productor']['nombre'],
+                    element.unidadProductiva['productor']['identificacion'],
+                    element.unidadProductiva['productor']['telefono'],
+                    element.unidadProductiva['productor']['annoIngreso'],
+                    element.unidadProductiva['productor']['ultimaAplicacion']
+                  ).then(
+                      (ok)=>{},
+                      (err)=>{}
+                    );
+                }
+              }
+            )
+          },
+        (err)=>{}
+        );
+        this.database.agregarunidadproductiva(
+          element.unidadProductiva['idUnidadProductiva'],
+          element.unidadProductiva['nombre'],
+          element.unidadProductiva['fechaIngreso'],
+          element.unidadProductiva['region']['idRegion'],
+          long,
+          lat,
+          element.unidadProductiva['productor']['idProductor'],
+          1002,
+          element.idAsignacion
+        ).then(
+          (ok)=>{
+            this.validarproductor(element.unidadProductiva['productor']['idProductor']).then(
+              (data:any)=>{
+                if(data==0){
+                  this.database.agregarproductor(
+                    element.unidadProductiva['productor']['idProductor'],
+                    element.unidadProductiva['productor']['nombre'],
+                    element.unidadProductiva['productor']['identificacion'],
+                    element.unidadProductiva['productor']['telefono'],
+                    element.unidadProductiva['productor']['annoIngreso'],
+                    element.unidadProductiva['productor']['ultimaAplicacion']
+                  ).then(
+                      (ok)=>{},
+                      (err)=>{}
+                    );
+                }
+              }
+            )
+          },
+        (err)=>{}
+        );
+
       }else if(element.auditor.codigo===micodigo && element.promotor.codigo!=micodigo){
         tipo =1002;
+        this.database.agregarunidadproductiva(
+          element.unidadProductiva['idUnidadProductiva'],
+          element.unidadProductiva['nombre'],
+          element.unidadProductiva['fechaIngreso'],
+          element.unidadProductiva['region']['idRegion'],
+          long,
+          lat,
+          element.unidadProductiva['productor']['idProductor'],
+          1002,
+          element.idAsignacion
+        ).then(
+          (ok)=>{
+            this.validarproductor(element.unidadProductiva['productor']['idProductor']).then(
+              (data:any)=>{
+                if(data==0){
+                  this.database.agregarproductor(
+                    element.unidadProductiva['productor']['idProductor'],
+                    element.unidadProductiva['productor']['nombre'],
+                    element.unidadProductiva['productor']['identificacion'],
+                    element.unidadProductiva['productor']['telefono'],
+                    element.unidadProductiva['productor']['annoIngreso'],
+                    element.unidadProductiva['productor']['ultimaAplicacion']
+                  ).then(
+                      (ok)=>{},
+                      (err)=>{}
+                    );
+                }
+              }
+            )
+          },
+        (err)=>{}
+        );
+
       }else if(element.auditor.codigo!=micodigo && element.promotor.codigo===micodigo){
         tipo =1001;
-      }
-  
-
-      this.database.agregarunidadproductiva(
-        element.unidadProductiva['idUnidadProductiva'],
-        element.unidadProductiva['nombre'],
-        element.unidadProductiva['fechaIngreso'],
-        element.unidadProductiva['region']['idRegion'],
-        long,
-        lat,
-        element.unidadProductiva['productor']['idProductor'],
-        tipo,
-        element.idAsignacion
-      ).then(
-        (ok)=>{
-          this.validarproductor(element.unidadProductiva['productor']['idProductor']).then(
-            (data:any)=>{
-              if(data==0){
-                this.database.agregarproductor(
-                  element.unidadProductiva['productor']['idProductor'],
-                  element.unidadProductiva['productor']['nombre'],
-                  element.unidadProductiva['productor']['identificacion'],
-                  element.unidadProductiva['productor']['telefono'],
-                  element.unidadProductiva['productor']['annoIngreso'],
-                  element.unidadProductiva['productor']['ultimaAplicacion']
-                ).then(
-                    (ok)=>{},
-                    (err)=>{}
-                  );
+        this.database.agregarunidadproductiva(
+          element.unidadProductiva['idUnidadProductiva'],
+          element.unidadProductiva['nombre'],
+          element.unidadProductiva['fechaIngreso'],
+          element.unidadProductiva['region']['idRegion'],
+          long,
+          lat,
+          element.unidadProductiva['productor']['idProductor'],
+          1001,
+          element.idAsignacion
+        ).then(
+          (ok)=>{
+            this.validarproductor(element.unidadProductiva['productor']['idProductor']).then(
+              (data:any)=>{
+                if(data==0){
+                  this.database.agregarproductor(
+                    element.unidadProductiva['productor']['idProductor'],
+                    element.unidadProductiva['productor']['nombre'],
+                    element.unidadProductiva['productor']['identificacion'],
+                    element.unidadProductiva['productor']['telefono'],
+                    element.unidadProductiva['productor']['annoIngreso'],
+                    element.unidadProductiva['productor']['ultimaAplicacion']
+                  ).then(
+                      (ok)=>{},
+                      (err)=>{}
+                    );
+                }
               }
-            }
-          )
-        },
-      (err)=>{}
-      );
-  
+            )
+          },
+        (err)=>{}
+        );
+
+      }
         });
   });
 

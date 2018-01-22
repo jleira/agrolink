@@ -34,13 +34,25 @@ guardarinfo(value){
   if(value.roles.length>0){
     value.roles.forEach(element => {
       if(element==1){
-        roles='Administrador' + roles;
+        if(roles==''){
+          roles='Administrador';
+        }else{
+          roles=roles+'-Administrador';
+        }
       } 
       if(element == 2){
-        roles=' - Auditor' + roles;
+        if(roles==''){
+          roles='Auditor';
+        }else{
+          roles=roles+'-Auditor';
+        }
       }
       if(element == 3 ){
-        roles=' - Promotor' + roles;
+        if(roles==''){
+          roles='Promotor';
+        }else{
+          roles=roles+'-Promotor';
+        }
       }      
     });
     this.storage.set('roll', roles);
@@ -48,12 +60,9 @@ guardarinfo(value){
      else{
     this.storage.set('roll', 'Sin rol asignada');
   }
-  
-
-  //this.storage.set('roll', 'Auditor Interno');
   this.storage.set('tipo_id', value['cataTiidCodigo']['campo2']);
   this.storage.set('identificacion', value['numeroIdentificacion']);
   this.storage.set('mail', value['correoElectronico']);
-  return 'fiannle;';
+  return true;
 }
 }

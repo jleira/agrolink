@@ -9,14 +9,14 @@
 
 <ion-content >
     <ion-list  style="margin-top:2%">
-      <button ion-item (click)="openPage(1)" >
+      <button ion-item (click)="openPage(1)" *ngIf="auditor">
           <ion-icon ios="ios-clipboard" md="md-clipboard" item-start></ion-icon>
         <h3 style="font-weight:bold">Formulario de Auditoria</h3>
         <p>
           Ingrese para realizar el diligenciamiento del formulario de auditoria para un producto
         </p>
       </button>
-      <button ion-item  (click)="openPage(2)">
+      <button ion-item  (click)="openPage(2)" *ngIf="promotor">
         <ion-icon ios="ios-clipboard" md="md-clipboard" item-start></ion-icon>
       <h3 style="font-weight:bold">Formulario de promotoria</h3>
       <p>
@@ -60,28 +60,12 @@
     </p>
   </button> 
     </ion-list>
+    <p>{{mensajes}}</p>
     
 <!--  
-    <ion-card *ngFor="let item of productor" >
-      
-          <ion-card-content>
-         <ion-row>
-           <ion-col col-10>
-              {{item.idUnidadProductiva}} -  {{item.nombre}}
-           </ion-col>
-      
-            <ion-col col-2>
-             <ion-icon name="checkbox" *ngIf="item.terminado === 1" style="color:green" item-end></ion-icon>
-              <ion-icon name="square-outline" *ngIf="item.terminado === 0" style="color:gray" item-end></ion-icon>
-
-      </ion-col>
-         </ion-row>
-                
-          </ion-card-content>
-      
- 
-        </ion-card>
-          -->
+<button   ion-button color="secondary" style="border: 1px green solid;" block (click)="galeria()">galeria</button>
+        <button   ion-button color="secondary" style="border: 1px green solid;" block (click)="getPicture()">getPicture</button>
+              -->
     
   </ion-content>
   

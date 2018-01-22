@@ -42,11 +42,14 @@ export class NuevanoconformidadPage {
       this.id = idd;
       this.habilitartarea = true;
       this.formulario.tareas(idd).then((data) => {
-
-        data.forEach(element => {
-          element.fechaposibleculminacion = this.fechatoinp(element.fechaposibleculminacion);
-          element.fechacierrereal = this.fechatoinp(element.fechacierrereal);
-        });
+        if(data)
+        {
+          data.forEach(element => {
+            element.fechaPautadaCierre = this.fechatoinp(element.fechaPautadaCierre);
+            element.fechaRealCierre = this.fechatoinp(element.fechaRealCierre);
+          });
+  
+        }
 
         this.tareas = data;
         console.log(this.tareas);
@@ -203,10 +206,10 @@ export class NuevanoconformidadPage {
 
     this.formulario.agregartarea(this.id, data.nombre, data.descripcion, data.encargado, data.fecha, 0, year + '-' + month + '-' + day).then((data) => {
       console.log(data);
-      this.formulario.tareas(this.id).then((tar) => {
+      this.formulario.tareas(this.id).then((tar) => { 
         tar.forEach(element => {
-          element.fechaposibleculminacion = this.fechatoinp(element.fechaposibleculminacion);
-          element.fechacierrereal = this.fechatoinp(element.fechacierrereal);
+          element.fechaPautadaCierre = this.fechatoinp(element.fechaPautadaCierre);
+          element.fechaRealCierre = this.fechatoinp(element.fechaRealCierre);
         });
         this.tareas = tar;
       })
@@ -223,8 +226,8 @@ export class NuevanoconformidadPage {
       console.log(data);
       this.formulario.tareas(this.id).then((tar) => {
         tar.forEach(element => {
-          element.fechaposibleculminacion = this.fechatoinp(element.fechaposibleculminacion);
-          element.fechacierrereal = this.fechatoinp(element.fechacierrereal);
+          element.fechaPautadaCierre = this.fechatoinp(element.fechaPautadaCierre);
+          element.fechaRealCierre = this.fechatoinp(element.fechaRealCierre);
         });
         this.tareas = tar;
         console.log(this.tareas);
@@ -244,18 +247,17 @@ export class NuevanoconformidadPage {
     let day = dt.getDate();
     let year = dt.getFullYear();
     fechacierrereal = year + '-' + month + '-' + day;
-    console.log('finalizar', data);
-    data.fechaposibleculminacion = this.fechatodb(data.fechaposibleculminacion);
-    this.formulario.tareaseditar(id, data.nombre, data.detalle, data.encargado, data.fechaposibleculminacion, estado, fechacierrereal).then((data) => {
-      console.log(data);
+
+    data.fechaPautadaCierre = this.fechatodb(data.fechaPautadaCierre);
+    this.formulario.tareaseditar(id, data.nombre, data.detalle, data.encargado, data.fechaPautadaCierre, estado, fechacierrereal).then((data) => {
+
       this.formulario.tareas(this.id).then((tar) => {
         tar.forEach(element => {
-          element.fechaposibleculminacion = this.fechatoinp(element.fechaposibleculminacion);
-          element.fechacierrereal = this.fechatoinp(element.fechacierrereal);
+          element.fechaPautadaCierre = this.fechatoinp(element.fechaPautadaCierre);
+          element.fechaRealCierre = this.fechatoinp(element.fechaRealCierre);
         });
         this.tareas = tar;
-        console.log(this.tareas);
-      })
+         })
     }, err => {
       this.handleError('error al guardar tarea, intentelo nuevamente');
     }).catch((err) => {
@@ -341,11 +343,11 @@ export class NuevanoconformidadPage {
     if (tareaid.estado == 1) {
       estado = 'terminado';
     }
-    if (tareaid.fechacierrereal == '') {
-      tareaid.fechacierrereal = 'tarea en proceso'
+    if (tareaid.fechaRealCierre == '') {
+      tareaid.fechaRealCierre = 'tarea en proceso'
     }
-    mensaje = 'id:' + tareaid.id + '\n descripcion: ' + tareaid.detalle + '\nfecha programada de cierre: ' + tareaid.fechaposibleculminacion
-      + ' \n estado:' + estado + '\n fecha de cierre: ' + tareaid.fechacierrereal;
+    mensaje = 'id:' + tareaid.id + '\n descripcion: ' + tareaid.detalle + '\nfecha programada de cierre: ' + tareaid.fechaPautadaCierre
+      + ' \n estado:' + estado + '\n fecha de cierre: ' + tareaid.fechaRealCierre;
     let prompt = this.alertCtrl.create({
       title: tareaid.nombre,
       message: mensaje,

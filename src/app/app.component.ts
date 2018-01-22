@@ -26,7 +26,7 @@ export class MyApp {
   nombre: string;
   rol: string;
   prueba:number;  
-
+empresa:string;
 
   constructor(
     public db:DbProvider,
@@ -40,12 +40,12 @@ export class MyApp {
     this.pages = [
       { title: 'Inicio', component: HomePage , icon: 'home' },
       { title: 'Unidades Productivas', component: UnidadproductivaPage, icon: 'list'},
-      { title: 'List', component: ListPage, icon: 'list' },
       { title: 'Perfil', component: PerfilPage, icon:'person'} 
     ];
     this.authService.authUser.subscribe(jwt => {
       if (jwt) {
         this.rootPage = HomePage;
+        console.log('entro esperemos a ver q pasa ');
         this.storage.get('nombre').then( decoded =>
           {
             this.nombre = decoded;
@@ -57,20 +57,12 @@ export class MyApp {
             return this.rol;
           },
         );
-        this.storage.get('reload').then((data)=>{
-          if(data==1){
-            this.prueba=1;
-            return this.prueba;
-          }
-        });
-console.log(this.prueba);
-        if(this.prueba==1){
-          this.storage.remove('reload');
-          this.storage.set('reload',2 );
-          this.prueba=3;
-          location.reload();
-        window.location.reload();
-        };
+        this.storage.get('empresa').then( empresa =>
+          {
+            this.empresa = empresa;
+            return this.empresa;
+          },
+        );
       }
       else {
         this.rootPage = LoginPage;

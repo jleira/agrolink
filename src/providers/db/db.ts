@@ -77,8 +77,8 @@ export class DbProvider {
             );`, {})
       }).then(() => {
         return this.database.executeSql(
-          `CREATE TABLE IF NOT EXISTS unidades_productivas (
-            idUnidadProductiva TEXT PRIMARY KEY,
+          `CREATE TABLE IF NOT EXISTS unidades_productivas (            
+            idUnidadProductiva TEXT,
             nombre TEXT,
             fechaIngreso TEXT,
             regionId INTEGER,
