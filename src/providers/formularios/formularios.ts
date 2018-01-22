@@ -65,7 +65,7 @@ export class FormulariosProvider {
                   preguntas => {
                     console.log('preguntas1',preguntas);
                     if (preguntas.json()) {
-
+                      console.log('entro al if',preguntas);
                       preguntas.json().forEach(pr => {
                         let requerido;
                         if (pr.pregunta.requerido == true) {
@@ -122,6 +122,7 @@ export class FormulariosProvider {
                                             element.preguntaTablaId.codigoPregunta.codigo,
                                             respuestastabla.respCodigo);
                                         });
+                                      }, (err) => {
                                       }
                                       );
                                   }
@@ -166,6 +167,7 @@ export class FormulariosProvider {
                                           element.preguntaTablaId.codigoPregunta.codigo,
                                           respuestastabla.respCodigo);
                                       });
+                                    }, (err) => {
                                     }
                                     );
                                 });
@@ -181,7 +183,7 @@ export class FormulariosProvider {
                                 respuestas.json().valores.forEach(resp => {
                                   this.database.guardarrespuesta(resp.codigo, resp.nombre, resp.valor, resp.tipoDato, pregunt, respuestas.json().codigo).then(
                                     (ok) => {
-                                    }, (orr) => {
+                                    }, (err) => {
                                     });
                                 });
                               }
@@ -375,7 +377,11 @@ export class FormulariosProvider {
         categoria => {
           console.log(categoria.json());
           categoria.json().forEach(element => {
-            this.database.agregarcategoria(element.codigo, element.campo2);
+            this.database.agregarcategoria(element.codigo, element.campo2).then((ok)=>{
+              console.log('ok',ok);
+            },(err)=>{
+              console.log('err',err);
+            });
           });
         }
       );
@@ -436,7 +442,7 @@ export class FormulariosProvider {
       return this.authHttp.post(`${SERVER_URL}/api/formulario/create/`, formularioaenviar).subscribe((data) => {
         console.log(data);
         if (data.status == 200) {
-          this.cambiarunidadproductiva(up, tipo);
+          this.cambiarunidadproductiva(up);
           this.handleError('Formulario para la unidad '+up.nombre+' Enviado exitosamente');
 
          return true;
@@ -447,11 +453,14 @@ export class FormulariosProvider {
     });
   }
 
-  cambiarunidadproductiva(up, tipo) {
-        this.database.cambiarestado(up.idUnidadProductiva,up.tipo,2).then(()=>{},()=>{
+  cambiarunidadproductiva(up) {
+    console.log(up);
+         this.database.cambiarestado(up.idUnidadProductiva,2).then(()=>{
+          this.handleError('unidad '+up.nombre+' editada exitosamente');
+        },()=>{
           this.handleError('No se puedo editar la unidad '+up.nombre+' a finalizada');
         });
-      }
+       }
     
       enviarfoto(pregunta){
         return this.storage.get('jwt').then((jwt)=>{
@@ -462,6 +471,9 @@ export class FormulariosProvider {
 
       
       enviarfotoprueba(ruta,imgname){
+        this.handleError(ruta);
+        this.handleError(imgname)
+
         return this.storage.get('jwt').then((jwt)=>{
           let options: FileUploadOptions = {
             fileKey: 'file',
@@ -473,10 +485,13 @@ export class FormulariosProvider {
            mimeType: 'image/*',
          }
        
-         return this.fileTransfer.upload(ruta+'/'+imgname, `${SERVER_URL}api/photoupload/`, options)
+         return this.fileTransfer.upload(ruta, `${SERVER_URL}api/photoupload/`, options)
           .then((data) => {
+            this.handleError(JSON.stringify(data))
             return JSON.stringify(data);
           }, (err) => {
+            this.handleError(JSON.stringify(err))
+
             return JSON.stringify(err);
           })          
 

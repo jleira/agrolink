@@ -1638,13 +1638,13 @@ export class DbProvider {
     })
   }
 
-  cambiarestado(idUnidadProductiva, tipo,terminado) {
+  cambiarestado(idUnidadProductiva,terminado) {
     let idseleccion = idUnidadProductiva;
     return this.isReady()
       .then(() => {
         return this.database.executeSql(
-          `UPDATE unidades_productivas SET tipo = (?), terminado = (?) WHERE idUnidadProductiva = '${idseleccion}' ;`,
-          [tipo,terminado]).then((datae) => { return datae; }).catch(err => { return err; });
+          `UPDATE unidades_productivas SET terminado = (?) WHERE idUnidadProductiva = '${idseleccion}' ;`,
+          [terminado]).then((datae) => { return datae; }).catch(err => { return err; });
       })
 
   }

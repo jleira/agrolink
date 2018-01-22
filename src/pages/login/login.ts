@@ -63,6 +63,8 @@ export class LoginPage {
       },
       (err) => {
         this.handleError(err);
+        loading.dismiss();
+
       });
 
   }

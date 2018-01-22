@@ -97,7 +97,7 @@ export class FormulariosPage {
       this.rutaimg = this.file.externalDataDirectory + `${this.up}/${this.grupoidselected.toString()}`;
       let fechaentro;
       fechaentro = new Date();
-      fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' + fechaentro.getHours() + ':' + fechaentro.getMinutes() + ':00';
+      fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' +("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
       this.geolocation.getCurrentPosition().then((resp) => {
         this.datoguardar = fechaentro + ',' + resp.coords.latitude.toString() + ',' + resp.coords.longitude.toString();
         console.log(this.datoguardar);
@@ -517,6 +517,8 @@ export class FormulariosPage {
   }
 
   guardarfechapadre(valor, preguntapadre, preguntaid, fecha) {
+    console.log(this.unidadproductiva,valor, preguntapadre, preguntaid, fecha);
+
     if(this.unidadproductiva.terminado==2){
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem;
@@ -528,13 +530,20 @@ export class FormulariosPage {
     }
   }
   guardarpadre(valor, preguntapadre, preguntaid, event) {
+
     if(this.unidadproductiva.terminado==2){
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem;
     }else{
-    if (event == "") {
+
+    if (event) {
       this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
     } else {
+      if(event===false){
+        this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
+  
+      }
+ 
     }
   }
   }
@@ -544,7 +553,7 @@ export class FormulariosPage {
       this.recargaritem;
     }else{
     this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, null, preguntaid, preguntapadre, '', '', $event.target.value, this.tipocuestionario);
-  }
+    }
   }
 
 

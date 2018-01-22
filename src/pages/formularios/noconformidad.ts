@@ -200,8 +200,8 @@ export class NuevanoconformidadPage {
   }
   guardartarea(data: any) {
     let dt = new Date();
-    let month = dt.getMonth() + 1;
-    let day = dt.getDate();
+    let month = ("0" + (dt.getMonth() + 1)).slice(-2);
+    let day = ("0" + dt.getDate()).slice(-2);
     let year = dt.getFullYear();
 
     this.formulario.agregartarea(this.id, data.nombre, data.descripcion, data.encargado, data.fecha, 0, year + '-' + month + '-' + day).then((data) => {
@@ -243,8 +243,8 @@ export class NuevanoconformidadPage {
   finalizartareaid(id, data, estado) {
     let fechacierrereal;
     let dt = new Date();
-    let month = dt.getMonth() + 1;
-    let day = dt.getDate();
+    let month = ("0" + (dt.getMonth() + 1)).slice(-2);
+    let day = ("0" + dt.getDate()).slice(-2);
     let year = dt.getFullYear();
     fechacierrereal = year + '-' + month + '-' + day;
 

@@ -162,7 +162,7 @@ export class EnviardatosPage {
   abrirpagina(pregunta) {
     this.tipo = pregunta.tipo;
     this.navCtrl.push(FormulariosPage, {
-      caso: 4, grupo: pregunta.grupo.idgrupobase, up: pregunta.up.idUnidadProductiva, gruponombre: pregunta.grupo.nombre, tipo: pregunta.tipo
+      caso: 4, grupo: pregunta.grupo.idgrupobase, up: pregunta.up, gruponombre: pregunta.grupo.nombre, tipo: pregunta.tipo
     });
   }
 
@@ -284,6 +284,9 @@ export class EnviardatosPage {
           let formularioRespuesta = [];
           this.db.respuestasparaunidad(up.idUnidadProductiva, this.tipo).then((data) => {
             data.forEach((respuestasdigitadas) => {
+              if (respuestasdigitadas.ruta) {
+                this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta);
+              }
               let valor = respuestasdigitadas.codigorespuesta.split('_');
               if (valor.length > 0) {
                 let i = 0;
@@ -326,9 +329,7 @@ export class EnviardatosPage {
             return this.db.respuestastablaparaunidad(up.idUnidadProductiva, this.tipo).then((respuestastabla) => {
               if (respuestastabla) {
                 respuestastabla.forEach((respuestasdigitadas) => {
-                  if (respuestasdigitadas.ruta) {
-                    this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta);
-                  }
+                  
                   let respuestassacadas;
                   respuestassacadas = {
                     formularioRespuestaId: {
@@ -353,39 +354,79 @@ export class EnviardatosPage {
                   noconformidad.forEach((nconformidad) => {
                     this.db.tareas(nconformidad.id).then((tareas) => {
                       let no_conformidadesf;
+                    
                       tareas.forEach((tareaguardada) => {
-                        if (tareaguardada.heredado != 1) {
-                          tareaguardada.id == null;
-                        }
-
+                      
                       });
+                      let codigonc:any;
+                      if(nconformidad.heredada==1){
+                        codigonc=nconformidad.id;
+                      }else{
+                        codigonc=null;
+                      }
                       if (tareas) {
+/*                         id INTEGER PRIMARY KEY,
+                        noconformidad INTEGER,
+                        nombre TEXT,
+                        detalle TEXT,
+                        encargado TEXT,
+                        heredada INTEGER,
+                        fechaPautadaCierre TEXT,
+                        estado INTEGER,
+                        fechaCreacion TEXT,
+                        fechaRealCierre TEXT */
+
+
+                        let tareajson=[];
+                        tareas.forEach((elementa)=>{
+                          let codigota:any;
+                          if(elementa.heredada==1){
+                            codigota=nconformidad.id;
+                          }else{
+                            codigota=null;
+                          }
+    
+                        tareajson.push({
+                            "codigo":codigota,
+                            "nombre": elementa.nombre,
+                            "descripcion":elementa.detalle,
+                            "encargado": elementa.encargado,
+                            "estado": elementa.estatus,
+                            "fechaPautadaCierre":elementa.fechaPautadaCierre,
+                            "fechaRealCierre":elementa.fechaRealCierre,
+                            "fechaCreacion":elementa.fechaCreacion
+                          });
+                        })
                         no_conformidadesf = {
-                          "no_conformidad": {
-                            "categoria": { codigo: nconformidad.categoria },
+                          "noConformidad": {
+                            "codigo": codigonc,
+                            "asignacion": up.idAsignacion,
+                            "categoria": nconformidad.categoria ,
                             "detalle": nconformidad.detalle,
                             "descripcion": nconformidad.descripcion,
                             "fechaPautadaCierre": nconformidad.fechaposiblecierre,
                             "fechaRealCierre": nconformidad.fechaposiblecierre,
-                            "estado": nconformidad.estado,
-                            "fechaCreacion": nconformidad.fechacreacion,
-                            "tareas": tareas
-                          }
+                            "status": nconformidad.estado,
+                            "fechaCreacion": nconformidad.fechacreacion
+                          },
+                            "tareas": tareajson                          
                         }
                         no_conformidades.push(no_conformidadesf);
 
                       } else {
                         no_conformidadesf = {
-                          "no_conformidad": {
-                            "categoria": { codigo: nconformidad.categoria },
+                          "noConformidad": {
+                            "codigo": codigonc,
+                            "asignacion": up.idAsignacion,
+                            "categoria": nconformidad.categoria ,
                             "detalle": nconformidad.detalle,
                             "descripcion": nconformidad.descripcion,
                             "fechaPautadaCierre": nconformidad.fechaposiblecierre,
                             "fechaRealCierre": nconformidad.fechaposiblecierre,
-                            "estado": nconformidad.estado,
-                            "fechaCreacion": nconformidad.fechacreacion,
-                            "tareas": null
-                          }
+                            "status": nconformidad.estado,
+                            "fechaCreacion": nconformidad.fechacreacion
+                          },
+                          "tareas": null                          
                         }
                         no_conformidades.push(no_conformidadesf);
                       }
