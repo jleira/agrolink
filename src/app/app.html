@@ -1,18 +1,13 @@
-<ion-menu [content]="content">
-  <ion-header>
-    <ion-toolbar  color="secondary">
-
-        <ion-list no-lines>
-            <ion-item-sliding >
-              <ion-item color="secondary">
-                <h2>{{empresa }} - {{rol}}</h2>
-                <p>{{nombre}}</p>
-              </ion-item> 
-            </ion-item-sliding>
-          </ion-list>
-    </ion-toolbar>
-  </ion-header>
-
+<ion-menu persistent="true" [content]="content" type="overlay">
+    <ion-header no-border>
+      <ion-toolbar style="position: relative;margin:0px;padding:0px">
+        <img src="assets/imgs/perfil.png" />
+        <ion-item  style="position: absolute;bottom:2px;background-color:transparent;" no-lines>
+          <h2 style="color:white"> {{empresa }} - {{rol}}</h2>
+          <p style="color:white">{{nombre}}</p>
+        </ion-item>
+      </ion-toolbar>
+    </ion-header>
 
 
   <ion-content>

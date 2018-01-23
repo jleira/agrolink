@@ -1,8 +1,5 @@
 <ion-header>
-  <ion-navbar color="secondary">
-    <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
-    </button>
+  <ion-navbar color="pesto-primary">
     <div *ngIf="caso == 1">
       <ion-title>UNIDADES PARA AUDITORIA </ion-title>
     </div>
@@ -24,12 +21,12 @@
 
 <ion-content>
   <ion-fab bottom right *ngIf="caso == 4" (click)="agregarnoconformidad(0)">
-    <button ion-fab mini color="danger">
+    <button ion-fab mini color="pesto-dark">
       <ion-icon name="add"></ion-icon>
     </button>
   </ion-fab>
   <ion-fab bottom right *ngIf="caso == 5" (click)="agregarnoconformidad(0)">
-    <button ion-fab mini color="danger">
+    <button ion-fab mini color="pesto-dark">
       <ion-icon name="add"></ion-icon>
     </button>
   </ion-fab>
@@ -42,7 +39,7 @@
   </div>
 
   <div *ngIf="caso < 3">
-    <ion-item-divider text-wrap>
+    <ion-item-divider text-wrap  color="pesto-light">
       <h2>Unidades pendientes</h2>
       <p>Son aquellas en las que no se ha iniciado el llenado del formulario</p>
     </ion-item-divider>
@@ -52,7 +49,7 @@
         <button ion-item (click)="mostrargrupos(item.tipo, item, item.productor )">
           <ion-row>
 
-            <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+            <ion-col col-6 text-center > {{item.idUnidadProductiva}}
               <br>
             </ion-col>
             <ion-col col-6 text-center> {{item.nombre}}</ion-col>
@@ -67,7 +64,7 @@
         </button>
       </ion-card>
     </div>
-    <ion-item-divider text-wrap>
+    <ion-item-divider text-wrap  color="pesto-light">
         <h2>Unidades Iniciadas</h2>
         <p>Son aquellas en las que no se ha iniciado el llenado del formulario pero no se ha enviado al administrador</p>
       </ion-item-divider>
@@ -92,7 +89,7 @@
         </button>
       </ion-card>
     </div>
-    <ion-item-divider text-wrap>
+    <ion-item-divider text-wrap  color="pesto-light">
         <h2>Unidades enviadas</h2>
         <p>Son aquellas enviada, no se pueden editar</p>
       </ion-item-divider>

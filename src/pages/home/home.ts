@@ -75,7 +75,7 @@ abririmagen(ruta){
     }else if (caso==2){
       this.navCtrl.push(FormulariosPage,{caso:2});
     } else if (caso==3) {
-      this.navCtrl.setRoot(UnidadproductivaPage);
+      this.navCtrl.push(UnidadproductivaPage);
     }else if (caso==4) {
       this.agregarnoconformidad();
   }

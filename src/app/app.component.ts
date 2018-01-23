@@ -39,13 +39,11 @@ empresa:string;
   ) {
     this.pages = [
       { title: 'Inicio', component: HomePage , icon: 'home' },
-      { title: 'Unidades Productivas', component: UnidadproductivaPage, icon: 'list'},
       { title: 'Perfil', component: PerfilPage, icon:'person'} 
     ];
     this.authService.authUser.subscribe(jwt => {
       if (jwt) {
         this.rootPage = HomePage;
-        console.log('entro esperemos a ver q pasa ');
         this.storage.get('nombre').then( decoded =>
           {
             this.nombre = decoded;

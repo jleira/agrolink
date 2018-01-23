@@ -4,7 +4,7 @@
      <img width="40%"  src="assets/imgs/icono.png"/>
   </div>
     
-  <ion-title color="secondary">  <h2 style="color:#52a780;text-align:center"  >Agrolink</h2>
+  <ion-title  color="pesto-light">  <h2 style="color:#52a780;text-align:center"  >Agrolink</h2>
     </ion-title>
   <form #form="ngForm" (ngSubmit)="login(form.value)" novalidate>
     <ion-list>
@@ -29,14 +29,14 @@
 
       <ion-item  no-lines>
         <ion-label >Empresa</ion-label>
-        <ion-select  name="empresa" okText="Seleccionar" cancelText="Cancelar" ngModel required #empresa="ngModel"
+        <ion-select  name="empresa" interface="action-sheet" cancelText="cancelar" ngModel required #empresa="ngModel"
         [class.invalid]="empresa.errors && empresa.dirty">
           <ion-option *ngFor="let opciones of empresas">{{opciones.schemaName}}</ion-option>
         </ion-select>
       </ion-item>
       
       <div padding>
-        <button ion-button color="secondary" style="border: 1px green solid;" block type="submit" [disabled]="!form.valid">Entrar</button>
+        <button ion-button  color="pesto-dark" style="border: 1px green solid;" block type="submit" [disabled]="!form.valid">Entrar</button>
       </div>
 
     </ion-list>

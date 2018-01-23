@@ -1,71 +1,95 @@
 <ion-header>
-  <ion-navbar color="secondary">
+  <ion-toolbar  color="pesto-primary">
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>{{rol}} - {{user}}</ion-title>
-  </ion-navbar>
+    <ion-item color="pesto-primary" no-lines>
+      <h2>{{rol}}</h2>
+      <p>{{user}}</p>
+    </ion-item>
+  </ion-toolbar>
 </ion-header>
 
-<ion-content >
-    <ion-list  style="margin-top:2%">
-      <button ion-item (click)="openPage(1)" *ngIf="auditor">
-          <ion-icon ios="ios-clipboard" md="md-clipboard" item-start></ion-icon>
-        <h3 style="font-weight:bold">Formulario de Auditoria</h3>
+
+<ion-content>
+  <ion-list style="margin-top:2%">
+
+    <ion-card>
+      <button ion-item text-wrap (click)="openPage(1)" *ngIf="auditor">
+        <ion-thumbnail item-start>
+          <img src="assets/imgs/forms.png">
+        </ion-thumbnail>
+        <h2 style="font-weight:bold">Formularios de auditoria</h2>
         <p>
-          Ingrese para realizar el diligenciamiento del formulario de auditoria para un producto
+          Ingrese para diligencias los formularios de auditoria
         </p>
       </button>
-      <button ion-item  (click)="openPage(2)" *ngIf="promotor">
-        <ion-icon ios="ios-clipboard" md="md-clipboard" item-start></ion-icon>
-      <h3 style="font-weight:bold">Formulario de promotoria</h3>
-      <p>
-        Ingrese para realizar el diligenciamiento del formulario de promotoria para un producto
-      </p>
-    </button>
-    
-      <button ion-item  (click)="openPage(3)">
-          <ion-icon ios="ios-paper-outline" md="md-paper" item-start></ion-icon>
-        <h3 style="font-weight:bold">Unidades productivas asignadas</h3>
+    </ion-card>
+
+    <ion-card>
+      <button ion-item text-wrap (click)="openPage(2)" *ngIf="auditor">
+        <ion-thumbnail item-start>
+          <img src="assets/imgs/foms2.png">
+        </ion-thumbnail>
+        <h2 style="font-weight:bold">Formulario de promotoria</h2>
         <p>
-          Ingrese aca para consultar las unidades productivas asignadas y el estado del trabajo en cada una de ellas 
+          Ingrese para realizar el diligenciamiento del formulario de promotoria para un producto
         </p>
       </button>
-      <button ion-item (click)="openPage(4)" >
-          <ion-icon ios="ios-sync" md="md-sync" item-start></ion-icon>
-        <h3 style="font-weight:bold">Sincronizacion De datos</h3>
+    </ion-card>
+
+    <ion-card>
+      <button ion-item text-wrap (click)="openPage(3)">
+        <ion-thumbnail item-start>
+          <img src="assets/imgs/unidades.png">
+        </ion-thumbnail>
+        <h2 style="font-weight:bold">Unidades productivas asignadas</h2>
         <p>
-          Ingrese aqui para realizar el envio de los formularios diligenciados 
+          Unidades productivas con sus respectivos detalles
         </p>
       </button>
-      <button ion-item  >
-          <ion-icon ios="ios-swap" md="md-swap" item-start></ion-icon>
-        <h3 style="font-weight:bold">Precargue de datos</h3>
+    </ion-card>
+    <ion-card>
+      <button ion-item text-wrap (click)="openPage(4)">
+        <ion-thumbnail item-start>
+          <img src="assets/imgs/enviar.png">
+        </ion-thumbnail>
+        <h2 style="font-weight:bold">Enviar Formularios</h2>
         <p>
-            Ingrese aqui para realizar el precargado de los formularios
+          Envio de formularios diligenciados
         </p>
       </button>
-      <button ion-item (click)="casoespecial()" >
-        <ion-icon name="color-wand" item-start></ion-icon>
-      <h3 style="font-weight:bold">Casos especiales</h3>
-      <p>
-        Esta seccion es reservada para crear nuevas unidades productivas, y llenar sus respectivas encuestas.
-      </p>
-    </button> 
-    <button ion-item  (click)="casoespecial()">
-      <ion-icon name="leaf" item-start></ion-icon>
-    <h3 style="font-weight:bold">Casos especiales</h3>
-    <p>
-      Esta seccion es reservada para crear nuevas unidades productivas, y llenar sus respectivas encuestas.
-    </p>
-  </button> 
-    </ion-list>
-    <p>{{mensajes}}</p>
-    
-<!--  
+    </ion-card>
+
+    <ion-card>
+      <button ion-item text-wrap (click)="openPage(5)">
+        <ion-thumbnail item-start>
+          <img src="assets/imgs/sinc.png">
+        </ion-thumbnail>
+        <h2 style="font-weight:bold">Descarcar Formularios</h2>
+        <p>
+          Elimina datos existentes y recargar sistema.
+        </p>
+      </button>
+    </ion-card>
+
+    <ion-card>
+      <button ion-item text-wrap (click)="casoespecial()">
+        <ion-thumbnail item-start>
+          <img src="assets/imgs/especial.png">
+        </ion-thumbnail>
+        <h2 style="font-weight:bold">Casos Especiales</h2>
+        <p>
+          Crear una unidad productiva, ññenar sus formularios ...
+        </p>
+      </button>
+    </ion-card>
+
+  </ion-list>
+
+  <!--  
 <button   ion-button color="secondary" style="border: 1px green solid;" block (click)="galeria()">galeria</button>
         <button   ion-button color="secondary" style="border: 1px green solid;" block (click)="getPicture()">getPicture</button>
               -->
-    
-  </ion-content>
-  
+
+</ion-content>
