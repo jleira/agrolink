@@ -4,7 +4,6 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { HomePage } from '../pages/home/home';
-import { ListPage } from '../pages/list/list';
 import { LoginPage} from '../pages/login/login';
 import { UnidadproductivaPage } from '../pages/unidadproductiva/unidadproductiva';
 
@@ -25,8 +24,7 @@ export class MyApp {
   pages: Array<{title: string, component: any ;icon: string}>;
   nombre: string;
   rol: string;
-  prueba:number;  
-empresa:string;
+  empresa:string;
 
   constructor(
     public db:DbProvider,
@@ -66,17 +64,15 @@ empresa:string;
         this.rootPage = LoginPage;
       }
     });
-
     authService.checkLogin();
-
-    this.initializeApp();
-
-    
+    this.initializeApp();    
   }
 
   initializeApp() {
     this.platform.ready().then(() => {
-      this.statusBar.styleDefault();
+      this.statusBar.overlaysWebView(true);
+//      this.statusBar.styleDefault();
+      this.statusBar.backgroundColorByHexString('#00AA8D');
       setTimeout(() => {
         this.splashScreen.hide();        
       }, 100 - 1000);

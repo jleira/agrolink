@@ -1,124 +1,56 @@
 import { Component } from '@angular/core';
-import { ViewController, NavParams, AlertController, LoadingController, ToastController, ModalController } from 'ionic-angular';
+import { ViewController, NavParams, LoadingController, ToastController,ModalController } from 'ionic-angular';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
 import { DateTime } from 'ionic-angular/components/datetime/datetime';
-//import {tareaPage} from './tarea';
+
 @Component({
 
-  templateUrl: 'noconformidad.html'
+  templateUrl: 'tarea.html'
 
 })
-export class NuevanoconformidadPage {
-  img: any;
-  up;
-  tipo;
-  id: number;
-  descripcion: string;
-  detalle: string;
-  categoria;
-  fecha;
-  tareas;
-  productor;
-  categorias: any;
-  habilitartarea: boolean;
-  habilitarcreacion: boolean;
-  fechadecierre;
+export class tareaPage {
+    
+    fechaminima;
+    fechamaxima;
+    fecha;
+    encargado;
+    nombre;
+    descripcion;
+    noconformidad;
+  
   constructor(
     public loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
-    public alertCtrl: AlertController,
     public viewCtrl: ViewController,
     public navParams: NavParams,
     public formulario: FormulariosProvider,
-    public modalCtrl: ModalController,
+    public modalCtrl: ModalController
   ) {
 
-    this.productor = this.navParams.get('productor');
-    this.up = this.navParams.get('up');
-    this.tipo = this.navParams.get('tipo');
-    let idd = this.navParams.get('id');
-
-    if (idd) {
-      this.habilitarcreacion = false;
-      this.id = idd;
-      this.habilitartarea = true;
-      this.formulario.tareas(idd).then((data) => {
-        if(data)
-        {
-          data.forEach(element => {
-            element.fechaPautadaCierre = this.fechatoinp(element.fechaPautadaCierre);
-            element.fechaRealCierre = this.fechatoinp(element.fechaRealCierre);
-          });
-  
-        }
-
-        this.tareas = data;
-        console.log(this.tareas);
-        return this.tareas;
-      });
-      this.formulario.noconformidadid(this.id).then((data) => {
-        this.descripcion = data[0].descripcion;
-        this.detalle = data[0].detalle;
-        this.fecha = data[0].fechaposiblecierre;
-        this.fechadecierre = data[0].fechafinalizado;
-
-        if (data[0].estado == 0) {
-          this.habilitartarea = true;
-
-        } else {
-          this.habilitartarea = false;
-        }
-        console.log(data);
-        return (this.descripcion, this.descripcion, this.detalle);
-
-      });
-    } else {
-      this.habilitarcreacion = true;
-      this.habilitartarea = false;
-    }
-    this.formulario.categoria().then((categoriasg) => {
-      this.categorias = categoriasg;
-    })
-  }
-  noconformidad(values) {
+    this.noconformidad = this.navParams.get('id');
+    this.fechamaxima=this.navParams.get('fecha');
     let dt = new Date();
     let month = ("0" + (dt.getMonth() + 1)).slice(-2);
     let day = ("0" + dt.getDate()).slice(-2);
     let year = dt.getFullYear();
+    this.fechaminima=year+' '+month+' '+day;
+    
+  }
+  guardartareanueva(values) {
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
       content: 'Validando datos...'
     });
+    this.guardartarea(values);
     loading.present();
-    this.formulario.guardarnoconformidades(this.up, this.tipo, values.categoria, values.detalle, values.descripcion, year + '-' + month + '-' + day, values.fecha, 0).then((data) => {
-      if (data) {
-        this.habilitartarea = true;
-        this.id = data;
-        this.categoria = values.categoria;
-        this.detalle = values.detalle;
-        this.descripcion = values.descripcion;
-        this.fecha = values.fecha;
-        this.fechadecierre = 'Noconformidad en progreso';
-        this.habilitarcreacion = false;
-      } else {
-        this.handleError('Error guardando no conformidad, intente guardar nuevamente');
-      }
-      loading.dismiss();
-    }).catch((err) => {
-      this.handleError('Error guardando no conformidad, intente guardar nuevamente');
-      console.log(err);
-      loading.dismiss();
+    this.dismiss();
 
-    });
   }
+
   dismiss() {
     this.viewCtrl.dismiss();
   }
 
-  agregartarea() {
-   // let modal = this.modalCtrl.create(tareaPage, { 'id': this.id, 'fecha':this.fecha });
-   // modal.present();
-  }
 
   handleError(error: string) {
     let message: string;

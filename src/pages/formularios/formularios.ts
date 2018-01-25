@@ -97,6 +97,7 @@ export class FormulariosPage {
       this.rutaimg = this.file.externalDataDirectory + `${this.up}/${this.grupoidselected.toString()}`;
       let fechaentro;
       fechaentro = new Date();
+
       fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' +("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
       this.geolocation.getCurrentPosition().then((resp) => {
         this.datoguardar = fechaentro + ',' + resp.coords.latitude.toString() + ',' + resp.coords.longitude.toString();
@@ -120,7 +121,7 @@ export class FormulariosPage {
             //          console.log(data);
             this.items.forEach(element => {
               if (element.tipo == 3007) {
-
+                console.log(atob(element.encabezado));
                 element.encabezado = JSON.parse(atob(element.encabezado));
 
                 this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {

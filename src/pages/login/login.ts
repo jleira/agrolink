@@ -39,7 +39,9 @@ export class LoginPage {
     this.http.get(`${apiUrl}/api/accounts/name`).subscribe((data)=>{
       this.empresas=data.json();
       loading.dismiss();
-
+    },
+     (err)=>{ 
+       this.handleError2('erroes en el servidor, consulte con su administrador');
     });
 
   }
@@ -50,16 +52,20 @@ export class LoginPage {
     });
 
     loading.present();
-    this.authService.login(value).finally(() => {}).subscribe(() => {
-       this.region.obtenerpaises();
-        this.region.obtenerdepartamentos();
-        this.region.obtenermunicipios();
-        this.region.obtenerregiones();
-        this.uproductiva.descargarunidadesproductivas();
-        this.uproductiva.descargarunidadesproductivasasignadas();
-        this.formularios.descargarformularios();
-        this.formularios.descargarcategorias();
-        loading.dismiss();
+    this.authService.login(value).finally(()=>{
+      loading.dismiss();
+    }).subscribe(() => {
+      console.log('entro en el subscribe del login');
+
+//        this.region.obtenerpaises();
+//        this.region.obtenerdepartamentos();
+//        this.region.obtenermunicipios();
+//        this.region.obtenerregiones();
+//        this.uproductiva.descargarunidadesproductivasasignadas();
+//        this.formularios.descargarformularios();
+//        this.formularios.descargarcategorias();
+//        console.log('aqui acabo el ooading del logiun');
+
       },
       (err) => {
         this.handleError(err);

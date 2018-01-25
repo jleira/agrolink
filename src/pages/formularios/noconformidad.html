@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar class="cyan" color="secondary">
+  <ion-toolbar class="cyan" color="pesto-primary">
     <ion-title>
       No conformidad
     </ion-title>
@@ -53,7 +53,7 @@
 
 
     <div padding>
-      <button ion-button color="secondary" style="border: 1px green solid;" block type="submit" [disabled]="!form.valid">GUARDAR</button>
+      <button ion-button color="pesto-light" style="border: 1px green solid;" block type="submit" [disabled]="!form.valid">GUARDAR</button>
     </div>
 
   </form>
@@ -151,6 +151,6 @@ Fecha pautada de cierre
   </ion-list>
 
   <div padding *ngIf="habilitartarea">
-    <button ion-button color="secondary" style="border: 1px green solid;" block (click)="finalizarnoconformidad()">Finalizar no conformidad</button>
+    <button ion-button color="pesto-dark" style="border: 1px green solid;" block (click)="finalizarnoconformidad()">Finalizar no conformidad</button>
   </div>
 </ion-content>

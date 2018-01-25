@@ -45,16 +45,14 @@ export class DbProvider {
           `CREATE TABLE IF NOT EXISTS departamentos (
             id INTEGER PRIMARY KEY,
             nombre TEXT,
-            paisid INTEGER,
-            FOREIGN KEY(paisid) REFERENCES paises(id)
+            paisid INTEGER
             );`, {})
       }).then(() => {
         return this.database.executeSql(
           `CREATE TABLE IF NOT EXISTS municipios (
             id INTEGER PRIMARY KEY,
             nombre TEXT,
-            departamentoid INTEGER,
-            FOREIGN KEY(departamentoid) REFERENCES departamentos(id)
+            departamentoid INTEGER
             );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -62,8 +60,7 @@ export class DbProvider {
             id INTEGER PRIMARY KEY,
             nombre TEXT,
             prefijo TEXT,
-            municipioid INTEGER,
-            FOREIGN KEY(municipioid) REFERENCES municipios(id)
+            municipioid INTEGER
             );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -91,8 +88,7 @@ export class DbProvider {
             iniciopromotoria TEXT,
             finpromotoria TEXT,
             inicioauditoria TEXT,
-            finauditoria TEXT,
-            FOREIGN KEY(regionId) REFERENCES regiones(id)
+            finauditoria TEXT
             );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -115,8 +111,7 @@ export class DbProvider {
               nombre TEXT,
               posicion INTEGER,
               formularioid INTEGER,              
-              textoayuda TEXT,
-              FOREIGN KEY(formularioid) REFERENCES formularios(id)
+              textoayuda TEXT
             );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -131,8 +126,7 @@ export class DbProvider {
                 requerido INTEGER,
                 codigorespuesta INTEGER,
                 archivo INTEGER,
-                encabezado TEXT,
-                FOREIGN KEY(grupoid) REFERENCES grupos(idgrupobase)
+                encabezado TEXT
               );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -142,8 +136,7 @@ export class DbProvider {
                   valor INTEGER,
                   tipo INTEGER,
                   preguntaid INTEGER,
-                  codigorespuestapadre INTEGER,
-                  FOREIGN KEY(preguntaid) REFERENCES preguntas(codigo)
+                  codigorespuestapadre INTEGER
                 );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -159,9 +152,7 @@ export class DbProvider {
                     observacion TEXT,
                     ruta TEXT,
                     tipoformulario INTEGER
-
-
-                  );`, {})
+           );`, {})
       }).then(() => {
         return this.database.executeSql(
           `CREATE TABLE IF NOT EXISTS preguntastabla (
@@ -185,8 +176,7 @@ export class DbProvider {
             constante TEXT,
             tipo INTEGER,
             preguntaid INTEGER,
-            codigorespuestapadre INTEGER,
-            FOREIGN KEY(preguntaid) REFERENCES preguntastabla(preguntaid)
+            codigorespuestapadre INTEGER
                     );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -219,7 +209,7 @@ export class DbProvider {
                     heredada INTEGER,
                     fechaposiblecierre TEXT, 
                     estado INTEGER,
-                    fechafinalizado, TEXT
+                    fechafinalizado TEXT
                   );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -1183,55 +1173,55 @@ export class DbProvider {
 
     return this.isReady().then(() => {
       return this.database.executeSql(
-        `DROP TABLE IF EXISTS paises;`, {})
+        `DELETE FROM paises;`, {})
         .then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS departamentos ;`, {})
+            `DELETE FROM departamentos ;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS municipios ;`, {})
+            `DELETE FROM municipios ;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS regiones ;`, {})
+            `DELETE FROM regiones ;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS productores;`, {})
+            `DELETE FROM productores;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS unidades_productivas ;`, {})
+            `DELETE FROM unidades_productivas ;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS formularios ;`, {})
+            `DELETE FROM formularios ;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS grupos ;`, {})
+            `DELETE FROM grupos ;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS preguntas;`, {})
+            `DELETE FROM preguntas;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS respuestas;`, {})
+            `DELETE FROM respuestas;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS respuestasguardadas;`, {})
+            `DELETE FROM respuestasguardadas;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS preguntastabla;`, {})
+            `DELETE FROM preguntastabla;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS respuestastabla;`, {})
+            `DELETE FROM respuestastabla;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS respuestasguardadastabla;`, {})
+            `DELETE FROM respuestasguardadastabla;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS noconformidades;`, {})
+            `DELETE FROM noconformidades;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS tareas;`, {})
+            `DELETE FROM tareas;`, {})
         }).then(() => {
           return this.database.executeSql(
-            `DROP TABLE IF EXISTS listacategoria;`, {})
+            `DELETE FROM listacategoria;`, {})
         });
 
     })
@@ -1638,7 +1628,7 @@ export class DbProvider {
     })
   }
 
-  cambiarestado(idUnidadProductiva,terminado) {
+  cambiarestado(idUnidadProductiva, terminado) {
     let idseleccion = idUnidadProductiva;
     return this.isReady()
       .then(() => {
