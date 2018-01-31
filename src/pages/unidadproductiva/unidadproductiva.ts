@@ -109,7 +109,7 @@ export class UnidadproductivaPage {
         content: 'Cargando informacion...'
       });
   
-      loading.present();
+//      loading.present();
           
 if(typeof data =="undefined"){
 this.prueba="indefinido todo";
@@ -366,7 +366,7 @@ this.prueba="indefinido todo";
           
         }
 
-      }loading.dismiss();
+      }//loading.dismiss();
     }
         );
     popover.present();

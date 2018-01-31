@@ -76,8 +76,9 @@ export class AuthProvider {
                   console.log('error paises');
                   this.handleError2('Error al descargar la informacion de paises, intentelo nuevamente');
                   this.cancelar = 1;
-                  return this.logout();
                   console.log('cancelar paises', this.cancelar);
+
+                  return this.logout();
                 });
               this.region.obtenerdepartamentos().subscribe(() => {
               }, () => {
@@ -241,7 +242,7 @@ export class AuthProvider {
                                                         }else{
                                                         this.handleError2('Error interno en el dispositivo, intentelonuevake nuevamente');
                                                         this.cancelar = 1;
-                                                       return return this.logout();
+                                                       return this.logout();
                                                         }
                                                       });
                                                   });
@@ -262,12 +263,13 @@ export class AuthProvider {
                                           return this.logout();
                                         }
                                       }, (err) => {
-                                        return this.logout();
                                         if (err.status == 500) {
                                           this.handleError2('Error al descargar la informacion de la pregunta tabla  ' + pr.pregunta.enunciado + ' , error en el servidor');
                                         } else {
                                           this.handleError2('Error al descargar la informacion pregunta tabla  ' + pr.pregunta.enunciado + ', intentelo nuevamente');
                                         }
+                                        return this.logout();
+
                                       }
                                     );
                                   } else {
@@ -300,17 +302,17 @@ export class AuthProvider {
                                             });
                                         });
                                       } else {
-                                        return this.logout();
                                         this.handleError2('No existen respuestas para la pregunta ' + pr.pregunta.enunciado);
+                                        return this.logout();
                                       }
                                     }, err => {
-                                      return this.logout();
                                       if (err.status == 500) {
                                         this.handleError2('Error al descargar las respuestas de la pregunta tabla ' + pr.pregunta.enunciado + ' , error en el servidor');
                                       } else {
                                         this.handleError2('Error al descargar las respuestas de la pregunta tabla ' + pr.pregunta.enunciado + ', intentelo nuevamente');
                                       }
-  
+                                      return this.logout();
+
                                     });
                                 }
                               })
@@ -322,12 +324,12 @@ export class AuthProvider {
                               return this.logout();
                             }
                           }, (err) => {
-                            return this.logout();
                             if (err.status == 500) {
                               this.handleError2('Error al descargar la preguntas en el grupo ' + element2.nombre + ' , error en el servidor');
                             } else {
                               this.handleError2('Error al descargar la informacion en el grupo ' + element2.nombre + ', intentelo nuevamente');
                             }
+                            return this.logout();
                           });
                         });
                       });
@@ -397,12 +399,13 @@ export class AuthProvider {
             },
             err => {
   
-              return this.logout();
               if (err.status == 500) {
                 this.handleError2('Error al descargar la informacion de la persona logeada, error en el servidor');
               } else {
                 this.handleError2('Error al descargar la informacion de la persona logeada, intentelo nuevamente');
               }
+              return this.logout();
+
             }
           )
         },err=>{
@@ -545,8 +548,9 @@ export class AuthProvider {
         data.json().forEach(element => {
            this.database.agregarnoconformidadantigua(element.codigo,unidad, tipo, element.categoria, element.detalle, element.descripcion, element.fechaCreacion, element.fechaPautadaCierre,element.estatus,element.asignacion, element.fechaRealCierre).then(
             (ok)=>{},err=>{
+              this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
+
               return this.logout();
-                this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
             }
           ); 
           element.tareas.forEach(element2 => {
@@ -559,12 +563,13 @@ export class AuthProvider {
         });
        }
     }, err => {
-      return this.logout();
       if (err.status == 500) {
         this.handleError2('Error al descargar las no conformidades pertenecientes a la unidad productiva ' + unidad + ', error en el servidor ');
       } else {
         this.handleError2('Error al descargar las no conformidades pertenecientes a la unidad productiva ' + unidad + ', intentelo nuevamente');
       }
+      return this.logout();
+
     })
   }
   precargue(unidad, tipo) {

@@ -51,25 +51,26 @@ export class FormulariosPage {
     public db: DbProvider,
     public popoverCtrl: PopoverController) {
     this.caso = navParams.get('caso');
-    console.log(this.caso);
 
   }
 
-  ionViewWillUnload() {//
-    console.log('vamos a ver si devuelve');
-    console.log(this.caso);
+
+
+
+  ionViewWillUnload() {
+
     let preguntasrequeridas = [];
 
 
     if (this.caso == 4) {
       let requeridas = 0;
-      this.items.forEach(element => {
+      let preguntasg = this.items;
+     if(this.items){
+      preguntasg.forEach(element => {
         if (element.requerido == 1) {
-          console.log();
           requeridas = requeridas + 1;
         }
       });
-      console.log(requeridas);
       let requeridas2 = 0;
       this.items.forEach(element => {
         if (element.requerido == 1) {
@@ -79,94 +80,84 @@ export class FormulariosPage {
               if (tienerespuesta) {
               } else {
                 preguntasrequeridas.push(element.enunciado);
-                console.log(requeridas2, requeridas);
               }
               if (requeridas2 == requeridas) {
                 this.avisopreguntaspendientes(preguntasrequeridas, 'Las siguientes preguntas del grupo ' + this.grupo + ' y la unidad ' + this.up + ' deben ser respondidas');
               }
 
-            },()=>{
+            }, () => {
               requeridas2 = requeridas2 + 1;
             });
         }
       });
+     }
     }
-
-
-
 
     if (this.caso == 3) {
       let gruposporrsponder = [];
-      console.log(this.items);
       let requeridas = 0;
-
-      this.items.forEach(element => {
-        this.db.preguntasporgruporequeridas(element.idgrupobase).then((pregunta) => {
-          if (pregunta) {
-            requeridas = requeridas + 1;
-            console.log('requeridas', requeridas);
-          }
-        });
-      });
-      let requeridas2 = 0;
-      this.items.forEach(element => {
-        let decide = 0;
-
-        this.db.preguntasporgruporequeridas(element.idgrupobase).then((pregunta) => {
-          if (pregunta) {
-            pregunta.forEach(preguntaid => {
-              return this.db.verficarrespuestas(this.up, element.idgrupobase, preguntaid.codigo, this.tipocuestionario, preguntaid.tipo).then(tienerespuesta => {
-                console.log(this.up, element.idgrupobase, preguntaid.codigo, this.tipo, preguntaid.tipo, element);
-
-                console.log(tienerespuesta)
-                if (tienerespuesta) {
-                } else {
-                  if (decide == 0) {
-                    requeridas2 = requeridas2 + 1;
-                    gruposporrsponder.push(element.nombre);
-                    decide = 1;
-                    console.log(requeridas2, requeridas);
-
-                    if (requeridas == requeridas2) {
-                      this.avisopreguntaspendientes(gruposporrsponder, 'Los siguientes grupos de la unidad ' + this.up + ' tienen preguntas requeridas pendientes');
+      if(this.items)
+      {
+        this.items.forEach(element => {
+          let decide1 = 0;
+  
+          this.db.preguntasporgruporequeridas(element.idgrupobase).then((pregunta) => {
+            if (pregunta) {
+              pregunta.forEach(preguntaid => {
+                this.db.verficarrespuestas(this.up, element.idgrupobase, preguntaid.codigo, this.tipo, preguntaid.tipo).then(tienerespuestaa => {
+                  if (tienerespuestaa) {
+                  } else {
+                    if (decide1 == 0) {
+                      requeridas = requeridas + 1;
+                      decide1 = 1;
                     }
                   }
-                }
+                })
               })
-            });
-          }
+            }
+          });
         });
-      });
-
+        let requeridas2 = 0;
+        this.items.forEach(element => {
+          let decide = 0;
+          this.db.preguntasporgruporequeridas(element.idgrupobase).then((pregunta) => {
+            if (pregunta) {
+              pregunta.forEach(preguntaid => {
+                this.db.verficarrespuestas(this.up, element.idgrupobase, preguntaid.codigo, this.tipo, preguntaid.tipo).then(tienerespuestaa => {
+                  if (tienerespuestaa) {
+                  } else {
+                    if (decide == 0) {
+                      requeridas2 = requeridas2 + 1;
+                      gruposporrsponder.push(element.nombre);
+                      decide = 1;
+                      if (requeridas === requeridas2) {
+                        this.avisopreguntaspendientes(gruposporrsponder, 'Los siguientes grupos de la unidad ' + this.up + ' tienen preguntas requeridas pendientes');
+                      }
+                    }
+                  }
+  
+                })
+              });
+            }
+          });
+        });
+  
+  
+      }
     }
   }
 
   avisopreguntaspendientes(itemspendientes, msj) {
-    if(itemspendientes.length>0){
+    if (itemspendientes.length > 0) {
       let modal = this.popoverCtrl.create(ImagePage, { 'caso': 2, 'pendientes': itemspendientes, 'msj': msj });
       modal.present();
-  
+
     }
-
-
-    /*     let alert = this.alertCtrl.create({
-          title: 'Formulario incompleto',
-          message: ,
-          buttons: [
-            {
-              text: 'Ok',
-              handler: () => {
-                console.log('ok');
-              }
-            }
-          ]
-        });
-        alert.present(); 
-     */
   }
 
 
   ionViewDidLoad() {
+    console.log('caso', this.caso);
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
       content: 'Cargando informacion...'
@@ -175,19 +166,102 @@ export class FormulariosPage {
 
     if (this.caso == 1) {//auditoria
       loading.present();
-      this.uproductiva.llamaruproductivasap(1002).then((data: any) => {
+     return this.uproductiva.llamaruproductivasap(1002).then((data: any) => {
+        data.forEach(element => {
+          element.porcentaje = 0;
+          let cantidaddepreguntas = 0;
+          let parcial = 0;
+          return this.formulario.gruposbase(1002).then((nuevop:any) => {
+            console.log('nuevop',nuevop);
+              if (nuevop) {
+              nuevop.forEach(grupospn => {
+                console.log('gp',grupospn)
+                this.db.preguntasporgruporequeridas(grupospn.idgrupobase).then((pregunta) => {
+                  if (pregunta) {
+                    cantidaddepreguntas = cantidaddepreguntas + pregunta.length;
+                    pregunta.forEach(preguntaid => {
+                      this.db.verficarrespuestas(element.idUnidadProductiva, grupospn.idgrupobase, preguntaid.codigo, 1002, preguntaid.tipo).then(tienerespuestaa => {
+                        if (tienerespuestaa) {
+                          parcial = parcial + 1;
+                          element.porcentaje = ((parcial / cantidaddepreguntas) * 100).toFixed(1);
+                        } else {
+                          parcial = parcial;
+                          element.porcentaje = ((parcial / cantidaddepreguntas) * 100).toFixed(1);
+                        }
+                      }, err => {
+                        console.log('aqui el erroe', err);
+                        console.log(data.idUnidadProductiva, grupospn.idgrupobase, preguntaid.codigo, 1001, preguntaid.tipo, 'aqui');
+                      })
+                    })
+                  } else {
+                    console.log('err');
+                  };
+                },err=>{console.log('error', err)});
+              });
+            }else{
+              console.log('err2');
+            } 
+          }, err => {
+            console.log('este es el error de los grupo',err);
+          })
+        });
+
+
+
         this.items = data;
         console.log(this.items);
         loading.dismiss();
+        return this.items;
       });
-      this.uproductiva.llamaruproductivas().then((data) => { console.log(data) })
 
     } else if (this.caso == 2) {//promotoria
       loading.present();
-      this.uproductiva.llamaruproductivasap(1001).then((data: any) => {
+     return this.uproductiva.llamaruproductivasap(1001).then((data: any) => {
+        data.forEach(element => {
+          element.porcentaje = 0;
+          let cantidaddepreguntas = 0;
+          let parcial = 0;
+          return this.formulario.gruposbase(1001).then((nuevop:any) => {
+            console.log('nuevop',nuevop);
+              if (nuevop) {
+              nuevop.forEach(grupospn => {
+                console.log('gp',grupospn)
+                this.db.preguntasporgruporequeridas(grupospn.idgrupobase).then((pregunta) => {
+                  if (pregunta) {
+                    cantidaddepreguntas = cantidaddepreguntas + pregunta.length;
+                    pregunta.forEach(preguntaid => {
+                      this.db.verficarrespuestas(element.idUnidadProductiva, grupospn.idgrupobase, preguntaid.codigo, 1001, preguntaid.tipo).then(tienerespuestaa => {
+                        if (tienerespuestaa) {
+                          parcial = parcial + 1;
+                          element.porcentaje = ((parcial / cantidaddepreguntas) * 100).toFixed(1);
+                        } else {
+                          parcial = parcial;
+                          element.porcentaje = ((parcial / cantidaddepreguntas) * 100).toFixed(1);
+                        }
+                      }, err => {
+                        console.log('aqui el erroe', err);
+                        console.log(data.idUnidadProductiva, grupospn.idgrupobase, preguntaid.codigo, 1001, preguntaid.tipo, 'aqui');
+                      })
+                    })
+                  } else {
+                    console.log('err');
+                  };
+                },err=>{console.log('error', err)});
+              });
+            }else{
+              console.log('err2');
+            } 
+          }, err => {
+            console.log('este es el error de los grupo',err);
+          })
+        });
+
+
+
         this.items = data;
-        console.log(data);
+        console.log(this.items);
         loading.dismiss();
+        return this.items;
       });
     } else if (this.caso == 3) {
       loading.present();
@@ -196,11 +270,62 @@ export class FormulariosPage {
       this.tipo = this.navParams.get('tipo');
       let casot = this.navParams.get('tipo');
       this.productor = this.navParams.get('productor');
+      console.log(casot);
       return this.formulario.gruposbase(casot).then(gpu => {
-        this.items = gpu;
+        if (gpu) {
+          gpu.forEach(gruposp => {
+            gruposp.porcentaje = 0;
+            return this.db.preguntasporgruporequeridas(gruposp.idgrupobase).then((pregunta) => {
+              if (pregunta) {
+                let total = pregunta.length;
+                let parcial = 0;
+                pregunta.forEach(preguntaid => {
+                  this.db.verficarrespuestas(this.up, gruposp.idgrupobase, preguntaid.codigo, this.tipo, preguntaid.tipo).then(tienerespuestaa => {
+                    if (tienerespuestaa) {
+                      parcial = parcial + 1;
+                      console.log('parcial', (parcial / total) * 100);
+                      gruposp.porcentaje = ((parcial / total) * 100).toFixed(1);
+                    } else {
+                      parcial = parcial;
+                      console.log('parcial2', (parcial / total) * 10);
+                      gruposp.porcentaje = ((parcial / total) * 100).toFixed(1);
+                    }
+                  })
+                })
+              } else {
+                return this.formulario.preguntasgrupo(gruposp.idgrupobase).then((data) => {
+                  if (data) {
+                    let total = data.length;
+                    let parcial = 0;
+                    data.forEach(preguntaid2 => {
+                      this.db.verficarrespuestas(this.up, gruposp.idgrupobase, preguntaid2.codigo, this.tipo, preguntaid2.tipo).then(tienerespuestaa2 => {
+                        if (tienerespuestaa2) {
+                          parcial = parcial + 1;
+                          console.log('parcial', (parcial / total) * 100);
+                          gruposp.porcentaje = ((parcial / total) * 100).toFixed(1);
+                        } else {
+                          parcial = parcial;
+                          console.log('parcial2', (parcial / total) * 10);
+                          gruposp.porcentaje = ((parcial / total) * 100).toFixed(1);
+                        }
+                      })
+                    })
+
+                  }
+                })
+
+              }
+            });
+          });
+          this.items = gpu;
+        } else {
+          this.items = gpu;
+        }
         loading.dismiss();
-        return this.items;
-      });
+        this.items;
+      }, err => {
+        console.log(err);
+      })
 
     } else if (this.caso == 4) {//promotoria
       loading.present();
@@ -218,11 +343,10 @@ export class FormulariosPage {
       fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' + ("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
       this.geolocation.getCurrentPosition().then((resp) => {
         this.datoguardar = fechaentro + ',' + resp.coords.latitude.toString() + ',' + resp.coords.longitude.toString();
-        console.log(this.datoguardar);
+
       }).catch((error) => {
         this.datoguardar = fechaentro + ',' + error.message + ',' + error.message;
         this.handleError('no se pudo acceder a la ubicacion del telefono ' + error.message);
-        console.log(this.datoguardar);
       }).then(() => {
       });
       this.formulario.preguntasgrupo(this.grupoidselected).then(preguntasg => {
@@ -235,10 +359,8 @@ export class FormulariosPage {
           this.resp = r;
           return this.formulario.respuestasporpreguntas(this.resp, this.up, this.grupoidselected, this.tipocuestionario).then(data => {
             this.resp = data;
-            //          console.log(data);
             this.items.forEach(element => {
               if (element.tipo == 3007) {
-                console.log(atob(element.encabezado));
                 element.encabezado = JSON.parse(atob(element.encabezado));
 
                 this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
@@ -252,8 +374,6 @@ export class FormulariosPage {
                   element.preguntas = data;
                   return this.items;
                 }, (err) => {
-                  console.log(err);
-
                 }).then((data) => {
 
                 });
@@ -272,7 +392,7 @@ export class FormulariosPage {
           }).
             then(() => {
               this.final = this.items;
-              console.log(this.final);
+
 
             }).then(() => {
               loading.dismiss();
@@ -288,18 +408,14 @@ export class FormulariosPage {
       this.productor = this.navParams.get('productor');
       loading.present();
       this.unidadproductiva = this.navParams.get('up');
-      //      console.log(this.unidadproductiva);
+
       this.up = this.unidadproductiva.idUnidadProductiva;
       this.tipo = this.navParams.get('tipo');
-      console.log(this.up, this.tipo);
       this.formulario.noconformidades(this.up, this.tipo).then((data) => {
         this.items = data;
-        console.log('no conformidades', this.items);
       });
       this.formulario.todasnoconformidades().then(ok => {
-        console.log('estas son todas', ok);
       })
-      //      console.log('no conformidad',this.up, this.tipo);
       loading.dismiss();
     }
   }
@@ -415,7 +531,6 @@ export class FormulariosPage {
     let nombrecarpetapadre = 'OC21';// unidad productiva 
     let idgrupo = codigo;
 
-    console.log(this.file.externalCacheDirectory);
     let alert = this.alertCtrl.create({
 
       title: 'Desea adjuntar una imagen a esta pregunta',
@@ -476,14 +591,15 @@ export class FormulariosPage {
       ) => {
         this.file.removeFile(this.file.externalCacheDirectory, imageData.replace(this.file.externalCacheDirectory, ""
         )).then((ok) => {
-          console.log(JSON.stringify(ok));
-        }, (err) => { console.log(JSON.stringify(err)) });
+
+        }, (err) => {
+
+        });
       }).then(() => {
         return this.recargaritem().then(() => { }, () => { });
       }).then(() => {
         loading.dismiss();
       });
-      //      console.log(imageData);
     }
     ).catch(error => {
       console.error(JSON.stringify(error));
@@ -614,7 +730,7 @@ export class FormulariosPage {
               element.preguntas = data;
               return this.items;
             }, (err) => {
-              console.log(err);
+              this.handleError('Error al consultar respuestas ');
             }).then((data) => {
             });
           }
@@ -633,7 +749,6 @@ export class FormulariosPage {
         then(() => {
           this.final = this.items;
           loading.dismiss();
-          console.log('final', this.final);
           return this.final;
         });
     });
@@ -641,7 +756,6 @@ export class FormulariosPage {
   }
 
   guardarfechapadre(valor, preguntapadre, preguntaid, fecha) {
-    //    console.log(this.unidadproductiva,valor, preguntapadre, preguntaid, fecha);
 
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');

@@ -219,11 +219,14 @@ export class FormulariosProvider {
 
   gruposbase(caso) {
     return this.database.formularioid(caso).then((data: any) => {
-      this.database.gruposbyid(data).then(grupodb => {
+      console.log('idf', data);
+     return this.database.gruposbyid(data).then(grupodb => {
         this.items = grupodb;
+        console.log(this.items);
         return this.items;
       });
-      return this.items;
+      
+//      return this.items;
     });
   }
   preguntasgrupo(grupo) {
@@ -316,6 +319,7 @@ export class FormulariosProvider {
   }
 
   respuestastablas(codigorespuesta, up, grupo, preguntapadre, tipo) {
+    console.log('tabla');
     return this.database.respuestasapreguntastablas(codigorespuesta).then((data) => {
       this.items = data;
       return this.items;

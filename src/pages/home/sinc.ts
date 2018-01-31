@@ -130,7 +130,7 @@ export class EnviardatosPage {
                       return this.db.verficarrespuestas(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo).then(tienerespuesta => {
                         console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
                         console.log(tienerespuesta);
-  
+
                         if (tienerespuesta) {
                           if (this.preguntassinresponder.length == 0) {
                             this.habilitarenvio = true;
@@ -292,7 +292,7 @@ export class EnviardatosPage {
           this.db.respuestasparaunidad(up.idUnidadProductiva, this.tipo).then((data) => {
             data.forEach((respuestasdigitadas) => {
               if (respuestasdigitadas.ruta) {
-//                this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta);
+                this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta);
               }
               let valor = respuestasdigitadas.codigorespuesta.split('_');
               if (valor.length > 0) {
@@ -378,16 +378,7 @@ export class EnviardatosPage {
                         asignacionc = up.idAsignacion;
                       }
                       if (tareas) {
-                        /*                         id INTEGER PRIMARY KEY,
-                                                noconformidad INTEGER,
-                                                nombre TEXT,
-                                                detalle TEXT,
-                                                encargado TEXT,
-                                                heredada INTEGER,
-                                                fechaPautadaCierre TEXT,
-                                                estado INTEGER,
-                                                fechaCreacion TEXT,
-                                                fechaRealCierre TEXT */
+
 
 
                         let tareajson = [];
@@ -405,7 +396,7 @@ export class EnviardatosPage {
                             "nombre": elementa.nombre,
                             "descripcion": elementa.detalle,
                             "encargado": elementa.encargado,
-                            "estado": elementa.estatus,
+                            "estado": elementa.estado,
                             "fechaPautadaCierre": elementa.fechaPautadaCierre,
                             "fechaRealCierre": elementa.fechaRealCierre,
                             "fechaCreacion": elementa.fechaCreacion,
@@ -461,7 +452,8 @@ export class EnviardatosPage {
                   let datosaenviar = {
                     formulario: {
                       "formularioBase": { codigo: formulario },
-                      "asignacion": { idAsignacion: up.idAsignacion }, fechaInicial: datosdeinicio[0],
+                      "asignacion": up.idAsignacio,
+                       fechaInicial: datosdeinicio[0],
                       localizacionInicial: {
                         "longitude": datosdeinicio[1],
                         "latitude": datosdeinicio[2]
@@ -475,7 +467,7 @@ export class EnviardatosPage {
                     no_conformidades
                   };
                   console.log('prueba', datosaenviar);
-/*                   this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
+                  this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
                     let envio = ok;
                     if (ok) {
                       this.handleError('formulario de la unidad productiva ' + up.nombre + ' envidado correctamente');
@@ -483,24 +475,30 @@ export class EnviardatosPage {
                       this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
                     }
                   });
- */                } else {
+                } else {
                   let datosaenviar = {
                     formulario: {
                       "formularioBase": { codigo: formulario },
-                      "asignacion": { idAsignacion: up.idAsignacion }, fechaInicial: datosdeinicio[0],
+                      "asignacion": up.idAsignacion , 
+                      fechaInicial: datosdeinicio[0],
                       localizacionInicial: {
                         "longitude": datosdeinicio[1],
                         "latitude": datosdeinicio[2]
+                        //"longitude": 10.00001,
+                        //"latitude": -7.000000
                       },
                       fechaFinal: datosdefinalizacion[0],
                       localizacionFinal: {
                         "longitude": datosdefinalizacion[1],
                         "latitude": datosdefinalizacion[2]
+
+                        //"longitude": 10.00001,
+                        //"latitude": -7.000000
                       }
                     }, formularioRespuesta
                   };
                   console.log('pruebas sin no conformidades', datosaenviar);
-/*                   this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
+                  this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
                     let envio = ok;
                     if (ok) {
                       this.handleError('formulario de la unidad productiva ' + up.nombre + ' envidado correctamente');
@@ -508,7 +506,7 @@ export class EnviardatosPage {
                       this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
                     }
                   });
- */                }
+                }
               })
 
             });

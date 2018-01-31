@@ -60,7 +60,11 @@
               <span> {{item.productor}} </span>
             </ion-col>
           </ion-row>
-
+          <div class="progress-outer">
+            <div class="progress-inner" [style.width]="item.porcentaje+'%'">
+                {{item.porcentaje}} %
+            </div>
+        </div>
         </button>
       </ion-card>
     </div>
@@ -85,7 +89,11 @@
               <span> {{item.productor}} </span>
             </ion-col>
           </ion-row>
-
+          <div class="progress-outer">
+            <div class="progress-inner" [style.width]="item.porcentaje+'%'">
+                {{item.porcentaje}} %
+            </div>
+        </div>
         </button>
       </ion-card>
     </div>
@@ -110,7 +118,11 @@
               <span> {{item.productor}} </span>
             </ion-col>
           </ion-row>
-
+          <div class="progress-outer">
+            <div class="progress-inner" [style.width]="item.porcentaje+'%'">
+                {{item.porcentaje}} %
+            </div>
+        </div>
         </button>
       </ion-card>
     </div>
@@ -133,6 +145,12 @@
                 {{item.textoayuda}} </h6>
             </ion-col>
           </ion-row>
+          <div class="progress-outer">
+            <div class="progress-inner" [style.width]="item.porcentaje+'%'">
+                {{item.porcentaje}} %
+            </div>
+        </div>
+
         </button>
       </ion-card>
     </div>
