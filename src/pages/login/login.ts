@@ -34,7 +34,6 @@ export class LoginPage {
       spinner: 'bubbles',
       content: 'Validando datos...'
     });
-
     loading.present();
     this.http.get(`${apiUrl}/api/accounts/name`).subscribe((data)=>{
       this.empresas=data.json();
@@ -50,29 +49,16 @@ export class LoginPage {
       spinner: 'bubbles',
       content: 'Validando datos...'
     });
-
     loading.present();
+    
     this.authService.login(value).finally(()=>{
       loading.dismiss();
     }).subscribe(() => {
-      console.log('entro en el subscribe del login');
-
-//        this.region.obtenerpaises();
-//        this.region.obtenerdepartamentos();
-//        this.region.obtenermunicipios();
-//        this.region.obtenerregiones();
-//        this.uproductiva.descargarunidadesproductivasasignadas();
-//        this.formularios.descargarformularios();
-//        this.formularios.descargarcategorias();
-//        console.log('aqui acabo el ooading del logiun');
 
       },
       (err) => {
         this.handleError(err);
-        loading.dismiss();
-
-      });
-
+        });
   }
   handleError(error: any) {
     let message: string;
@@ -85,23 +71,20 @@ export class LoginPage {
 
     const toast = this.toastCtrl.create({
       message,
-      duration: 5000,
+      duration: 10000,
       position: 'bottom'
     });
-
     toast.present();
   }
 
   handleError2(mensaje:string) {
     let message: string;
     message=mensaje;
-
     const toast = this.toastCtrl.create({
       message,
       duration: 5000,
       position: 'bottom'
     });
-
     toast.present();
   }
 

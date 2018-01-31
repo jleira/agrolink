@@ -1,3 +1,32 @@
 page-formularios {
 
+.enunciadopregunta{
+  color:cadetblue;
+}
+  .preguntastabla{
+    width: 100%;
+    }
+    
+    .divscroll{
+      white-space: normal;
+      overflow-x:scroll !important; table-layout: fixed;background-color:white;
+
+    }
+  .encabezadotabla{
+    color:white;
+    background-color:#26A69A;
+    th{
+      padding:10px; 
+      border:0.4px solid rgba(0 , 0 , 0 , 0.09);
+    }
+  }  
+    
+  .cuerpotabla{
+    td{
+      padding:5px;border: 2px solid rgba(0, 0, 0, 0.08);
+    }
+  }
+
+
+      
 }

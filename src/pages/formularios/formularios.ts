@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController, LoadingController, PopoverController, ModalController, ToastController } from 'ionic-angular';
 import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
+import { DbProvider } from '../../providers/db/db';
 import { observeOn } from 'rxjs/operators/observeOn';
 import { retry } from 'rxjs/operator/retry';
 import { ImagePage } from './imagenes';
@@ -47,10 +48,123 @@ export class FormulariosPage {
     public loadingCtrl: LoadingController,
     private file: File,
     private geolocation: Geolocation,
+    public db: DbProvider,
     public popoverCtrl: PopoverController) {
     this.caso = navParams.get('caso');
     console.log(this.caso);
+
   }
+
+  ionViewWillUnload() {//
+    console.log('vamos a ver si devuelve');
+    console.log(this.caso);
+    let preguntasrequeridas = [];
+
+
+    if (this.caso == 4) {
+      let requeridas = 0;
+      this.items.forEach(element => {
+        if (element.requerido == 1) {
+          console.log();
+          requeridas = requeridas + 1;
+        }
+      });
+      console.log(requeridas);
+      let requeridas2 = 0;
+      this.items.forEach(element => {
+        if (element.requerido == 1) {
+          this.db.verficarrespuestas(this.up, this.grupoidselected, element.codigo, this.tipocuestionario, element.tipo).then(
+            tienerespuesta => {
+              requeridas2 = requeridas2 + 1;
+              if (tienerespuesta) {
+              } else {
+                preguntasrequeridas.push(element.enunciado);
+                console.log(requeridas2, requeridas);
+              }
+              if (requeridas2 == requeridas) {
+                this.avisopreguntaspendientes(preguntasrequeridas, 'Las siguientes preguntas del grupo ' + this.grupo + ' y la unidad ' + this.up + ' deben ser respondidas');
+              }
+
+            },()=>{
+              requeridas2 = requeridas2 + 1;
+            });
+        }
+      });
+    }
+
+
+
+
+    if (this.caso == 3) {
+      let gruposporrsponder = [];
+      console.log(this.items);
+      let requeridas = 0;
+
+      this.items.forEach(element => {
+        this.db.preguntasporgruporequeridas(element.idgrupobase).then((pregunta) => {
+          if (pregunta) {
+            requeridas = requeridas + 1;
+            console.log('requeridas', requeridas);
+          }
+        });
+      });
+      let requeridas2 = 0;
+      this.items.forEach(element => {
+        let decide = 0;
+
+        this.db.preguntasporgruporequeridas(element.idgrupobase).then((pregunta) => {
+          if (pregunta) {
+            pregunta.forEach(preguntaid => {
+              return this.db.verficarrespuestas(this.up, element.idgrupobase, preguntaid.codigo, this.tipocuestionario, preguntaid.tipo).then(tienerespuesta => {
+                console.log(this.up, element.idgrupobase, preguntaid.codigo, this.tipo, preguntaid.tipo, element);
+
+                console.log(tienerespuesta)
+                if (tienerespuesta) {
+                } else {
+                  if (decide == 0) {
+                    requeridas2 = requeridas2 + 1;
+                    gruposporrsponder.push(element.nombre);
+                    decide = 1;
+                    console.log(requeridas2, requeridas);
+
+                    if (requeridas == requeridas2) {
+                      this.avisopreguntaspendientes(gruposporrsponder, 'Los siguientes grupos de la unidad ' + this.up + ' tienen preguntas requeridas pendientes');
+                    }
+                  }
+                }
+              })
+            });
+          }
+        });
+      });
+
+    }
+  }
+
+  avisopreguntaspendientes(itemspendientes, msj) {
+    if(itemspendientes.length>0){
+      let modal = this.popoverCtrl.create(ImagePage, { 'caso': 2, 'pendientes': itemspendientes, 'msj': msj });
+      modal.present();
+  
+    }
+
+
+    /*     let alert = this.alertCtrl.create({
+          title: 'Formulario incompleto',
+          message: ,
+          buttons: [
+            {
+              text: 'Ok',
+              handler: () => {
+                console.log('ok');
+              }
+            }
+          ]
+        });
+        alert.present(); 
+     */
+  }
+
 
   ionViewDidLoad() {
     let loading = this.loadingCtrl.create({
@@ -63,13 +177,16 @@ export class FormulariosPage {
       loading.present();
       this.uproductiva.llamaruproductivasap(1002).then((data: any) => {
         this.items = data;
+        console.log(this.items);
         loading.dismiss();
       });
+      this.uproductiva.llamaruproductivas().then((data) => { console.log(data) })
 
     } else if (this.caso == 2) {//promotoria
       loading.present();
       this.uproductiva.llamaruproductivasap(1001).then((data: any) => {
         this.items = data;
+        console.log(data);
         loading.dismiss();
       });
     } else if (this.caso == 3) {
@@ -98,7 +215,7 @@ export class FormulariosPage {
       let fechaentro;
       fechaentro = new Date();
 
-      fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' +("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
+      fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' + ("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
       this.geolocation.getCurrentPosition().then((resp) => {
         this.datoguardar = fechaentro + ',' + resp.coords.latitude.toString() + ',' + resp.coords.longitude.toString();
         console.log(this.datoguardar);
@@ -155,8 +272,10 @@ export class FormulariosPage {
           }).
             then(() => {
               this.final = this.items;
-              loading.dismiss();
               console.log(this.final);
+
+            }).then(() => {
+              loading.dismiss();
               return this.final;
             });
         } else {
@@ -168,8 +287,8 @@ export class FormulariosPage {
     else if (this.caso == 5) {
       this.productor = this.navParams.get('productor');
       loading.present();
-      this.unidadproductiva=this.navParams.get('up');
-//      console.log(this.unidadproductiva);
+      this.unidadproductiva = this.navParams.get('up');
+      //      console.log(this.unidadproductiva);
       this.up = this.unidadproductiva.idUnidadProductiva;
       this.tipo = this.navParams.get('tipo');
       console.log(this.up, this.tipo);
@@ -177,6 +296,9 @@ export class FormulariosPage {
         this.items = data;
         console.log('no conformidades', this.items);
       });
+      this.formulario.todasnoconformidades().then(ok => {
+        console.log('estas son todas', ok);
+      })
       //      console.log('no conformidad',this.up, this.tipo);
       loading.dismiss();
     }
@@ -440,7 +562,7 @@ export class FormulariosPage {
     return blob;
   }
   verimagen(link) {
-    let popover = this.popoverCtrl.create(ImagePage, { urlimg: link });
+    let popover = this.popoverCtrl.create(ImagePage, { 'caso': 1, urlimg: link });
     popover.present();
   }
 
@@ -468,7 +590,7 @@ export class FormulariosPage {
     this.tipocuestionario = this.navParams.get('tipo');
     this.grupoidselected = this.navParams.get('grupo');
     this.unidadproductiva = this.navParams.get('up');
-    this.up= this.unidadproductiva.idUnidadProductiva;
+    this.up = this.unidadproductiva.idUnidadProductiva;
     this.grupo = this.navParams.get('gruponombre');
     this.rutaimg = this.file.externalDataDirectory + `${this.up}/${this.grupoidselected.toString()}`;
     return this.formulario.preguntasgrupo(this.grupoidselected).then(preguntasg => {
@@ -511,6 +633,7 @@ export class FormulariosPage {
         then(() => {
           this.final = this.items;
           loading.dismiss();
+          console.log('final', this.final);
           return this.final;
         });
     });
@@ -518,42 +641,42 @@ export class FormulariosPage {
   }
 
   guardarfechapadre(valor, preguntapadre, preguntaid, fecha) {
-    console.log(this.unidadproductiva,valor, preguntapadre, preguntaid, fecha);
+    //    console.log(this.unidadproductiva,valor, preguntapadre, preguntaid, fecha);
 
-    if(this.unidadproductiva.terminado==2){
+    if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem;
-    }else{
-    if (fecha == "") {
     } else {
-      this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, fecha, this.tipocuestionario);
-    }
+      if (fecha == "") {
+      } else {
+        this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, fecha, this.tipocuestionario);
+      }
     }
   }
   guardarpadre(valor, preguntapadre, preguntaid, event) {
 
-    if(this.unidadproductiva.terminado==2){
+    if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem;
-    }else{
-
-    if (event) {
-      this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
     } else {
-      if(event===false){
+
+      if (event) {
         this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
-  
+      } else {
+        if (event === false) {
+          this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
+
+        }
+
       }
- 
     }
   }
-  }
   guardarobservacionpadre($event, preguntapadre, preguntaid) {
-    if(this.unidadproductiva.terminado==2){
+    if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem;
-    }else{
-    this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, null, preguntaid, preguntapadre, '', '', $event.target.value, this.tipocuestionario);
+    } else {
+      this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, null, preguntaid, preguntapadre, '', '', $event.target.value, this.tipocuestionario);
     }
   }
 
@@ -583,6 +706,39 @@ export class FormulariosPage {
     }
     this.formulario.guardarubicacion(unidad, valor, c);
   }
+
+
+  comprobarunidades(tipo, unidad) {
+    let formulario;
+    let enviar = [];
+
+
+    /*               grupos.forEach(grupoi => {
+                    this.db.preguntasporgruporequeridas(grupoi.idgrupobase).then((pregunta) => {
+                      if (pregunta) {
+                        pregunta.forEach(preguntaid => {
+                          return this.db.verficarrespuestas(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo).then(tienerespuesta => {
+                            if (tienerespuesta) {
+                              if (this.preguntassinresponder.length == 0) {
+                                this.habilitarenvio = true;
+                              }
+                            } else {
+                              let datatopush = { 'preguntaid': preguntaid, 'grupo': grupoi, 'up': up, 'tipo': tipo };
+                              this.habilitarenvio = false;
+                              this.preguntassinresponder.push(datatopush);
+                            }
+                          })
+                        });
+                      }
+                    });
+                  });
+     */
+
+
+
+  }
+
+
 
 
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
-
+import { LoadingController, ToastController } from 'ionic-angular';
 import { SERVER_URL } from "../../config";
 import { JwtHelper, AuthHttp, AuthConfig } from "angular2-jwt";
 import { DbProvider } from '../db/db';
@@ -23,6 +23,7 @@ export class UproductivaProvider {
   constructor(
     public http: Http, jwtHelper: JwtHelper,
     public database: DbProvider,
+    public loadingCtrl: LoadingController,
     private readonly authHttp: AuthHttp,
     private readonly storage: Storage
   ) {
@@ -31,7 +32,7 @@ export class UproductivaProvider {
 
   guardarunidades(value) {
 
-    this.storage.get('codigo').then((micodigo) => {
+   return this.storage.get('codigo').then((micodigo) => {
       value.forEach(element => {
         let tipo;
         let lat;
@@ -45,11 +46,11 @@ export class UproductivaProvider {
         }
          if (element.auditor.codigo === micodigo) {
           tipo = 1002;
-          this.agregar(element,long,lat,tipo);
+          return this.agregar(element,long,lat,tipo);
         }
         if (element.promotor.codigo === micodigo) {
           tipo = 1001;
-          this.agregar(element,long,lat,tipo);
+         return this.agregar(element,long,lat,tipo);
         }        
       });
     });

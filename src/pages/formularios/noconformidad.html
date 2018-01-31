@@ -44,16 +44,16 @@
       <ion-label>
         Fecha Pautada de cierre
       </ion-label>
-      <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar" name="fecha" ngModel required #fecha="ngModel"
+      <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar"  min={{fechaminima}} name="fecha" ngModel required #fecha="ngModel"
         [class.invalid]="fecha.errors && fecha.dirty"></ion-datetime>
     </ion-item>
-    <ion-item class="error-message" no-lines *ngIf="fecha.errors?.required && fecha.dirty">
-      <p style="color:red">Fecha de posible solucion Requerida </p>
+    <ion-item class="error-message"  no-lines *ngIf="fecha.errors?.required && fecha.dirty">
+      <p style="color:red">Fecha pautada de cierre </p>
     </ion-item>
 
 
     <div padding>
-      <button ion-button color="pesto-light" style="border: 1px green solid;" block type="submit" [disabled]="!form.valid">GUARDAR</button>
+      <button ion-button color="pesto-light" style="border: 1px green solid;" block type="submit" >GUARDAR</button>
     </div>
 
   </form>
@@ -79,11 +79,9 @@
       <ion-label stacked>
 Fecha pautada de cierre
       </ion-label>
-      <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" [(ngModel)]="fecha" doneText="Guardar" (ionChange)="editarnoconformidad(id,'fechaposiblecierre', fecha)"></ion-datetime>
+      <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" min="{{fechaminima}}" max="{{fechamaxima}}" [(ngModel)]="fecha" doneText="Guardar" (ionChange)="editarnoconformidad(id,'fechaposiblecierre', fecha)"></ion-datetime>
     </ion-item>
-    <button ion-button color="secondary" (click)="agregartarea()">Agregar tarea</button>
-
-
+    <button ion-button color="pesto-dark" block (click)="agregartarea()">Agregar tarea</button>
   </div>
 
   <div *ngIf="!habilitartarea">
@@ -144,9 +142,9 @@ Fecha pautada de cierre
       <h2>{{item.nombre}}</h2>
       <p>{{item.detalle}}</p>
       <ion-icon name="eye" item-end (click)="verdetalles(item)"></ion-icon>
-      <ion-icon name="create" *ngIf="item.estado==0" item-end (click)="editartarea(item)"></ion-icon>
-      <ion-icon name="checkbox" *ngIf="item.estado==0" item-end (click)="finalizartarea(item)"></ion-icon>
-      <ion-icon name="checkbox" *ngIf="item.estado==1" color="secondary" item-end></ion-icon>
+      <ion-icon name="create" *ngIf="item.estado==0" item-end (click)="editartarea(item)" style="padding:10px"></ion-icon>
+      <ion-icon name="checkbox" *ngIf="item.estado==0" item-end (click)="finalizartarea(item)"  style="padding:10px"></ion-icon>
+      <ion-icon name="checkbox" *ngIf="item.estado==1" color="secondary" item-end  style="padding:10px"></ion-icon>
     </ion-item>
   </ion-list>
 

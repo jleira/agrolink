@@ -4,12 +4,12 @@
      <img width="40%"  src="assets/imgs/icono.png"/>
   </div>
     
-  <ion-title  color="pesto-light">  <h2 style="color:#52a780;text-align:center"  >Agrolink</h2>
+  <ion-title  color="pesto-dark">  <h2 color="pesto-dark" style="color:#009688;text-align:center"  >Agrolink</h2>
     </ion-title>
   <form #form="ngForm" (ngSubmit)="login(form.value)" novalidate>
     <ion-list>
       <ion-item style="border-color: white;">
-        <ion-label floating>Usuario</ion-label>
+        <ion-label color="pesto-scondary-text" floating>Usuario</ion-label>
         <ion-input type="text" name='username' ngModel required #username="ngModel"
                    [class.invalid]="username.errors && username.dirty"></ion-input>
       </ion-item>
@@ -18,7 +18,7 @@
       </ion-item>
 
       <ion-item>
-        <ion-label floating>Contraseña</ion-label>
+        <ion-label color="pesto-scondary-text" floating>Contraseña</ion-label>
         <ion-input type="password" name='password' ngModel required #password="ngModel"
                    [class.invalid]="password.errors && password.dirty"></ion-input>
       </ion-item>
@@ -28,7 +28,7 @@
       <br>
 
       <ion-item  no-lines>
-        <ion-label >Empresa</ion-label>
+        <ion-label color="pesto-scondary-text" >Empresa</ion-label>
         <ion-select  name="empresa" interface="action-sheet" cancelText="cancelar" ngModel required #empresa="ngModel"
         [class.invalid]="empresa.errors && empresa.dirty">
           <ion-option *ngFor="let opciones of empresas">{{opciones.schemaName}}</ion-option>
@@ -36,7 +36,7 @@
       </ion-item>
       
       <div padding>
-        <button ion-button  color="pesto-dark" style="border: 1px green solid;" block type="submit" [disabled]="!form.valid">Entrar</button>
+        <button ion-button  color="pesto-dark" block type="submit" [disabled]="!form.valid">Entrar</button>
       </div>
 
     </ion-list>

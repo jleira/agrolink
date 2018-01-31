@@ -45,33 +45,34 @@ export class EnviardatosPage {
     public loadingCtrl: LoadingController,
     private file: File
   ) {
-    this.auditorseleccionado=false;
-    this.promotorseleccionado= false;
-    this.storage.get('roll').then( roll =>
-      {
-          if(roll){
-            if(roll.indexOf("Auditor")>-1){
-              this.auditor=true;
-            }
-            if(roll.indexOf("Promotor")>-1){
-              this.promotor=true;      
-            }      
-          }
+    this.auditorseleccionado = false;
+    this.promotorseleccionado = false;
+    this.storage.get('roll').then(roll => {
+      if (roll) {
+        if (roll.indexOf("Auditor") > -1) {
+          this.auditor = true;
+        }
+        if (roll.indexOf("Promotor") > -1) {
+          this.promotor = true;
+        }
       }
+    }
     );
 
     this.evento = [];
     this.habilitarenvio = false;
     this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
-      this.upa = data;
-      if (this.upa.length == 0) {
-        this.upa = false;
-      }
-    });
-    this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
       this.upp = data;
       if (this.upp.length == 0) {
         this.upp = false;
+      }
+
+    });
+    this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
+      this.upa = data;
+      if (this.upa.length == 0) {
+
+        this.upa = false;
       }
     });
 
@@ -87,17 +88,19 @@ export class EnviardatosPage {
     this.viewCtrl.dismiss();
   }
   habilitartipo($event) {
+    console.log($event);
     if ($event == 1001) {
-      this.auditorseleccionado= false;
-      this.promotorseleccionado=true;
-    
+      this.auditorseleccionado = false;
+      this.promotorseleccionado = true;
+
     } else {
-      this.auditorseleccionado= true;
-      this.promotorseleccionado=false;
+      this.auditorseleccionado = true;
+      this.promotorseleccionado = false;
     }
   }
 
   comprobarunidades(tipo, $event) {
+    console.log(tipo, $event);
     this.tipo = tipo;
     this.preguntassinresponder = [];
     this.evento = $event;
@@ -123,7 +126,11 @@ export class EnviardatosPage {
                 this.db.preguntasporgruporequeridas(grupoi.idgrupobase).then((pregunta) => {
                   if (pregunta) {
                     pregunta.forEach(preguntaid => {
+                      console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
                       return this.db.verficarrespuestas(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo).then(tienerespuesta => {
+                        console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
+                        console.log(tienerespuesta);
+  
                         if (tienerespuesta) {
                           if (this.preguntassinresponder.length == 0) {
                             this.habilitarenvio = true;
@@ -285,7 +292,7 @@ export class EnviardatosPage {
           this.db.respuestasparaunidad(up.idUnidadProductiva, this.tipo).then((data) => {
             data.forEach((respuestasdigitadas) => {
               if (respuestasdigitadas.ruta) {
-                this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta);
+//                this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta);
               }
               let valor = respuestasdigitadas.codigorespuesta.split('_');
               if (valor.length > 0) {
@@ -329,7 +336,7 @@ export class EnviardatosPage {
             return this.db.respuestastablaparaunidad(up.idUnidadProductiva, this.tipo).then((respuestastabla) => {
               if (respuestastabla) {
                 respuestastabla.forEach((respuestasdigitadas) => {
-                  
+
                   let respuestassacadas;
                   respuestassacadas = {
                     formularioRespuestaId: {
@@ -354,62 +361,77 @@ export class EnviardatosPage {
                   noconformidad.forEach((nconformidad) => {
                     this.db.tareas(nconformidad.id).then((tareas) => {
                       let no_conformidadesf;
-                    
+
                       tareas.forEach((tareaguardada) => {
-                      
+
                       });
-                      let codigonc:any;
-                      if(nconformidad.heredada==1){
-                        codigonc=nconformidad.id;
-                      }else{
-                        codigonc=null;
+                      let codigonc: any;
+                      let asignacionc;
+                      if (nconformidad.heredada == 1) {
+                        codigonc = nconformidad.id;
+                      } else {
+                        codigonc = null;
+                      }
+                      if (nconformidad.asignacion) {
+                        asignacionc = nconformidad.asignacion;
+                      } else {
+                        asignacionc = up.idAsignacion;
                       }
                       if (tareas) {
-/*                         id INTEGER PRIMARY KEY,
-                        noconformidad INTEGER,
-                        nombre TEXT,
-                        detalle TEXT,
-                        encargado TEXT,
-                        heredada INTEGER,
-                        fechaPautadaCierre TEXT,
-                        estado INTEGER,
-                        fechaCreacion TEXT,
-                        fechaRealCierre TEXT */
+                        /*                         id INTEGER PRIMARY KEY,
+                                                noconformidad INTEGER,
+                                                nombre TEXT,
+                                                detalle TEXT,
+                                                encargado TEXT,
+                                                heredada INTEGER,
+                                                fechaPautadaCierre TEXT,
+                                                estado INTEGER,
+                                                fechaCreacion TEXT,
+                                                fechaRealCierre TEXT */
 
 
-                        let tareajson=[];
-                        tareas.forEach((elementa)=>{
-                          let codigota:any;
-                          if(elementa.heredada==1){
-                            codigota=nconformidad.id;
-                          }else{
-                            codigota=null;
+                        let tareajson = [];
+                        tareas.forEach((elementa) => {
+                          let codigota: any;
+                          if (elementa.heredada == 1) {
+                            codigota = nconformidad.id;
+                          } else {
+                            codigota = null;
                           }
-    
-                        tareajson.push({
-                            "codigo":codigota,
+
+                          tareajson.push({
+                            "codigo": codigota,
+                            "noConformidad": codigonc,
                             "nombre": elementa.nombre,
-                            "descripcion":elementa.detalle,
+                            "descripcion": elementa.detalle,
                             "encargado": elementa.encargado,
                             "estado": elementa.estatus,
-                            "fechaPautadaCierre":elementa.fechaPautadaCierre,
-                            "fechaRealCierre":elementa.fechaRealCierre,
-                            "fechaCreacion":elementa.fechaCreacion
+                            "fechaPautadaCierre": elementa.fechaPautadaCierre,
+                            "fechaRealCierre": elementa.fechaRealCierre,
+                            "fechaCreacion": elementa.fechaCreacion,
+                            "activo": null,
+                            "fechaModificacion": "2018-01-25",
+                            "usuarioCreacion": 1,
+                            "usuarioModificacion": 1
                           });
                         })
                         no_conformidadesf = {
                           "noConformidad": {
                             "codigo": codigonc,
-                            "asignacion": up.idAsignacion,
-                            "categoria": nconformidad.categoria ,
+                            "asignacion": asignacionc,
+                            "categoria": nconformidad.categoria,
                             "detalle": nconformidad.detalle,
                             "descripcion": nconformidad.descripcion,
                             "fechaPautadaCierre": nconformidad.fechaposiblecierre,
+                            "fechaModificacion": null,
                             "fechaRealCierre": nconformidad.fechaposiblecierre,
                             "status": nconformidad.estado,
-                            "fechaCreacion": nconformidad.fechacreacion
+                            "fechaCreacion": nconformidad.fechacreacion,
+                            "usuarioCreacion": null,
+                            "usuarioModificacion": null,
+                            "activo": null
                           },
-                            "tareas": tareajson                          
+                          "tareas": tareajson
                         }
                         no_conformidades.push(no_conformidadesf);
 
@@ -417,16 +439,20 @@ export class EnviardatosPage {
                         no_conformidadesf = {
                           "noConformidad": {
                             "codigo": codigonc,
-                            "asignacion": up.idAsignacion,
-                            "categoria": nconformidad.categoria ,
+                            "asignacion": asignacionc,
+                            "categoria": nconformidad.categoria,
                             "detalle": nconformidad.detalle,
                             "descripcion": nconformidad.descripcion,
                             "fechaPautadaCierre": nconformidad.fechaposiblecierre,
+                            "fechaModificacion": null,
                             "fechaRealCierre": nconformidad.fechaposiblecierre,
                             "status": nconformidad.estado,
-                            "fechaCreacion": nconformidad.fechacreacion
+                            "fechaCreacion": nconformidad.fechacreacion,
+                            "usuarioCreacion": null,
+                            "usuarioModificacion": null,
+                            "activo": null
                           },
-                          "tareas": null                          
+                          "tareas": null
                         }
                         no_conformidades.push(no_conformidadesf);
                       }
@@ -449,15 +475,15 @@ export class EnviardatosPage {
                     no_conformidades
                   };
                   console.log('prueba', datosaenviar);
-                  this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
+/*                   this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
                     let envio = ok;
                     if (ok) {
                       this.handleError('formulario de la unidad productiva ' + up.nombre + ' envidado correctamente');
                     } else {
                       this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
                     }
-                  });;
-                } else {
+                  });
+ */                } else {
                   let datosaenviar = {
                     formulario: {
                       "formularioBase": { codigo: formulario },
@@ -474,7 +500,7 @@ export class EnviardatosPage {
                     }, formularioRespuesta
                   };
                   console.log('pruebas sin no conformidades', datosaenviar);
-                  this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
+/*                   this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
                     let envio = ok;
                     if (ok) {
                       this.handleError('formulario de la unidad productiva ' + up.nombre + ' envidado correctamente');
@@ -482,7 +508,7 @@ export class EnviardatosPage {
                       this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
                     }
                   });
-                }
+ */                }
               })
 
             });

@@ -13,8 +13,10 @@ import { FiltroupPage} from '../pages/filtroup/filtroup';
 import { FormulariosPage} from '../pages/formularios/formularios';
 import { CasoespecialPage} from '../pages/casoespecial/casoespecial';
 import { ImagePage} from '../pages/formularios/imagenes';
+import { tareaPage} from '../pages/formularios/tarea';
 import { NuevanoconformidadPage} from '../pages/formularios/noconformidad';
 import { EnviardatosPage} from '../pages/home/sinc';
+
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -61,7 +63,8 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     ImagePage,
     NuevanoconformidadPage,
     EnviardatosPage,
-    CasoespecialPage
+    CasoespecialPage,
+    tareaPage
     ],
   imports: [
     BrowserModule,
@@ -88,7 +91,8 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions, stor
     ImagePage,
     NuevanoconformidadPage,
     EnviardatosPage,
-    CasoespecialPage
+    CasoespecialPage,
+    tareaPage
   ],
   providers: [
     StatusBar,

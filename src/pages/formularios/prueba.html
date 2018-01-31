@@ -1,0 +1,279 @@
+
+      <div *ngIf="item.tipo==3001">
+        <ion-item no-lines>
+          <ion-label style="color:#000000">{{item.enunciado}}</ion-label>
+          <ion-select (ionChange)="guardar3001($event, item.codigo ,item.codigorespuesta)" okText="Seleccionar" cancelText="Cancelar">
+            <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
+          </ion-select>
+        </ion-item>
+        <div *ngIf="item.archivo===1">
+          <div *ngFor="let opciones of item.respuestas;  let i = index">
+            <div *ngIf="i==0">
+              <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>
+              <ion-item *ngIf="opciones.ruta" no-lines>
+                <ion-avatar item-start>
+                  <img (click)="verimagen(rutaimg+'/'+opciones.ruta)" *ngIf="opciones.ruta" src="{{rutaimg+'/'+opciones.ruta}}" />
+                </ion-avatar>
+                <ion-grid>
+                  <ion-row>
+                    <ion-col col-8>
+                      <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">cambiar imagen</a>
+                    </ion-col>
+                    <ion-col col-4>
+                      <a (click)="eliminarimagen(item.codigo, item.codigorespuesta)">Eliminar</a>
+                    </ion-col>
+
+                  </ion-row>
+                </ion-grid>
+              </ion-item>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+<!--
+    
+
+      <div *ngIf="item.tipo==3003">
+        <div *ngFor="let opciones of item.respuestas">
+            <div *ngIf="opciones.tipo==210001">
+              <div *ngIf="opciones.respuesta">
+                <ion-item text-wrap no-lines>
+                  <ion-label>
+                    {{item.enunciado}}
+                  </ion-label>
+                  <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar" [(ngModel)]="opciones.respuesta" (ionChange)="guardarfecha(opciones, item.codigo, item.codigorespuesta, opciones.respuesta)"></ion-datetime>
+                </ion-item>
+                <div *ngIf="item.archivo===1">
+                  <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>
+  
+                  <ion-item *ngIf="opciones.ruta">
+                    <ion-avatar item-start>
+                      <img (click)="verimagen(rutaimg+'/'+opciones.ruta)" *ngIf="opciones.ruta" src="{{rutaimg+'/'+opciones.ruta}}" />
+                    </ion-avatar>
+  
+                    <ion-grid>
+                      <ion-row>
+                        <ion-col col-8>
+                          <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">cambiar imagen</a>
+                        </ion-col>
+                        <ion-col col-4>
+                          <a (click)="eliminarimagen(item.codigo, item.codigorespuesta)">Eliminar</a>
+  
+                        </ion-col>
+  
+                      </ion-row>
+                    </ion-grid>
+                  </ion-item>
+                </div>
+  
+              </div>
+              <div *ngIf="!opciones.respuesta">
+                <ion-item>
+                  <ion-label>{{item.enunciado}}</ion-label>
+                  <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar" (ionChange)="guardarfecha(opciones, item.codigo, item.codigorespuesta, $event)"></ion-datetime>
+                </ion-item>
+                <ion-item class="error-message" *ngIf="item.requerido==1">
+                  <p style="color:red">Pregunta requerida</p>
+                </ion-item>
+                <div *ngIf="item.archivo===1">
+                  <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>
+  
+                  <ion-item *ngIf="opciones.ruta">
+                    <ion-avatar item-start>
+                      <img (click)="verimagen(rutaimg+'/'+opciones.ruta)" *ngIf="opciones.ruta" src="{{rutaimg+'/'+opciones.ruta}}" />
+                    </ion-avatar>
+  
+                    <ion-grid>
+                      <ion-row>
+                        <ion-col col-8>
+                          <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">cambiar imagen</a>
+                        </ion-col>
+                        <ion-col col-4>
+                          <a (click)="eliminarimagen(item.codigo, item.codigorespuesta)">Eliminar</a>
+  
+                        </ion-col>
+  
+                      </ion-row>
+                    </ion-grid>
+                  </ion-item>
+                </div>
+              </div>
+  
+            </div>
+  
+            <div *ngIf="opciones.tipo==210002">
+              <div *ngIf="opciones.respuesta">
+                <ion-item text-wrap no-lines>
+                  <ion-label stacked>
+                    {{item.enunciado}}
+                  </ion-label>
+                  <ion-input type="number" [(ngModel)]="opciones.respuesta" (change)="guardarnumero(opciones, item.codigo, item.codigorespuesta, opciones.respuesta)"></ion-input>
+                </ion-item>
+                <div *ngIf="item.archivo===1">
+                  <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>
+  
+                  <ion-item *ngIf="opciones.ruta">
+                    <ion-avatar item-start>
+                      <img (click)="verimagen(rutaimg+'/'+opciones.ruta)" *ngIf="opciones.ruta" src="{{rutaimg+'/'+opciones.ruta}}" />
+                    </ion-avatar>
+  
+                    <ion-grid>
+                      <ion-row>
+                        <ion-col col-8>
+                          <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">cambiar imagen</a>
+                        </ion-col>
+                        <ion-col col-4>
+                          <a (click)="eliminarimagen(item.codigo, item.codigorespuesta)">Eliminar</a>
+  
+                        </ion-col>
+  
+                      </ion-row>
+                    </ion-grid>
+                  </ion-item>
+                </div>
+  
+              </div>
+              <div *ngIf="!opciones.respuesta">
+                <ion-item>
+                  <ion-label stacked>{{item.enunciado}} </ion-label>
+                  <ion-input type="number" [(ngModel)]="item.identificador" (change)="guardarnumero(opciones, item.codigo, item.codigorespuesta,item.identificador )"></ion-input>
+                </ion-item>
+                <div *ngIf="item.archivo===1">
+                  <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>
+  
+                  <ion-item *ngIf="opciones.ruta">
+                    <ion-avatar item-start>
+                      <img (click)="verimagen(rutaimg+'/'+opciones.ruta)" *ngIf="opciones.ruta" src="{{rutaimg+'/'+opciones.ruta}}" />
+                    </ion-avatar>
+  
+                    <ion-grid>
+                      <ion-row>
+                        <ion-col col-8>
+                          <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">cambiar imagen</a>
+                        </ion-col>
+                        <ion-col col-4>
+                          <a (click)="eliminarimagen(item.codigo, item.codigorespuesta)">Eliminar</a>
+  
+                        </ion-col>
+  
+                      </ion-row>
+                    </ion-grid>
+                  </ion-item>
+                </div>
+              </div>
+              <ion-item class="error-message" no-lines |>
+                <p style="color:red">Pregunta requerida</p>
+              </ion-item>
+  
+            </div>
+  
+            <div *ngIf="opciones.tipo==210003">
+              <div *ngIf="opciones.respuesta">
+                <ion-item text-wrap no-lines>
+                  <ion-label stacked>
+                    {{item.enunciado}}
+                  </ion-label>
+                  <ion-input type="text" [(ngModel)]="opciones.respuesta" (change)="guardar3003(opciones, item.codigo, item.codigorespuesta, opciones.respuesta)"></ion-input>
+                </ion-item>
+                <div *ngIf="item.archivo===1">
+                  <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>
+  
+                  <ion-item *ngIf="opciones.ruta">
+                    <ion-avatar item-start>
+                      <img (click)="verimagen(rutaimg+'/'+opciones.ruta)" *ngIf="opciones.ruta" src="{{rutaimg+'/'+opciones.ruta}}" />
+                    </ion-avatar>
+  
+                    <ion-grid>
+                      <ion-row>
+                        <ion-col col-8>
+                          <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">cambiar imagen</a>
+                        </ion-col>
+                        <ion-col col-4>
+                          <a (click)="eliminarimagen(item.codigo, item.codigorespuesta)">Eliminar</a>
+  
+                        </ion-col>
+  
+                      </ion-row>
+                    </ion-grid>
+                  </ion-item>
+                </div>
+  
+              </div>
+              <div *ngIf="!opciones.respuesta">
+                <ion-item>
+                  <ion-label stacked>{{item.enunciado}} </ion-label>
+                  <ion-input type="text" (change)="guardar3003(opciones, item.codigo, item.codigorespuesta,$event.target.value)"></ion-input>
+                </ion-item>
+                <div *ngIf="item.archivo===1">
+                  <a (click)="presentConfirm(item.codigo, item.codigorespuesta)" *ngIf="!opciones.ruta">Adjuntar Imagen</a>
+  
+                  <ion-item *ngIf="opciones.ruta">
+                    <ion-avatar item-start>
+                      <img (click)="verimagen(rutaimg+'/'+opciones.ruta)" *ngIf="opciones.ruta" src="{{rutaimg+'/'+opciones.ruta}}" />
+                    </ion-avatar>
+  
+                    <ion-grid>
+                      <ion-row>
+                        <ion-col col-8>
+                          <a (click)="presentConfirm(item.codigo, item.codigorespuesta)">cambiar imagen</a>
+                        </ion-col>
+                        <ion-col col-4>
+                          <a (click)="eliminarimagen(item.codigo, item.codigorespuesta)">Eliminar</a>
+  
+                        </ion-col>
+  
+                      </ion-row>
+                    </ion-grid>
+                  </ion-item>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ion-item class="error-message" *ngIf="item.requerido==1">
+            <p style="color:red">Pregunta requerida</p>
+          </ion-item>
+        </div>
+
+
+        <ion-grid>
+          <ion-row *ngFor="let encabezado of item.encabezado" nowrap>
+            <ion-col *ngFor="let columnas of encabezado.columnas" style="border: 1px solid gray;text-align: center">
+              {{columnas.enunciado}}
+            </ion-col>
+          </ion-row>
+          <ion-row nowrap justify-content-center *ngFor="let preguntas of item.preguntas">
+            <ion-col style="border: 1px solid gray;text-align: center;vertical-align: middle" *ngIf="preguntas.observacion==1">{{preguntas.enunciado}}</ion-col>
+            <ion-col style="border: 1px solid gray;text-align: center;vertical-align: middle" *ngIf="preguntas.observacion==1">
+              <ion-input type="text" (change)="guardarobservacionpadre($event,preguntas.preguntapadre,preguntas.preguntaid)"></ion-input>
+            </ion-col>
+
+
+
+            <ion-col *ngFor="let respuestas of preguntas.respuesta" style="border: 1px solid gray;text-align: center;vertical-align: middle">
+              <div *ngIf="respuestas.tipo==210000">
+                {{respuestas.constante}}
+              </div>
+              <div *ngIf="respuestas.tipo==210001">
+                <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" [(ngModel)]="respuestas.respuesta" doneText="Guardar" (ionChange)="guardarfechapadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-datetime>
+              </div>
+              <div *ngIf="respuestas.tipo==210002">
+                <ion-input type="number" [(ngModel)]="respuestas.respuesta" (change)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-input>
+              </div>
+              <div *ngIf="respuestas.tipo==210003">
+                <ion-input type="text" [(ngModel)]="respuestas.respuesta" (change)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-input>
+              </div>
+              <div *ngIf="respuestas.tipo==210004" style="margin-top:15px">
+                <ion-checkbox [(ngModel)]="respuestas.respuesta" (ionChange)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-checkbox>
+              </div>
+            </ion-col>
+
+          </ion-row>
+
+        </ion-grid>
+
+
+    -->

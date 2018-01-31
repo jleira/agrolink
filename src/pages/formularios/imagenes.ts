@@ -3,17 +3,28 @@ import { ViewController, NavParams } from 'ionic-angular';
 
 @Component({
 
-   templateUrl: 'imagenes.html'
+    templateUrl: 'imagenes.html'
 
 })
 export class ImagePage {
-    img:any;
+    img: any;
+    caso;
+    items;
+    msj;
+    constructor(public viewCtrl: ViewController,
+        public navParams: NavParams) {
+            this.caso=navParams.get('caso');
+            if(this.caso==1){
+                this.img = navParams.get('urlimg');
+                console.log(this.img);
+            }else{
+                this.items=navParams.get('pendientes');
+                this.msj=navParams.get('msj');
 
-   constructor (public viewCtrl: ViewController, 
-             public navParams: NavParams) {
-                 this.img=navParams.get('urlimg');
-                 console.log(this.img);
-                }
+            }
+            console.log(this.caso);
+
+    }
 
 
 }

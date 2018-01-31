@@ -1,1 +1,18 @@
 <img *ngIf="img" src="{{img}}" />
+
+<ion-header *ngIf="items">
+        <ion-toolbar color="pesto-primary">
+         {{msj}}
+        </ion-toolbar>
+      </ion-header>
+
+
+<ion-content fullscreen *ngIf="items">
+    <ion-list>
+        <ion-item text-wrap>
+        </ion-item>
+        <ion-item text-wrap *ngFor="let item of items">
+            {{item}}
+        </ion-item>
+    </ion-list>
+</ion-content>

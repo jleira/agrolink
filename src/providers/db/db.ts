@@ -170,7 +170,7 @@ export class DbProvider {
       }).then(() => {
         return this.database.executeSql(
           `CREATE TABLE IF NOT EXISTS respuestastabla (
-            codigo INTEGER,
+            codigo INTEGER PRIMARY KEY,
             nombre TEXT,
             valor INTEGER,
             constante TEXT,
@@ -209,7 +209,8 @@ export class DbProvider {
                     heredada INTEGER,
                     fechaposiblecierre TEXT, 
                     estado INTEGER,
-                    fechafinalizado TEXT
+                    fechafinalizado TEXT,
+                    asignacion INTEGER
                   );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -1268,7 +1269,7 @@ export class DbProvider {
             todo.respuesta = [];
             todos.push(todo);
           }
-        } else {
+        } else { 
           let todo;
           todo = false;
           todos = todo;
@@ -1343,7 +1344,12 @@ export class DbProvider {
             cres]).then((data) => {
               let todos = [];
               if (data.rows.length) {
-                todos = data.rows.item(0).valor;
+                if(data.rows.item(0).valor=="true"){
+                  data.rows.item(0).valor=true;
+                }
+                  todos = data.rows.item(0).valor;
+                
+
               } else {
                 let todo;
                 todo = false;
@@ -1392,15 +1398,29 @@ export class DbProvider {
         return false
       });
   }
+  agregarnoconformidadantigua(id,unidadproductiva, tipo_formulario, categoria, detalle, descripcion, fechacreacion, fechaposiblecierre, estado, asignacion, fechacierre) {
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(`INSERT INTO noconformidades 
+              (id,unidadproductiva,tipo, categoria, descripcion, detalle, fechacreacion, fechaposiblecierre, estado, fechafinalizado,heredada,asignacion) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);`,
+          [id,unidadproductiva, tipo_formulario, categoria, descripcion, detalle, fechacreacion, fechaposiblecierre, estado, fechacierre, 1,asignacion]);
+      })
+  }
 
+  agregartareaantigua(id,noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion,fechaRealCierre) {
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(`INSERT INTO tareas 
+              (id,noconformidad, nombre, detalle,encargado,fechaPautadaCierre, estado, fechaCreacion, fechaRealCierre, heredada) VALUES (?,?,?,?,?,?,?,?,?,?);`,
+          [id,noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion,fechaRealCierre, 1]);
+      })
+  }
   agregartarea(noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion) {
     return this.isReady()
       .then(() => {
         return this.database.executeSql(`INSERT INTO tareas 
               (noconformidad, nombre, detalle,encargado,fechaPautadaCierre, estado, fechaCreacion) VALUES (?,?,?,?,?,?,?);`,
           [noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion]);
-      }).catch(() => {
-        return false
       });
   }
   tareas(noconformidad) {
@@ -1464,6 +1484,26 @@ export class DbProvider {
     })
 
   }
+
+  todasnoconformidades() {
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM noconformidades`, []).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todos.push(todo);
+          }
+        } else {
+          todos = null;
+        }
+        return todos;
+      })
+    })
+
+  }
+
   noconformidadid(id) {
     let identificador = id;
     return this.isReady(
@@ -1505,21 +1545,21 @@ export class DbProvider {
             if (caso == 1) {//promotoria
               if (todo.iniciopromotoria === null) {
                 return this.database.executeSql(
-                  `UPDATE unidades_productivas SET iniciopromotoria = (?), finpromotoria = (?) , terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' ;`,
+                  `UPDATE unidades_productivas SET iniciopromotoria = (?), finpromotoria = (?) , terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' AND tipo = 1001;`,
                   [datoaguardar, datoaguardar]).then((datae) => { return data; }).catch(err => { return err; });
               } else {
                 return this.database.executeSql(
-                  `UPDATE unidades_productivas SET finpromotoria = (?),terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' ;`,
+                  `UPDATE unidades_productivas SET finpromotoria = (?),terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' AND tipo = 1001;`,
                   [datoaguardar]).then((datae) => { }).catch(err => { return err; });
               }
             } else {
               if (todo.inicioauditoria === null) {
                 return this.database.executeSql(
-                  `UPDATE unidades_productivas SET inicioauditoria = (?), terminado = 1, finauditoria = (?) WHERE idUnidadProductiva = '${idseleccion}' ;`,
+                  `UPDATE unidades_productivas SET inicioauditoria = (?), terminado = 1, finauditoria = (?) WHERE idUnidadProductiva = '${idseleccion}' AND tipo = 1002;`,
                   [datoaguardar, datoaguardar]).then((datae) => { return datae; }).catch(err => { return err });
               } else {
                 return this.database.executeSql(
-                  `UPDATE unidades_productivas SET finauditoria = (?),terminado = 1  WHERE idUnidadProductiva = '${idseleccion}' ;`,
+                  `UPDATE unidades_productivas SET finauditoria = (?),terminado = 1  WHERE idUnidadProductiva = '${idseleccion}' AND tipo = 1002;`,
                   [datoaguardar]).then((datae) => { return datae; }).catch(err => { return err });
               }
             }
