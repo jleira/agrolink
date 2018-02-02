@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController, LoadingController, PopoverController, ModalController, ToastController } from 'ionic-angular';
 import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
-import { DbProvider } from '../../providers/db/db';
+
 import { observeOn } from 'rxjs/operators/observeOn';
 import { retry } from 'rxjs/operator/retry';
 import { ImagePage } from './imagenes';
 import { NuevanoconformidadPage } from './noconformidad';
-
+import { DbProvider } from '../../providers/db/db';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { File, DirectoryEntry } from '@ionic-native/file';
 import { Geolocation } from '@ionic-native/geolocation';
@@ -51,7 +51,7 @@ export class FormulariosPage {
     public db: DbProvider,
     public popoverCtrl: PopoverController) {
     this.caso = navParams.get('caso');
-
+      console.log(this.caso);
   }
 
 
@@ -65,42 +65,41 @@ export class FormulariosPage {
     if (this.caso == 4) {
       let requeridas = 0;
       let preguntasg = this.items;
-     if(this.items){
-      preguntasg.forEach(element => {
-        if (element.requerido == 1) {
-          requeridas = requeridas + 1;
-        }
-      });
-      let requeridas2 = 0;
-      this.items.forEach(element => {
-        if (element.requerido == 1) {
-          this.db.verficarrespuestas(this.up, this.grupoidselected, element.codigo, this.tipocuestionario, element.tipo).then(
-            tienerespuesta => {
-              requeridas2 = requeridas2 + 1;
-              if (tienerespuesta) {
-              } else {
-                preguntasrequeridas.push(element.enunciado);
-              }
-              if (requeridas2 == requeridas) {
-                this.avisopreguntaspendientes(preguntasrequeridas, 'Las siguientes preguntas del grupo ' + this.grupo + ' y la unidad ' + this.up + ' deben ser respondidas');
-              }
+      if (this.items) {
+        preguntasg.forEach(element => {
+          if (element.requerido == 1) {
+            requeridas = requeridas + 1;
+          }
+        });
+        let requeridas2 = 0;
+        this.items.forEach(element => {
+          if (element.requerido == 1) {
+            this.db.verficarrespuestas(this.up, this.grupoidselected, element.codigo, this.tipocuestionario, element.tipo).then(
+              tienerespuesta => {
+                requeridas2 = requeridas2 + 1;
+                if (tienerespuesta) {
+                } else {
+                  preguntasrequeridas.push(element.enunciado);
+                }
+                if (requeridas2 == requeridas) {
+                  this.avisopreguntaspendientes(preguntasrequeridas, 'Las siguientes preguntas del grupo ' + this.grupo + ' y la unidad ' + this.up + ' deben ser respondidas');
+                }
 
-            }, () => {
-              requeridas2 = requeridas2 + 1;
-            });
-        }
-      });
-     }
+              }, () => {
+                requeridas2 = requeridas2 + 1;
+              });
+          }
+        });
+      }
     }
 
     if (this.caso == 3) {
       let gruposporrsponder = [];
       let requeridas = 0;
-      if(this.items)
-      {
+      if (this.items) {
         this.items.forEach(element => {
           let decide1 = 0;
-  
+
           this.db.preguntasporgruporequeridas(element.idgrupobase).then((pregunta) => {
             if (pregunta) {
               pregunta.forEach(preguntaid => {
@@ -135,14 +134,14 @@ export class FormulariosPage {
                       }
                     }
                   }
-  
+
                 })
               });
             }
           });
         });
-  
-  
+
+
       }
     }
   }
@@ -156,8 +155,7 @@ export class FormulariosPage {
   }
 
 
-  ionViewDidLoad() {
-    console.log('caso', this.caso);
+  ionViewDidEnter() {
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
       content: 'Cargando informacion...'
@@ -166,16 +164,14 @@ export class FormulariosPage {
 
     if (this.caso == 1) {//auditoria
       loading.present();
-     return this.uproductiva.llamaruproductivasap(1002).then((data: any) => {
+      return this.uproductiva.llamaruproductivasap(1002).then((data: any) => {
         data.forEach(element => {
           element.porcentaje = 0;
           let cantidaddepreguntas = 0;
           let parcial = 0;
-          return this.formulario.gruposbase(1002).then((nuevop:any) => {
-            console.log('nuevop',nuevop);
-              if (nuevop) {
+          return this.formulario.gruposbase(1002).then((nuevop: any) => {
+            if (nuevop) {
               nuevop.forEach(grupospn => {
-                console.log('gp',grupospn)
                 this.db.preguntasporgruporequeridas(grupospn.idgrupobase).then((pregunta) => {
                   if (pregunta) {
                     cantidaddepreguntas = cantidaddepreguntas + pregunta.length;
@@ -189,43 +185,40 @@ export class FormulariosPage {
                           element.porcentaje = ((parcial / cantidaddepreguntas) * 100).toFixed(1);
                         }
                       }, err => {
-                        console.log('aqui el erroe', err);
-                        console.log(data.idUnidadProductiva, grupospn.idgrupobase, preguntaid.codigo, 1001, preguntaid.tipo, 'aqui');
                       })
                     })
                   } else {
-                    console.log('err');
+
                   };
-                },err=>{console.log('error', err)});
+                }, err => {
+
+                });
               });
-            }else{
-              console.log('err2');
-            } 
+            } else {
+
+            }
           }, err => {
-            console.log('este es el error de los grupo',err);
+
           })
         });
 
 
 
         this.items = data;
-        console.log(this.items);
         loading.dismiss();
         return this.items;
       });
 
     } else if (this.caso == 2) {//promotoria
       loading.present();
-     return this.uproductiva.llamaruproductivasap(1001).then((data: any) => {
+      return this.uproductiva.llamaruproductivasap(1001).then((data: any) => {
         data.forEach(element => {
           element.porcentaje = 0;
           let cantidaddepreguntas = 0;
           let parcial = 0;
-          return this.formulario.gruposbase(1001).then((nuevop:any) => {
-            console.log('nuevop',nuevop);
-              if (nuevop) {
+          return this.formulario.gruposbase(1001).then((nuevop: any) => {
+            if (nuevop) {
               nuevop.forEach(grupospn => {
-                console.log('gp',grupospn)
                 this.db.preguntasporgruporequeridas(grupospn.idgrupobase).then((pregunta) => {
                   if (pregunta) {
                     cantidaddepreguntas = cantidaddepreguntas + pregunta.length;
@@ -239,27 +232,21 @@ export class FormulariosPage {
                           element.porcentaje = ((parcial / cantidaddepreguntas) * 100).toFixed(1);
                         }
                       }, err => {
-                        console.log('aqui el erroe', err);
-                        console.log(data.idUnidadProductiva, grupospn.idgrupobase, preguntaid.codigo, 1001, preguntaid.tipo, 'aqui');
                       })
                     })
                   } else {
-                    console.log('err');
                   };
-                },err=>{console.log('error', err)});
+                }, err => { });
               });
-            }else{
-              console.log('err2');
-            } 
+            } else {
+            }
           }, err => {
-            console.log('este es el error de los grupo',err);
           })
         });
 
 
 
         this.items = data;
-        console.log(this.items);
         loading.dismiss();
         return this.items;
       });
@@ -270,7 +257,6 @@ export class FormulariosPage {
       this.tipo = this.navParams.get('tipo');
       let casot = this.navParams.get('tipo');
       this.productor = this.navParams.get('productor');
-      console.log(casot);
       return this.formulario.gruposbase(casot).then(gpu => {
         if (gpu) {
           gpu.forEach(gruposp => {
@@ -283,17 +269,15 @@ export class FormulariosPage {
                   this.db.verficarrespuestas(this.up, gruposp.idgrupobase, preguntaid.codigo, this.tipo, preguntaid.tipo).then(tienerespuestaa => {
                     if (tienerespuestaa) {
                       parcial = parcial + 1;
-                      console.log('parcial', (parcial / total) * 100);
                       gruposp.porcentaje = ((parcial / total) * 100).toFixed(1);
                     } else {
                       parcial = parcial;
-                      console.log('parcial2', (parcial / total) * 10);
                       gruposp.porcentaje = ((parcial / total) * 100).toFixed(1);
                     }
                   })
                 })
               } else {
-                return this.formulario.preguntasgrupo(gruposp.idgrupobase).then((data) => {
+                return this.formulario.preguntasgrupo(gruposp.idgrupobase, this.tipo).then((data) => {
                   if (data) {
                     let total = data.length;
                     let parcial = 0;
@@ -301,11 +285,9 @@ export class FormulariosPage {
                       this.db.verficarrespuestas(this.up, gruposp.idgrupobase, preguntaid2.codigo, this.tipo, preguntaid2.tipo).then(tienerespuestaa2 => {
                         if (tienerespuestaa2) {
                           parcial = parcial + 1;
-                          console.log('parcial', (parcial / total) * 100);
                           gruposp.porcentaje = ((parcial / total) * 100).toFixed(1);
                         } else {
                           parcial = parcial;
-                          console.log('parcial2', (parcial / total) * 10);
                           gruposp.porcentaje = ((parcial / total) * 100).toFixed(1);
                         }
                       })
@@ -324,10 +306,10 @@ export class FormulariosPage {
         loading.dismiss();
         this.items;
       }, err => {
-        console.log(err);
       })
 
     } else if (this.caso == 4) {//promotoria
+    
       loading.present();
       this.productor = this.navParams.get('productor');
       this.tipocuestionario = this.navParams.get('tipo');
@@ -339,9 +321,8 @@ export class FormulariosPage {
       this.rutaimg = this.file.externalDataDirectory + `${this.up}/${this.grupoidselected.toString()}`;
       let fechaentro;
       fechaentro = new Date();
-
       fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' + ("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
-      this.geolocation.getCurrentPosition().then((resp) => {
+       this.geolocation.getCurrentPosition().then((resp) => {
         this.datoguardar = fechaentro + ',' + resp.coords.latitude.toString() + ',' + resp.coords.longitude.toString();
 
       }).catch((error) => {
@@ -349,60 +330,86 @@ export class FormulariosPage {
         this.handleError('no se pudo acceder a la ubicacion del telefono ' + error.message);
       }).then(() => {
       });
-      this.formulario.preguntasgrupo(this.grupoidselected).then(preguntasg => {
+      this.formulario.preguntasgrupo(this.grupoidselected, this.tipo).then(preguntasg => {
+        console.log(preguntasg);
         this.items = preguntasg;
         if (this.items) {
           let r = [];
           this.items.forEach(element => {
-            r.push(element.codigo);
+            if(element.codigorespuesta!==""){
+              r.push(element.codigorespuesta);
+            }
           });
           this.resp = r;
-          return this.formulario.respuestasporpreguntas(this.resp, this.up, this.grupoidselected, this.tipocuestionario).then(data => {
-            this.resp = data;
+          console.log(this.resp);
+          if(this.resp.length>0){
+            return this.formulario.respuestasporpreguntas(this.resp, this.up, this.grupoidselected, this.tipocuestionario).then(data => {
+              this.resp = data;
+              this.items.forEach(element => {
+                if (element.tipo == 3007) {
+                  element.encabezado = JSON.parse(atob(element.encabezado));
+                  this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
+                    if (data) {
+                      data.forEach(pregunta => {
+                        return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario).then((respu) => {
+                          pregunta.respuesta = respu;
+                        });
+                      });
+                    }
+                    element.preguntas = data;
+                    return this.items;
+                  }, (err) => {
+                  })
+                }
+                let vr: any;
+                if (this.resp) {
+                  this.resp.forEach(element2 => {
+                    if (element2.codigorespuestapadre == element.codigorespuesta) {
+                      element.respuestas.push(element2);
+                    }
+                  });
+                }
+              })
+              this.resp = JSON.stringify(this.resp);
+            }).
+              then(() => {
+                this.final = this.items;
+                console.log('final',this.final);
+                loading.dismiss();
+                return this.final;
+              }).catch(()=>{
+                loading.dismiss();              
+              });
+          }else{
             this.items.forEach(element => {
               if (element.tipo == 3007) {
                 element.encabezado = JSON.parse(atob(element.encabezado));
-
                 this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
                   if (data) {
                     data.forEach(pregunta => {
                       return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario).then((respu) => {
                         pregunta.respuesta = respu;
-                      });
+                      },err=>{});
                     });
                   }
                   element.preguntas = data;
-                  return this.items;
+                  this.final=this.items;
+                  loading.dismiss();
+                  return this.final;
                 }, (err) => {
-                }).then((data) => {
-
-                });
-
-              }
-              let vr: any;
-              if (this.resp) {
-                this.resp.forEach(element2 => {
-                  if (element2.preguntaid == element.codigo) {
-                    element.respuestas.push(element2);
-                  }
-                });
+                  loading.dismiss();
+                })
               }
             })
-            this.resp = JSON.stringify(this.resp);
-          }).
-            then(() => {
-              this.final = this.items;
+          }
 
-
-            }).then(() => {
-              loading.dismiss();
-              return this.final;
-            });
         } else {
           loading.dismiss();
           this.handleError('No existen preguntas registradas en este grupo');
         }
-      });
+      },err=>{
+
+      }).catch(()=>{}); 
     }
     else if (this.caso == 5) {
       this.productor = this.navParams.get('productor');
@@ -517,10 +524,8 @@ export class FormulariosPage {
   }
 
   mostrarpreguntas(grupoid, nbre) {
-    this.formulario.preguntasgrupo(grupoid).then(preguntasg => {
       this.navCtrl.push(FormulariosPage, {
         caso: 4, grupo: grupoid, up: this.unidadproductiva, gruponombre: nbre, tipo: this.navParams.get('tipo')
-      });
     });
   }
 
@@ -528,13 +533,12 @@ export class FormulariosPage {
   presentConfirm(codigo, respcodigo) {
 
     let targetPath = this.file.externalDataDirectory;
-    let nombrecarpetapadre = 'OC21';// unidad productiva 
     let idgrupo = codigo;
 
     let alert = this.alertCtrl.create({
 
       title: 'Desea adjuntar una imagen a esta pregunta',
-      message: 'Para escoger una foto de la galeria del telefono seleccione la opcion Galeria, si desea tomar una foro escoja camara',
+      message: 'Para escoger una foto de la galeria del telefono seleccione la opcion Galeria, si desea tomar una foto escoja camara',
       buttons: [
         {
           text: 'Galeria',
@@ -602,7 +606,7 @@ export class FormulariosPage {
       });
     }
     ).catch(error => {
-      console.error(JSON.stringify(error));
+     
     });
   }
 
@@ -650,8 +654,7 @@ export class FormulariosPage {
           loading.dismiss();
         });
       }).catch(error => {
-        console.error('error', error);
-      });
+              });
   }
 
   b64toBlob(b64Data, contentType, sliceSize) {
@@ -709,7 +712,7 @@ export class FormulariosPage {
     this.up = this.unidadproductiva.idUnidadProductiva;
     this.grupo = this.navParams.get('gruponombre');
     this.rutaimg = this.file.externalDataDirectory + `${this.up}/${this.grupoidselected.toString()}`;
-    return this.formulario.preguntasgrupo(this.grupoidselected).then(preguntasg => {
+    return this.formulario.preguntasgrupo(this.grupoidselected, this.tipo).then(preguntasg => {
       this.items = preguntasg;
       let r = [];
       this.items.forEach(element => {
@@ -768,7 +771,7 @@ export class FormulariosPage {
     }
   }
   guardarpadre(valor, preguntapadre, preguntaid, event) {
-
+console.log(valor, preguntapadre, preguntaid, event);
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem;
@@ -825,31 +828,10 @@ export class FormulariosPage {
   comprobarunidades(tipo, unidad) {
     let formulario;
     let enviar = [];
+  }
 
-
-    /*               grupos.forEach(grupoi => {
-                    this.db.preguntasporgruporequeridas(grupoi.idgrupobase).then((pregunta) => {
-                      if (pregunta) {
-                        pregunta.forEach(preguntaid => {
-                          return this.db.verficarrespuestas(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo).then(tienerespuesta => {
-                            if (tienerespuesta) {
-                              if (this.preguntassinresponder.length == 0) {
-                                this.habilitarenvio = true;
-                              }
-                            } else {
-                              let datatopush = { 'preguntaid': preguntaid, 'grupo': grupoi, 'up': up, 'tipo': tipo };
-                              this.habilitarenvio = false;
-                              this.preguntassinresponder.push(datatopush);
-                            }
-                          })
-                        });
-                      }
-                    });
-                  });
-     */
-
-
-
+  abrirmapa(unidadproductiva){
+    let modal = this.navCtrl.push(ImagePage, { 'caso': 3, 'unidad': unidadproductiva });
   }
 
 

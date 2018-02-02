@@ -154,7 +154,25 @@
         </button>
       </ion-card>
     </div>
-    <ion-card style="border-top:2px solid red">
+
+    <ion-card style="border-top:2px solid green" *ngIf="items" >
+      <button ion-item (click)="abrirmapa(unidadproductiva)">
+        <ion-row text-wrap>
+          <ion-col col-12 text-center>
+            <h3>
+              <strong>Mapa unidad productiva</strong>
+            </h3>
+
+          </ion-col>
+          <ion-col col-12 text-center>
+            <h6>Aqui encontrara el mapa de la finca, en caso de no tenerlo registrado debera hacerlo.
+            </h6>
+          </ion-col>
+        </ion-row>
+      </button>
+    </ion-card>
+
+    <ion-card style="border-top:2px solid red" *ngIf="items" >
       <button ion-item (click)="noconformidades(unidadproductiva, tipo)">
         <ion-row text-wrap>
           <ion-col col-12 text-center>
@@ -452,9 +470,7 @@
                   <ion-input type="text" [(ngModel)]="respuestas.respuesta" (change)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-input>
                 </div>
                 <div *ngIf="respuestas.tipo==210004" align="center" >
-                  <ion-item no-lines>
                       <ion-checkbox [(ngModel)]="respuestas.respuesta"  (ionChange)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-checkbox>
-                  </ion-item>
                 </div>
               </td>
             </tr>

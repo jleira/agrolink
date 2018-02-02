@@ -20,7 +20,7 @@ export class LoginPage {
   loginData = { username: '', password: '' };
   data: any; 
   empresas:any;
-
+  msj:string=null;
   constructor(public http: Http,
     public authService: AuthProvider,
     public loadingCtrl: LoadingController,
@@ -33,14 +33,25 @@ export class LoginPage {
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
       content: 'Validando datos...'
+      
     });
     loading.present();
     this.http.get(`${apiUrl}/api/accounts/name`).subscribe((data)=>{
-      this.empresas=data.json();
       loading.dismiss();
+      if(data.json()){
+        this.empresas=data.json();
+        console.log('1');
+      }else{
+        this.msj='erroes en el servidor, consulte con su administrador'; 
+        console.log('2');
+
+      }
     },
      (err)=>{ 
-       this.handleError2('erroes en el servidor, consulte con su administrador');
+       loading.dismiss();
+       this.msj='erroes en el servidor, consulte con su administrador';
+       console.log('3');
+
     });
 
   }

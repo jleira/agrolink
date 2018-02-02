@@ -32,7 +32,7 @@ export class FormulariosProvider {
 
   }
 
-  descargarformularios() {
+/*   descargarformularios() {
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
       content: 'descargando Formularios'
@@ -215,7 +215,7 @@ export class FormulariosProvider {
         //       this.auth.logout();
         console.log(err);
       })
-  }
+  } */
 
   gruposbase(caso) {
     return this.database.formularioid(caso).then((data: any) => {
@@ -229,15 +229,16 @@ export class FormulariosProvider {
 //      return this.items;
     });
   }
-  preguntasgrupo(grupo) {
-    return this.database.preguntasporgrupo(grupo).then((data: any) => {
+  preguntasgrupo(grupo,tipo ) {
+    return this.database.preguntasporgrupo(grupo,tipo).then((data: any) => {
       this.items = data;
 
       return this.items;
     });
   }
-  respuestasporpreguntas(preguntas, up, grupo, tipo) {
-    return this.database.respuestasporpregunta(preguntas).then(data => {
+  respuestasporpreguntas(codigosrespuesta, up, grupo, tipo) {
+    return this.database.respuestasporpregunta(codigosrespuesta).then(data => {
+      console.log(data)
       this.items = data;
       return this.items;
     }).then(() => {
@@ -271,12 +272,9 @@ export class FormulariosProvider {
                       }
                     } else {
                       respuestas.respuesta = false;
-
                     };
-
                   } else {
                     respuestas.ruta = valores.ruta;
-
                   }
                 }
               });

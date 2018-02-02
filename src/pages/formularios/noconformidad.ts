@@ -60,7 +60,6 @@ export class NuevanoconformidadPage {
           let year = dt.getFullYear();
           let fechainicial = new Date();
           fechainicial.setFullYear(year, month, day);
-          console.log('inicial',fechainicial);   
           data.forEach(element => {
             let fechac=new Date();
             let fechacomp=element.fechaPautadaCierre.split('-');
@@ -72,9 +71,7 @@ export class NuevanoconformidadPage {
           this.fechaminima=fechainicial.getFullYear()+'-'+ ("0" + (fechainicial.getMonth() + 1)).slice(-2);+'-'+("0" + fechainicial.getDate()).slice(-2);
           this.fechamaxima=(fechainicial.getFullYear()+3)+'-'+ ("0" + (fechainicial.getMonth() + 1)).slice(-2);+'-'+("0" + fechainicial.getDate()).slice(-2);
         }
-
         this.tareas = data;
-        console.log(this.tareas);
         return this.tareas;
       });
       this.formulario.noconformidadid(this.id).then((data) => {
@@ -89,7 +86,6 @@ export class NuevanoconformidadPage {
         } else {
           this.habilitartarea = false;
         }
-        console.log(data);
         return (this.descripcion, this.descripcion, this.detalle);
  
       });
@@ -102,7 +98,6 @@ export class NuevanoconformidadPage {
     })
   }
   noconformidad(values) {
-    console.log(values);
     let dt = new Date();
     let month = ("0" + (dt.getMonth() + 1)).slice(-2);
     let day = ("0" + dt.getDate()).slice(-2);
@@ -148,9 +143,7 @@ export class NuevanoconformidadPage {
     this.viewCtrl.dismiss();
   }
   ionViewWillEnter() {
-    console.log('entro aqui',this.id);
     this.formulario.tareas(this.id).then((tar) => { 
-      console.log('tar',tar);
       this.tareas = tar;
     })
 
@@ -178,7 +171,6 @@ export class NuevanoconformidadPage {
     let day = dt.getDate();
     let year = dt.getFullYear();
     return this.formulario.editarnoconformidad(id, columna, valor).then((data) => {
-      console.log(data);
     })
   }
 
@@ -198,19 +190,17 @@ export class NuevanoconformidadPage {
     }, err => {
       this.handleError('error al guardar tarea, intentelo nuevamente');
     }).catch((err) => {
-      console.log(err);
+
       this.handleError('error al guardar tarea, intentelo nuevamente');
 
     })
   }
 
   editartarea(item: any) {
-    console.log(item);
     let modal = this.modalCtrl.create(tareaPage, {'caso':3, 'noconformidad': this.id, 'fecha':this.fecha, 'tarea':item });
     modal.present();
   }
   verdetalles(tareaid) {
-    console.log(tareaid);
     let modal = this.modalCtrl.create(tareaPage, {'caso':2, 'noconformidad': this.id, 'fecha':this.fecha, 'tarea':tareaid });
     modal.present();
   }
@@ -255,7 +245,7 @@ export class NuevanoconformidadPage {
       let day = dt.getDate();
       let year = dt.getFullYear();
       this.formulario.editarnoconformidad(this.id, 'fechafinalizado', year + '-' + month + '-' + day).then((data) => {
-        console.log(data);
+
       }).then(() => {
         this.formulario.editarnoconformidad(this.id, 'estado', 1).then(() => {
           this.habilitartarea = false;
@@ -265,7 +255,6 @@ export class NuevanoconformidadPage {
   
       }).catch((err) => {
         this.handleError('error, intentelo nuevamente');
-        console.log(err);
       })
     }else{
       this.handleError('Para cerrar la no conformidad primero debe culminar todas las tareas ');

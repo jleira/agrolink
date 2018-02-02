@@ -70,11 +70,9 @@ export class MyApp {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      this.statusBar.overlaysWebView(true);
-//      this.statusBar.styleDefault();
-      this.statusBar.backgroundColorByHexString('#00AA8D');
+//      this.statusBar.backgroundColorByHexString('#00796D');
       setTimeout(() => {
-        this.splashScreen.hide();        
+        this.splashScreen.hide();
       }, 100 - 1000);
     });
   }

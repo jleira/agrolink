@@ -6,6 +6,7 @@ import { RegionProvider } from '../../providers/region/region';
 import { UpdetallesPage} from '../updetalles/updetalles';
 import { FiltroupPage} from '../filtroup/filtroup';
 import {Storage} from "@ionic/storage";
+import { FormulariosPage} from '../formularios/formularios';
 
 
 @IonicPage()
@@ -371,5 +372,12 @@ this.prueba="indefinido todo";
         );
     popover.present();
 }
+abrirformulario(unidad){
+ 
+  this.navCtrl.push(FormulariosPage, {
+    caso: 3, tipo: unidad.tipo, up: unidad, productor: unidad.productor
+  });
+}
+
 
 }

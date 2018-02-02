@@ -83,12 +83,13 @@ export class DbProvider {
             localizacion_latitude TEXT,
             terminado INTEGER,
             tipo INTEGER,
-            idAsignacion,
+            idAsignacion INTEGER,
             IdProductor INTEGER,
             iniciopromotoria TEXT,
             finpromotoria TEXT,
             inicioauditoria TEXT,
-            finauditoria TEXT
+            finauditoria TEXT,
+            mapa TEXT
             );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -101,13 +102,15 @@ export class DbProvider {
                   );`, {})
       }).then(() => {
         return this.database.executeSql(
-          `CREATE TABLE IF NOT EXISTS pruebas (
-                    nombre TEXT
+          `CREATE TABLE IF NOT EXISTS pendientes (
+                    id INTEGER,
+                    img TEXT,
+                    estado INTEGER
                     );`, {})
       }).then(() => {
         return this.database.executeSql(
           `CREATE TABLE IF NOT EXISTS grupos (
-              idgrupobase INTEGER PRIMARY KEY,
+              idgrupobase INTEGER,
               nombre TEXT,
               posicion INTEGER,
               formularioid INTEGER,              
@@ -126,7 +129,8 @@ export class DbProvider {
                 requerido INTEGER,
                 codigorespuesta INTEGER,
                 archivo INTEGER,
-                encabezado TEXT
+                encabezado TEXT,
+                tipoformulario INTEGER
               );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -135,7 +139,6 @@ export class DbProvider {
                   nombre TEXT,
                   valor INTEGER,
                   tipo INTEGER,
-                  preguntaid INTEGER,
                   codigorespuestapadre INTEGER
                 );`, {})
       }).then(() => {
@@ -145,10 +148,10 @@ export class DbProvider {
                     unidadproductiva TEXT,
                     grupo INTEGER,
                     pregunta INTEGER,
-                    respuestascodigo INTEGER, 
-                    codigorespuesta TEXT,
-                    valorrespuesta TEXT,
-                    valor TEXT,
+                    codigorespuestapadre INTEGER, 
+                    codigorespuestaseleccionada TEXT,
+                    valorrespuestaseleccionada TEXT,
+                    valorseleccionado TEXT,
                     observacion TEXT,
                     ruta TEXT,
                     tipoformulario INTEGER
@@ -156,17 +159,13 @@ export class DbProvider {
       }).then(() => {
         return this.database.executeSql(
           `CREATE TABLE IF NOT EXISTS preguntastabla (
-                id INTEGER PRIMARY KEY,
-                preguntapadre INTEGER,
-                preguntaid INTEGER,
-                enunciado TEXT,
-                fila INTEGER,
-                tipo INTEGER,
-                estado INTEGER,
-                requerido INTEGER,
-                codigorespuesta INTEGER,
-                observacion INTEGER
-                    );`, {})
+            preguntaid INTEGER PRIMARY KEY,
+            preguntapadre INTEGER,
+            enunciado TEXT,
+            fila INTEGER,
+            codigorespuesta INTEGER,
+            observacion INTEGER
+            );`, {})
       }).then(() => {
         return this.database.executeSql(
           `CREATE TABLE IF NOT EXISTS respuestastabla (
@@ -175,8 +174,7 @@ export class DbProvider {
             valor INTEGER,
             constante TEXT,
             tipo INTEGER,
-            preguntaid INTEGER,
-            codigorespuestapadre INTEGER
+            codigorespuesta INTEGER
                     );`, {})
       }).then(() => {
         return this.database.executeSql(
@@ -324,7 +322,7 @@ export class DbProvider {
   todasuproductivasap(caso) {
     return this.isReady()
       .then(() => {
-        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado, tipo from unidades_productivas WHERE tipo IN (${caso},1003)`, []).then((data) => {
+        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado, tipo, mapa from unidades_productivas WHERE tipo IN (${caso},1003)`, []).then((data) => {
           let todas = [];
           for (let i = 0; i < data.rows.length; i++) {
             let todo = data.rows.item(i);
@@ -823,27 +821,33 @@ export class DbProvider {
           [idGrupoBase, nombre, posicion, id, textoAyuda]);
       });
   }
-  guardarpregunta(codigo, enunciado, posicion, tipo, valorinicial, grupobase, requerido, codresp, archivo, encabezado) {
+  guardarpregunta(codigo, enunciado, posicion, tipo, valorinicial, grupobase, requerido, codresp, archivo, encabezado, tipoformulario) {
     return this.isReady()
       .then(() => {
-        return this.database.executeSql(`INSERT INTO preguntas (codigo, enunciado, posicion, tipo, valorinicial, grupoid, requerido, codigorespuesta, archivo, encabezado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-          [codigo, enunciado, posicion, tipo, valorinicial, grupobase, requerido, codresp, archivo, encabezado]);
-      });
-  }
-  guardarrespuesta(codigo, nombre, valor, tipo, preguntaid, codigorespuestapadre) {
-    return this.isReady()
-      .then(() => {
-        return this.database.executeSql(`INSERT INTO respuestas (codigo, nombre, valor, tipo, preguntaid, codigorespuestapadre) VALUES (?, ?, ?, ?, ?, ?);`,
-          [codigo, nombre, valor, tipo, preguntaid, codigorespuestapadre]);
+        return this.database.executeSql(`INSERT INTO preguntas 
+        (codigo, enunciado, posicion, tipo, valorinicial, grupoid, requerido, codigorespuesta, archivo, encabezado, tipoformulario) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+          [codigo, enunciado, posicion, tipo, valorinicial, grupobase, requerido, codresp, archivo, encabezado, tipoformulario]);
       });
   }
 
 
-  guardarrespuestatabla(codigo, nombre, valor, constante, tipo, preguntaid, codigorespuestapadre) {
+
+  guardarrespuesta(codigo, nombre, valor, tipo, codigorespuestapadre) {
     return this.isReady()
       .then(() => {
-        return this.database.executeSql(`INSERT INTO respuestastabla (codigo, nombre, valor, constante, tipo, preguntaid, codigorespuestapadre) VALUES (?, ?, ?, ?, ?, ?, ?);`,
-          [codigo, nombre, valor, constante, tipo, preguntaid, codigorespuestapadre]);
+        return this.database.executeSql(`INSERT INTO respuestas (codigo, nombre, valor, tipo, codigorespuestapadre) VALUES (?, ?, ?, ?, ?);`,
+          [codigo, nombre, valor, tipo, codigorespuestapadre]);
+      });
+  }
+
+
+  guardarrespuestatabla(codigo, nombre , valor , constante ,tipo , codigorespuesta  ) {
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(`INSERT INTO respuestastabla (codigo, nombre , valor , constante ,tipo , codigorespuesta ) 
+        VALUES (?, ?, ?, ?, ?, ?);`,
+          [codigo, nombre , valor , constante ,tipo , codigorespuesta ]);
       });
   }
 
@@ -897,10 +901,10 @@ export class DbProvider {
     })
   }
 
-  preguntasporgrupo(grupo) {
+  preguntasporgrupo(grupo, tipo) {
     return this.isReady(
     ).then(() => {
-      return this.database.executeSql(`SELECT * FROM preguntas WHERE grupoid =  ${grupo}  ORDER BY posicion ASC`, []).then((data) => {
+      return this.database.executeSql(`SELECT * FROM preguntas WHERE grupoid = ${grupo} AND tipoformulario = ${tipo}  ORDER BY posicion ASC`, []).then((data) => {
         let todos = [];
         if (data.rows.length) {
           for (let i = 0; i < data.rows.length; i++) {
@@ -945,11 +949,11 @@ export class DbProvider {
   }
 
 
-  respuestasporpregunta(pregunta) {
-    let ids = pregunta.join();
+  respuestasporpregunta(codigosrespuesta) {
+    let ids = codigosrespuesta.join();
     return this.isReady(
     ).then(() => {
-      return this.database.executeSql(`SELECT * FROM respuestas WHERE preguntaid IN (${ids})`, []).then((data) => {
+      return this.database.executeSql(`SELECT * FROM respuestas WHERE codigorespuestapadre IN (${ids})`, []).then((data) => {
         let todos = [];
         if (data.rows.length) {
           for (let i = 0; i < data.rows.length; i++) {
@@ -1229,11 +1233,12 @@ export class DbProvider {
   }
   //
 
-  guardarpreguntatabla(preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido, codigorespuesta, observacion) {
+  guardarpreguntatabla(preguntaid, preguntapadre, enunciado, fila, codigorespuesta, observacion) {
     return this.isReady()
       .then(() => {
-        return this.database.executeSql(`INSERT INTO preguntastabla (preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido,codigorespuesta,observacion ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-          [preguntapadre, preguntaid, enunciado, fila, tipo, estado, requerido, codigorespuesta, observacion]);
+        return this.database.executeSql(`INSERT INTO preguntastabla 
+        (preguntaid, preguntapadre, enunciado, fila, codigorespuesta, observacion) VALUES (?, ?, ?, ?, ?, ?);`,
+          [preguntaid, preguntapadre, enunciado, fila, codigorespuesta, observacion]);
       });
   }
   //                 INTEGER,
@@ -1261,7 +1266,7 @@ export class DbProvider {
   respuestasapreguntastablas(codigorespuestapadre) {
     return this.isReady(
     ).then(() => {
-      return this.database.executeSql(`SELECT * FROM respuestastabla WHERE codigorespuestapadre = ${codigorespuestapadre}`, []).then((data) => {
+      return this.database.executeSql(`SELECT * FROM respuestastabla WHERE codigorespuesta = ${codigorespuestapadre}`, []).then((data) => {
         let todos = [];
         if (data.rows.length) {
           for (let i = 0; i < data.rows.length; i++) {
@@ -1269,7 +1274,7 @@ export class DbProvider {
             todo.respuesta = [];
             todos.push(todo);
           }
-        } else { 
+        } else {
           let todo;
           todo = false;
           todos = todo;
@@ -1315,7 +1320,7 @@ export class DbProvider {
                 [codigoresp, valorresp, valortext]);
             }
           })
-      }).catch(err => console.log(err));
+      }).catch(err => { });
 
   }
 
@@ -1344,11 +1349,11 @@ export class DbProvider {
             cres]).then((data) => {
               let todos = [];
               if (data.rows.length) {
-                if(data.rows.item(0).valor=="true"){
-                  data.rows.item(0).valor=true;
+                if (data.rows.item(0).valor == "true") {
+                  data.rows.item(0).valor = true;
                 }
-                  todos = data.rows.item(0).valor;
-                
+                todos = data.rows.item(0).valor;
+
 
               } else {
                 let todo;
@@ -1398,21 +1403,21 @@ export class DbProvider {
         return false
       });
   }
-  agregarnoconformidadantigua(id,unidadproductiva, tipo_formulario, categoria, detalle, descripcion, fechacreacion, fechaposiblecierre, estado, asignacion, fechacierre) {
+  agregarnoconformidadantigua(id, unidadproductiva, tipo_formulario, categoria, detalle, descripcion, fechacreacion, fechaposiblecierre, estado, asignacion, fechacierre) {
     return this.isReady()
       .then(() => {
         return this.database.executeSql(`INSERT INTO noconformidades 
               (id,unidadproductiva,tipo, categoria, descripcion, detalle, fechacreacion, fechaposiblecierre, estado, fechafinalizado,heredada,asignacion) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);`,
-          [id,unidadproductiva, tipo_formulario, categoria, descripcion, detalle, fechacreacion, fechaposiblecierre, estado, fechacierre, 1,asignacion]);
+          [id, unidadproductiva, tipo_formulario, categoria, descripcion, detalle, fechacreacion, fechaposiblecierre, estado, fechacierre, 1, asignacion]);
       })
   }
 
-  agregartareaantigua(id,noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion,fechaRealCierre) {
+  agregartareaantigua(id, noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion, fechaRealCierre) {
     return this.isReady()
       .then(() => {
         return this.database.executeSql(`INSERT INTO tareas 
               (id,noconformidad, nombre, detalle,encargado,fechaPautadaCierre, estado, fechaCreacion, fechaRealCierre, heredada) VALUES (?,?,?,?,?,?,?,?,?,?);`,
-          [id,noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion,fechaRealCierre, 1]);
+          [id, noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion, fechaRealCierre, 1]);
       })
   }
   agregartarea(noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion) {
@@ -1592,7 +1597,7 @@ export class DbProvider {
         })
       }
 
-    }).catch((err) => { console.log(err) })
+    }).catch((err) => { })
 
   }
 
@@ -1678,6 +1683,19 @@ export class DbProvider {
       })
 
   }
+
+
+  agregarmapa(idUnidadProductiva, mapa) {
+    let idseleccion = idUnidadProductiva;
+    return this.isReady()
+      .then(() => {
+        return this.database.executeSql(
+          `UPDATE unidades_productivas SET mapa = (?) WHERE idUnidadProductiva = '${idseleccion}' ;`,
+          [mapa]).then((datae) => { return datae; }).catch(err => { return err; });
+      })
+
+  }
+
 
 
 }//                     unidadproductiva TEXT,tipo INTEGER,

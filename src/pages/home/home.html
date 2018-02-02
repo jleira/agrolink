@@ -11,10 +11,10 @@
 </ion-header>
 
 
-<ion-content>
-  <ion-list style="margin-top:2%">
+<ion-content padding-top="15px" >
+  <ion-list >
 
-    <ion-card>
+    <ion-card >
       <button ion-item text-wrap (click)="openPage(1)" *ngIf="auditor">
         <ion-thumbnail item-start>
           <img src="assets/imgs/forms.png">
@@ -26,8 +26,8 @@
       </button>
     </ion-card>
 
-    <ion-card>
-      <button ion-item text-wrap (click)="openPage(2)" *ngIf="auditor">
+    <ion-card >
+      <button ion-item text-wrap (click)="openPage(2)" *ngIf="promotor">
         <ion-thumbnail item-start>
           <img src="assets/imgs/foms2.png">
         </ion-thumbnail>

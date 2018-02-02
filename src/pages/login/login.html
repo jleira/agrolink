@@ -27,18 +27,23 @@
       </ion-item>
       <br>
 
-      <ion-item  no-lines>
+      <ion-item  no-lines *ngIf="!msj">
         <ion-label color="pesto-scondary-text" >Empresa</ion-label>
         <ion-select  name="empresa" interface="action-sheet" cancelText="cancelar" ngModel required #empresa="ngModel"
         [class.invalid]="empresa.errors && empresa.dirty">
           <ion-option *ngFor="let opciones of empresas">{{opciones.schemaName}}</ion-option>
         </ion-select>
       </ion-item>
-      
-      <div padding>
+
+      <div *ngIf="msj" padding color="danger" style="text-align:center;width:100%">
+        <h2 style="color:red">{{msj}}</h2> 
+       </div>
+ 
+
+      <div padding *ngIf="!msj">
         <button ion-button  color="pesto-dark" block type="submit" [disabled]="!form.valid">Entrar</button>
       </div>
-
+     
     </ion-list>
   </form>
 </ion-content>

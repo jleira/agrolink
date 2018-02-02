@@ -40,11 +40,11 @@
                     </ion-row>
                   </ion-item>
                   <ion-item-options side="right">
-                    <button ion-button color="secondary">
+                    <button ion-button color="pesto-secondary" (click)="abrirformulario(item)">
                       <ion-icon name="clipboard"></ion-icon>
                       Formulario
                     </button>
-                    <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="primary">
+                    <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="pesto-primary">
                       <ion-icon name="eye"></ion-icon>
                       Detalles
                     </button>
@@ -70,11 +70,11 @@
                 </ion-row>
               </ion-item>
               <ion-item-options side="right">
-                <button ion-button color="secondary">
+                <button ion-button color="pesto-secondary" (click)="abrirformulario(item)">
                   <ion-icon name="clipboard"></ion-icon>
                   Formulario
                 </button>
-                <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="primary">
+                <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="pesto-primary">
                   <ion-icon name="eye"></ion-icon>
                   Detalles
                 </button>
@@ -99,11 +99,11 @@
                 </ion-row>
               </ion-item>
               <ion-item-options side="right">
-                <button ion-button color="secondary">
+                <button ion-button color="pesto-secondary"  (click)="abrirformulario(item)" >
                   <ion-icon name="clipboard"></ion-icon>
                   Formulario
                 </button>
-                <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="primary">
+                <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="pesto-primary">
                   <ion-icon name="eye"></ion-icon>
                   Detalles
                 </button>
@@ -115,7 +115,7 @@
 
       </div>
     </ion-list>
-
+</div>
     <div *ngIf="auditor">
 
         <ion-list-header color="pesto-light">
@@ -126,40 +126,41 @@
     Unidades para Auditoria
  </h2>
           </ion-list-header>
-
+      <ion-list>
       <div *ngFor="let item of items">
 
         <div *ngIf="item.tipo==1002">
           <!--promotoria-->
 
-          <ion-card *ngIf="item.terminado === 0">
-              <ion-item-sliding>
-                <ion-item>
-                  <ion-row>
-                    <ion-col col-6 text-center>  {{item.idUnidadProductiva}}
-                      <br>
-                    </ion-col>
-                    <ion-col col-6 text-center>  {{item.nombre}}</ion-col>
-                    <ion-col col-6 text-center>
-                      <span> {{item.region}} </span>
-                    </ion-col>
-                    <ion-col col-6 text-center>
-                      <span> {{item.productor}} </span>
-                    </ion-col>
-                  </ion-row>
-                </ion-item>
-                <ion-item-options side="right">
-                  <button ion-button color="secondary">
-                    <ion-icon name="clipboard"></ion-icon>
-                    Formulario
-                  </button>
-                  <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="primary" >
-                    <ion-icon name="eye"></ion-icon>
-                    Detalles
-                  </button>
-                </ion-item-options>
-              </ion-item-sliding>
-            </ion-card>
+          <ion-card *ngIf="item.terminado === 0" >
+            <ion-item-sliding>
+              <ion-item>
+                <ion-row>
+                  <ion-col col-6 text-center>  {{item.idUnidadProductiva}}
+                    <br>
+                  </ion-col>
+                  <ion-col col-6 text-center>  {{item.nombre}}</ion-col>
+                  <ion-col col-6 text-center>
+                    <span> {{item.region}} </span>
+                  </ion-col>
+                  <ion-col col-6 text-center>
+                    <span> {{item.productor}} </span>
+                  </ion-col>
+                </ion-row>
+              </ion-item>
+              <ion-item-options side="right">
+                <button ion-button color="pesto-secondary" (click)="abrirformulario(item)">
+                  <ion-icon name="clipboard"></ion-icon>
+                  Formulario
+                </button>
+                <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="pesto-primary">
+                  <ion-icon name="eye"></ion-icon>
+                  Detalles
+                </button>
+              </ion-item-options>
+            </ion-item-sliding>
+          </ion-card>
+
   
 
         <ion-card *ngIf="item.terminado === 1" style="border-top:2px solid yellow">
@@ -179,11 +180,11 @@
               </ion-row>
             </ion-item>
             <ion-item-options side="right">
-              <button ion-button color="secondary">
+              <button ion-button color="pesto-secondary" (click)="abrirformulario(item)">
                 <ion-icon name="clipboard"></ion-icon>
                 Formulario
               </button>
-              <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="primary">
+              <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="pesto-primary">
                 <ion-icon name="eye"></ion-icon>
                 Detalles
               </button>
@@ -208,11 +209,11 @@
               </ion-row>
             </ion-item>
             <ion-item-options side="right">
-              <button ion-button color="secondary">
+              <button ion-button color="pesto-secondary" (click)="abrirformulario(item)">
                 <ion-icon name="clipboard"></ion-icon>
                 Formulario
               </button>
-              <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="primary">
+              <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="pesto-primary">
                 <ion-icon name="eye"></ion-icon>
                 Detalles
               </button>
@@ -220,15 +221,12 @@
           </ion-item-sliding>
         </ion-card>
 
-
         </div>
 
 
       </div>
-
+</ion-list>
     </div>
-
-  </div>
 
 
 
