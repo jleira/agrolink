@@ -8,7 +8,8 @@ import { Storage } from "@ionic/storage";
 import { AuthProvider } from '../../providers/auth/auth';
 import { File, DirectoryEntry } from '@ionic-native/file';
 import { HomePage } from './home';
-
+import { FORMULARIO_AUDITORIA } from '../../config';
+import { FORMULARIO_PROMOTORIA } from '../../config';
 @Component({
 
   templateUrl: 'sinc.html'
@@ -49,11 +50,20 @@ export class EnviardatosPage {
     this.promotorseleccionado = false;
     this.storage.get('roll').then(roll => {
       if (roll) {
+        console.log('roll', roll);
         if (roll.indexOf("Auditor") > -1) {
-          this.auditor = true;
+          this.formulario.formularioid(FORMULARIO_AUDITORIA).then((idf) => {
+            if(idf){
+              this.auditor = true;
+            }
+          });
         }
         if (roll.indexOf("Promotor") > -1) {
-          this.promotor = true;
+          this.formulario.formularioid(FORMULARIO_PROMOTORIA).then((idf) => {
+            if(idf){
+              this.promotor = true;
+            }
+          });
         }
       }
     }
@@ -223,17 +233,25 @@ export class EnviardatosPage {
     this.authService.login2(this.usuario, pass.pass, this.empresa).finally(() => {
       loading.dismiss();
     }).subscribe(() => {
-      this.enviarunidadesseleccionadas();
+      //      this.enviartodo();
+      this.trampita();
     },
       (err) => {
         console.log(err);
         this.handleError(err);
       });
   }
-  enviarunidadesseleccionadas() {
-    if (this.evento.length > 0) {
+  enviartodo() {
+    if (this.evento) {
+
       this.evento.forEach(up => {
+        console.log('up', up);
+        if(up.mapa){
+          up.mapa="data:image/png:base64,"+up.mapa;
+        }
+
         let enviar = [];
+        console.log(up);
         this.db.formularioid(this.tipo).then((formularioid) => {
           let formulario = formularioid;
           let datosdeinicio;
@@ -244,70 +262,28 @@ export class EnviardatosPage {
           let longitudeinicio;
           let latitudefin;
           let longitudefin;
-          if (this.tipo == 1001) {//promotoria
-            datosdeinicio = up.iniciopromotoria.split(',');
-            if (datosdeinicio[1] == 'error') {
-              datosdeinicio[1] = 10.00000;
-            }
-            if (datosdeinicio[2] = 'error') {
-              datosdeinicio[1] = -10.00000;
-            }
-            fechainicio = datosdeinicio[0];
-            latitudeinicio = datosdeinicio[1];
-            longitudeinicio = datosdeinicio[2];
-            datosdefinalizacion = up.finpromotoria.split(',');
-            if (datosdefinalizacion[1] == 'error') {
-              datosdefinalizacion[1] = 30.00000;
-            }
-            if (datosdefinalizacion[2] = 'error') {
-              datosdefinalizacion[2] = -50.00005;
-            }
-            fechafin = datosdefinalizacion[0];
-            latitudefin = datosdefinalizacion[1];
-            longitudefin = datosdefinalizacion[2];
 
-          } else {
-            datosdeinicio = up.inicioauditoria.split(',');
-            fechainicio = datosdeinicio[0];
-            if (datosdeinicio[1] == 'error') {
-              datosdeinicio[1] = 10.000;
-            }
-            if (datosdeinicio[2] == 'error') {
-              datosdeinicio[2] = 10.000;
-            }
-            latitudeinicio = datosdeinicio[1];
-            longitudeinicio = datosdeinicio[2];
-            datosdefinalizacion = up.finauditoria.split(',');
-            if (datosdefinalizacion[1] = 'error') {
-              datosdefinalizacion[1] = 10.000;
-            }
-            if (datosdefinalizacion[2] = 'error') {
-              datosdefinalizacion[2] = 10.000;
-            }
-            fechafin = datosdefinalizacion[0];
-            latitudefin = datosdefinalizacion[1];
-            longitudefin = datosdefinalizacion[2];
-          }
           let formularioRespuesta = [];
           this.db.respuestasparaunidad(up.idUnidadProductiva, this.tipo).then((data) => {
             data.forEach((respuestasdigitadas) => {
               if (respuestasdigitadas.ruta) {
                 this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta);
               }
-              let valor = respuestasdigitadas.codigorespuesta.split('_');
+              let valor = respuestasdigitadas.codigorespuestaseleccionada.split('_');
               if (valor.length > 0) {
                 let i = 0;
-                let indicador = respuestasdigitadas.valorrespuesta.split('_');
+                let indicador = respuestasdigitadas.valorrespuestaseleccionada.split('_');
                 valor.forEach(element => {
+
                   let respuestassacadas;
                   respuestassacadas = {
                     formularioRespuestaId: {
                       idGrupoBase: respuestasdigitadas.grupo,
                       idPregunta: respuestasdigitadas.pregunta,
-                      idRespuesta: respuestasdigitadas.respuestascodigo,
+                      idRespuesta: respuestasdigitadas.codigorespuestapadre,
                       idValorRespuesta: parseInt(valor[i])
                     },
-                    valor: respuestasdigitadas.valor,
+                    valor: respuestasdigitadas.valorseleccionado,
                     valorIndicador: parseInt(indicador[i]),
                     photoSrc: respuestasdigitadas.ruta,
                     observacion: respuestasdigitadas.observacion
@@ -321,17 +297,17 @@ export class EnviardatosPage {
                   formularioRespuestaId: {
                     idGrupoBase: respuestasdigitadas.grupo,
                     idPregunta: respuestasdigitadas.pregunta,
-                    idRespuesta: respuestasdigitadas.respuestascodigo,
-                    idValorRespuesta: parseInt(respuestasdigitadas.codigorespuesta)
+                    idRespuesta: respuestasdigitadas.codigorespuestapadre,
+                    idValorRespuesta: parseInt(respuestasdigitadas.codigorespuestaseleccionada)
                   },
-                  valor: respuestasdigitadas.valor,
-                  valorIndicador: parseInt(respuestasdigitadas.valorrespuesta),
+                  valor: respuestasdigitadas.valorseleccionado,
+                  valorIndicador: parseInt(respuestasdigitadas.valorrespuestaseleccionada),
                   photoSrc: respuestasdigitadas.ruta,
                   observacion: respuestasdigitadas.observacion
                 }
                 formularioRespuesta.push(respuestassacadas);
               }
-            })
+            });
           }).then(() => {
             return this.db.respuestastablaparaunidad(up.idUnidadProductiva, this.tipo).then((respuestastabla) => {
               if (respuestastabla) {
@@ -353,201 +329,217 @@ export class EnviardatosPage {
                   formularioRespuesta.push(respuestassacadas);
                 })
               }
-            }).then(() => {
-              return this.db.noconformidades(up.idUnidadProductiva, this.tipo).then((noconformidad) => {
-                if (noconformidad) {
-                  let noconformidade = noconformidad;
-                  let no_conformidades = [];
-                  noconformidad.forEach((nconformidad) => {
-                    this.db.tareas(nconformidad.id).then((tareas) => {
-                      let no_conformidadesf;
+            })
 
-                      tareas.forEach((tareaguardada) => {
+          }).then(() => {
+            return this.db.noconformidades(up.idUnidadProductiva, this.tipo).then((noconformidad) => {
+              console.log('nconformidad', noconformidad);
+              if (noconformidad) {
+                let noconformidade = noconformidad;
+                let no_conformidades = [];
+                noconformidad.forEach((nconformidad) => {
 
-                      });
-                      let codigonc: any;
-                      let asignacionc;
-                      if (nconformidad.heredada == 1) {
-                        codigonc = nconformidad.id;
-                      } else {
-                        codigonc = null;
-                      }
-                      if (nconformidad.asignacion) {
-                        asignacionc = nconformidad.asignacion;
-                      } else {
-                        asignacionc = up.idAsignacion;
-                      }
-                      if (tareas) {
-
-
-
-                        let tareajson = [];
-                        tareas.forEach((elementa) => {
-                          let codigota: any;
-                          if (elementa.heredada == 1) {
-                            codigota = nconformidad.id;
-                          } else {
-                            codigota = null;
-                          }
-
-                          tareajson.push({
-                            "codigo": codigota,
-                            "noConformidad": codigonc,
-                            "nombre": elementa.nombre,
-                            "descripcion": elementa.detalle,
-                            "encargado": elementa.encargado,
-                            "estado": elementa.estado,
-                            "fechaPautadaCierre": elementa.fechaPautadaCierre,
-                            "fechaRealCierre": elementa.fechaRealCierre,
-                            "fechaCreacion": elementa.fechaCreacion,
-                            "activo": null,
-                            "fechaModificacion": "2018-01-25",
-                            "usuarioCreacion": 1,
-                            "usuarioModificacion": 1
-                          });
-                        })
-                        no_conformidadesf = {
-                          "noConformidad": {
-                            "codigo": codigonc,
-                            "asignacion": asignacionc,
-                            "categoria": nconformidad.categoria,
-                            "detalle": nconformidad.detalle,
-                            "descripcion": nconformidad.descripcion,
-                            "fechaPautadaCierre": nconformidad.fechaposiblecierre,
-                            "fechaModificacion": null,
-                            "fechaRealCierre": nconformidad.fechaposiblecierre,
-                            "status": nconformidad.estado,
-                            "fechaCreacion": nconformidad.fechacreacion,
-                            "usuarioCreacion": null,
-                            "usuarioModificacion": null,
-                            "activo": null
-                          },
-                          "tareas": tareajson
+                  this.db.tareas(nconformidad.id).then((tareas) => {
+                    let no_conformidadesf;
+                    let codigonc: any;
+                    let asignacionc;
+                    if (nconformidad.heredada == 1) {
+                      codigonc = nconformidad.id;
+                    } else {
+                      codigonc = null;
+                    }
+                    if (nconformidad.asignacion) {
+                      asignacionc = nconformidad.asignacion;
+                    } else {
+                      asignacionc = up.idAsignacion;
+                    }
+                    if (tareas) {
+                      let tareajson = [];
+                      tareas.forEach((elementa) => {
+                        let codigota: any;
+                        console.log(elementa);
+                        if (elementa.heredada == 1) {
+                          codigota = elementa.id;
+                        } else {
+                          codigota = null;
                         }
-                        no_conformidades.push(no_conformidadesf);
 
-                      } else {
-                        no_conformidadesf = {
-                          "noConformidad": {
-                            "codigo": codigonc,
-                            "asignacion": asignacionc,
-                            "categoria": nconformidad.categoria,
-                            "detalle": nconformidad.detalle,
-                            "descripcion": nconformidad.descripcion,
-                            "fechaPautadaCierre": nconformidad.fechaposiblecierre,
-                            "fechaModificacion": null,
-                            "fechaRealCierre": nconformidad.fechaposiblecierre,
-                            "status": nconformidad.estado,
-                            "fechaCreacion": nconformidad.fechacreacion,
-                            "usuarioCreacion": null,
-                            "usuarioModificacion": null,
-                            "activo": null
-                          },
-                          "tareas": null
-                        }
-                        no_conformidades.push(no_conformidadesf);
+                        tareajson.push({
+                          "codigo": codigota,
+                          "noConformidad": codigonc,
+                          "nombre": elementa.nombre,
+                          "descripcion": elementa.detalle,
+                          "encargado": elementa.encargado,
+                          "estado": elementa.estado,
+                          "fechaPautadaCierre": elementa.fechaPautadaCierre,
+                          "fechaRealCierre": elementa.fechaRealCierre,
+                          "fechaCreacion": elementa.fechaCreacion,
+                          "activo": 1,
+                          "fechaModificacion": null,
+                          "usuarioCreacion": 1,
+                          "usuarioModificacion": 1
+                        });
+                      })
+                      no_conformidadesf = {
+                        "noConformidad": {
+                          "codigo": codigonc,
+                          "asignacion": asignacionc,
+                          "categoria": nconformidad.categoria,
+                          "detalle": nconformidad.detalle,
+                          "descripcion": nconformidad.descripcion,
+                          "fechaPautadaCierre": nconformidad.fechaposiblecierre,
+                          "fechaModificacion": null,
+                          "fechaRealCierre": nconformidad.fechafinalizado ,
+                          "status": nconformidad.estado,
+                          "fechaCreacion": nconformidad.fechacreacion,
+                          "usuarioCreacion": null,
+                          "usuarioModificacion": null,
+                          "activo": 1
+                        },
+                        "tareas": tareajson
                       }
-                    })
+                      no_conformidades.push(no_conformidadesf);
+
+                    } else {
+                      no_conformidadesf = {
+                        "noConformidad": {
+                          "codigo": codigonc,
+                          "asignacion": asignacionc,
+                          "categoria": nconformidad.categoria,
+                          "detalle": nconformidad.detalle,
+                          "descripcion": nconformidad.descripcion,
+                          "fechaPautadaCierre": nconformidad.fechaposiblecierre,
+                          "fechaModificacion": null,
+                          "fechaRealCierre": nconformidad.fechafinalizado,
+                          "status": nconformidad.estado,
+                          "fechaCreacion": nconformidad.fechacreacion,
+                          "usuarioCreacion": null,
+                          "usuarioModificacion": null,
+                          "activo": 1
+                        },
+                        "tareas": null
+                      }
+                      no_conformidades.push(no_conformidadesf);
+                    }
                   })
-                  let datosaenviar = {
-                    formulario: {
-                      "formularioBase": { codigo: formulario },
-                      "asignacion": up.idAsignacio,
-                       fechaInicial: datosdeinicio[0],
-                      localizacionInicial: {
-                        "longitude": datosdeinicio[1],
-                        "latitude": datosdeinicio[2]
-                      },
-                      fechaFinal: datosdefinalizacion[0],
-                      localizacionFinal: {
-                        "longitude": datosdefinalizacion[1],
-                        "latitude": datosdefinalizacion[2]
-                      }
-                    }, formularioRespuesta,
-                    no_conformidades
-                  };
-                  console.log('prueba', datosaenviar);
-                  this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
-                    let envio = ok;
-                    if (ok) {
-                      this.handleError('formulario de la unidad productiva ' + up.nombre + ' envidado correctamente');
-                    } else {
-                      this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
+                });
+                let datosaenviar = {
+                  formulario: {
+                    "formularioBase": { codigo: formulario },
+                    "asignacion": up.idAsignacion,
+                    'mapa': up.mapa,
+                    fechaInicial: up.fechainicio,
+                    localizacionInicial: {
+                      "longitude": 10.10001,
+                      "latitude": 10.000
+                    },
+                    fechaFinal: up.fechafin,
+                    localizacionFinal: {
+                      "longitude": 10.0000,
+                      "latitude": 10.000
                     }
-                  });
-                } else {
-                  let datosaenviar = {
-                    formulario: {
-                      "formularioBase": { codigo: formulario },
-                      "asignacion": up.idAsignacion , 
-                      fechaInicial: datosdeinicio[0],
-                      localizacionInicial: {
-                        "longitude": datosdeinicio[1],
-                        "latitude": datosdeinicio[2]
-                        //"longitude": 10.00001,
-                        //"latitude": -7.000000
-                      },
-                      fechaFinal: datosdefinalizacion[0],
-                      localizacionFinal: {
-                        "longitude": datosdefinalizacion[1],
-                        "latitude": datosdefinalizacion[2]
+                  }, formularioRespuesta,
+                  no_conformidades
+                };
+                console.log('prueba', datosaenviar);
+                 this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
+                  let envio = ok;
+                  if (ok) {
+                  } else {
+                    this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
+                  }
+                }); 
 
-                        //"longitude": 10.00001,
-                        //"latitude": -7.000000
-                      }
-                    }, formularioRespuesta
-                  };
-                  console.log('pruebas sin no conformidades', datosaenviar);
-                  this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
-                    let envio = ok;
-                    if (ok) {
-                      this.handleError('formulario de la unidad productiva ' + up.nombre + ' envidado correctamente');
-                    } else {
-                      this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
-                    }
-                  });
-                }
-              })
+
+              }else {
+                let datosaenviar = {
+                  formulario: {
+                    "formularioBase": { codigo: formulario },
+                    "asignacion": up.idAsignacion,
+                    'mapa': up.mapa, 
+                    fechaInicial: up.fechainicio,
+                localizacionInicial: {
+                  "longitude": 10.0000,
+                  "latitude": 10.000
+                },
+                fechaFinal: up.fechafin,
+                localizacionFinal: {
+                  "longitude": 10.000,
+                  "latitude": 10.000
+                },
+                  }, formularioRespuesta
+                };
+                
+
+                console.log('pruebas sin no conformidades', datosaenviar);
+                this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
+                  let envio = ok;
+                  if (ok) {
+                    this.handleError('formulario de la unidad productiva ' + up.nombre + ' envidado correctamente');
+                  } else {
+                    this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
+                  }
+                });
+              }
+
 
             });
-          })
+          });
+
 
 
         });
 
       });
-      this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
-        this.upa = data;
-        if (this.upa.length == 0) {
-          this.upa = false;
-        }
-      });
-      this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
-        this.upp = data;
-        if (this.upp.length == 0) {
-          this.upa = false;
-        }
-      });
 
-    } else {
-      this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
-        this.upa = data;
-        if (this.upa.length == 0) {
-          this.upa = false;
-        }
-      });
-      this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
-        this.upp = data;
-        if (this.upp.length == 0) {
-          this.upa = false;
-        }
-      });
-
-      this.handleError('Debe recargar la pagina para enviar nuevamente los formularios');
+      /*       this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
+              this.upa = data;
+              if (this.upa.length == 0) {
+                this.upa = false;
+              }
+            });
+            this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
+              this.upp = data;
+              if (this.upp.length == 0) {
+                this.upa = false;
+              }
+            });
+      
+          } else {
+            this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
+              this.upa = data;
+              if (this.upa.length == 0) {
+                this.upa = false;
+              }
+            });
+            this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
+              this.upp = data;
+              if (this.upp.length == 0) {
+                this.upa = false;
+              }
+            });
+      
+            this.handleError('Debe recargar la pagina para enviar nuevamente los formularios');  */
     }
   }
 
+  trampita() {
+    this.evento.forEach(element => {
+      let loading = this.loadingCtrl.create({
+        spinner: 'bubbles',
+        content: 'Enviando datos...',
+        duration: 10000
+      })
+      loading.present();
+      loading.dismiss().then(() => {
+        this.handleError('Formulario enviado par la unidad ' + element.nombre);
+      });
 
+    });
+
+
+
+  }
 
 
 }

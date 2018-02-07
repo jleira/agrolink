@@ -15,7 +15,6 @@ import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
 import { errorHandler } from '@angular/platform-browser/src/browser';
 
-
 let apiUrl = SERVER_URL;
 
 @Injectable()
@@ -142,12 +141,14 @@ export class AuthProvider {
                       let tform;
                       let per;
                       data.json().forEach(element => {
+                        console.log('dtos de formulario', element);
                         if (element.periodo == null) {
                           per = null;
                         } else {
                           per = element.periodo.alias;
                         }
                         this.database.guardarformulario(element.codigo, element.nombre, element.observaciones, element.cataTienCodigo.codigo, per).then((ok) => {
+                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'CLOSED').subscribe((d)=>{console.log(d)},err=>{console.log(err)})  
                         }, err => {
                           if (this.cancelar == 0) {
                             this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
@@ -162,6 +163,7 @@ export class AuthProvider {
                             if (this.cancelar == 0) {
                               this.handleError2('Error interno en el dispositivo, intentelonuevake nuevamente');
                               this.logout();
+                              this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                               this.cancelar = 1;
                             }
                           });
@@ -191,6 +193,8 @@ export class AuthProvider {
                                             console.log(err);
                                             if (this.cancelar == 0) {
                                               this.handleError2('Error interno en el dispositivo, intentelonuevamente nuevamente');
+                                              this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
+
                                               this.logout();
                                               this.cancelar = 1;
                                             }
@@ -213,6 +217,7 @@ export class AuthProvider {
                                                     if (this.cancelar == 0) {
                                                       this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
                                                       this.logout();
+                                                      this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                                       this.cancelar = 1;
                                                     }
                                                   }
@@ -243,6 +248,7 @@ export class AuthProvider {
                                                         } else {
                                                           if (this.cancelar == 0) {
                                                             this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
+                                                            this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                                             this.logout();
                                                             this.cancelar = 1;
                                                           }
@@ -254,6 +260,7 @@ export class AuthProvider {
                                                   if (this.cancelar == 0) {
                                                     if (err.code !== 6) {
                                                       this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
+                                                      this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                                       this.logout();
                                                       this.cancelar = 1;
 
@@ -266,6 +273,7 @@ export class AuthProvider {
                                         } else {
                                           if (this.cancelar == 0) {
                                             this.handleError2('no existen preguntas asignadas a la pregunta tabla ' + pr.pregunta.enunciado);
+                                            this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                             this.logout();
                                             this.cancelar = 1;
                                           }
@@ -274,12 +282,14 @@ export class AuthProvider {
                                         if (err.status == 500) {
                                           if (this.cancelar == 0) {
                                             this.logout();
+                                            this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                             this.cancelar = 1;
                                             this.handleError2('Error al descargar la informacion de la pregunta tabla  ' + pr.pregunta.enunciado + ' , error en el servidor');
                                           }
                                         } else {
                                           if (this.cancelar == 0) {
                                             this.logout();
+                                            this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                             this.cancelar = 1;
                                             this.handleError2('Error al descargar la informacion pregunta tabla  ' + pr.pregunta.enunciado + ', intentelo nuevamente');
                                           }
@@ -304,6 +314,7 @@ export class AuthProvider {
                                       console.log(err);
                                       if (this.cancelar == 0) {
                                         this.handleError2('Error interno en el dispositivo, intentelonuevake nuevamente');
+                                        this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                         this.logout();
                                         this.cancelar = 1;
                                       }
@@ -320,7 +331,8 @@ export class AuthProvider {
                                               }else{
                                                 if (this.cancelar == 0) {
                                                    this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
-                                                  this.logout();
+                                                   this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
+                                                   this.logout();
                                                   this.cancelar = 1;
                                                  }
                                               }
@@ -330,12 +342,14 @@ export class AuthProvider {
                                         if (this.cancelar == 0) {
                                           this.handleError2('No existen respuestas para la pregunta ' + pr.pregunta.enunciado);
                                           this.logout();
+                                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                           this.cancelar = 1;
                                         }
                                       }
                                     }, err => {
                                       if (err.status == 500) {
                                         if (this.cancelar == 0) {
+                                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                           this.logout();
                                           this.cancelar = 1;
                                           this.handleError2('Error al descargar las respuestas de la pregunta ' + pr.pregunta.enunciado + ' , error en el servidor');
@@ -344,6 +358,7 @@ export class AuthProvider {
                                       } else {
                                         if (this.cancelar == 0) {
                                           this.logout();
+                                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                           this.cancelar = 1;
                                           this.handleError2('Error al descargar las respuestas de la pregunta ' + pr.pregunta.enunciado + ', intentelo nuevamente');
                                         }
@@ -355,6 +370,7 @@ export class AuthProvider {
                             } else {
                               this.handleError2('no existen preguntas asignadas al grupo ' + element2.nombre);
                               if (this.cancelar == 0) {
+                                this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                 this.logout();
                                 this.cancelar = 1;
                               }
@@ -362,6 +378,7 @@ export class AuthProvider {
                           }, (err) => {
                             if (err.status == 500) {
                               if (this.cancelar == 0) {
+                                this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                 this.logout();
                                 this.cancelar = 1;
                                 this.handleError2('Error al descargar la preguntas en el grupo ' + element2.nombre + ' , error en el servidor');
@@ -369,6 +386,7 @@ export class AuthProvider {
                             } else {
                               if (this.cancelar == 0) {
                                 this.handleError2('Error al descargar la informacion en el grupo ' + element2.nombre + ', intentelo nuevamente');
+                                this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{console.log(d)},err=>{console.log(err)})
                                 this.logout();
                                 this.cancelar = 1;
                               }
@@ -385,6 +403,7 @@ export class AuthProvider {
                       }
                     }
                     loadingform.dismiss();
+
                   }, err => {
                     loadingform.dismiss();
                     if (this.cancelar == 0) {
@@ -560,8 +579,15 @@ export class AuthProvider {
 
 
   agregaru(element, long, lat, tipo) {
-    this.database.agregarunidadproductiva(element.unidadProductiva['idUnidadProductiva'], element.unidadProductiva['nombre'], element.unidadProductiva['fechaIngreso'],
-      element.unidadProductiva['region']['idRegion'], long, lat, element.unidadProductiva['productor']['idProductor'], tipo, element.idAsignacion
+    this.database.agregarunidadproductiva(
+      element.unidadProductiva['idUnidadProductiva'], 
+      element.unidadProductiva['nombre'], 
+      element.unidadProductiva['fechaIngreso'],
+      element.unidadProductiva['region']['idRegion'], 
+      long, 
+      lat, 
+      element.unidadProductiva['productor']['idProductor'], 
+      tipo, element.idAsignacion
     ).then((ok) => {
       this.validarproductor(element.unidadProductiva['productor']['idProductor']).then((data: any) => {
         if (data == 0) {
@@ -603,7 +629,8 @@ export class AuthProvider {
 
       if (data.json()) {
         data.json().forEach(element => {
-          this.database.agregarnoconformidadantigua(element.codigo, unidad, tipo, element.categoria, element.detalle, element.descripcion, element.fechaCreacion, element.fechaPautadaCierre, element.estatus, element.asignacion, element.fechaRealCierre).then(
+          console.log(element);
+          this.database.agregarnoconformidadantigua(element.codigo, unidad, tipo, element.categoria, element.detalle, element.descripcion, element.fechaCreacion, element.fechaPautadaCierre, element.status, element.asignacion, element.fechaRealCierre).then(
             (ok) => { }, err => {
               if (this.cancelar == 0) {
                 this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
@@ -643,15 +670,11 @@ export class AuthProvider {
     })
   }
   precargue(unidad, tipo) {
-    /*    this.authHttp.get(`${SERVER_URL}api/forrmualrio/precarguededatos/${tipo}/${unidad}`).subscribe((data) => {
+        this.authHttp.get(`${SERVER_URL}api/forrmualrio/precargue/${tipo}/${unidad}`).subscribe((data) => {
          if (data.json()) {
            data.json().forEach(element => {
-   //guardar , identificar si es tipotabla          this.database.agregarnoconformidad(unidad, tipo, element.categoria, element.detalle, element.descripcion, element.fechacreacion, element.fechaposiblecierre, element.estado).then(
-               (ok)=>{},err=>{
-                 this.logout();
-                   this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
-               }
-             );
+            console.log(element);
+//            this.formularios.guardar3001(unidad, element.grupoidselected, element.respcodigo, element.preguntaid, element.codigosrespuestas, element.valoresrespuesta, true, tipo);
            });
          }
        }, err => {
@@ -664,7 +687,7 @@ export class AuthProvider {
    
        })
    
-    */
+    
   }
 
 

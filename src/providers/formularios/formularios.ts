@@ -31,192 +31,11 @@ export class FormulariosProvider {
   ) {
 
   }
-
-/*   descargarformularios() {
-    let loading = this.loadingCtrl.create({
-      spinner: 'bubbles',
-      content: 'descargando Formularios'
-    });
-
-    loading.present();
-
-    return this.authHttp.get(`${SERVER_URL}/api/inquiries/findByPeriodoUser`).map(
-      data => {
-        let tform;
-        let per;
-        loading.present();
-        if (data.json()) {
-          data.json().forEach(element => {
-            if (element.cataTienCodigo == null) {
-              tform = null;
-            } else {
-              tform = element.cataTienCodigo.codigo;
-            }
-            if (element.periodo == null) {
-              per = null;
-            } else {
-              per = element.periodo.alias;
-            }
-            this.database.guardarformulario(element.codigo, element.nombre, element.observaciones, tform, per);
-            let id = element.codigo;
-            element.grupos.forEach(element2 => {
-              this.database.guardargrupo(element2.idGrupoBase, element2.nombre, element2.posicion, id, element2.textoAyuda);
-              let gid = element2.idGrupoBase;
-              return this.authHttp.get(`${SERVER_URL}/api/grupoBasesPreguntasBases/findByGroup/${element2.idGrupoBase}`).map(
-                preguntas => {
-                  console.log('preguntas1', preguntas);
-                  if (preguntas.json()) {
-                    console.log('entro al if', preguntas);
-                    preguntas.json().forEach(pr => {
-                      let requerido;
-                      if (pr.pregunta.requerido == true) {
-                        requerido = 1;
-                      } else {
-                        requerido = 0;
-                      }
-                      if (pr.pregunta.adjuntos === true) {
-                        pr.pregunta.adjuntos = 1;
-                      }
-
-                      let preg = pr.pregunta.respCodigo;
-                      let pregunt = pr.pregunta.codigo;
-                      if (preg === null) {
-                        if (pr.pregunta.cataTipeCodigo.codigo === 3007) {//pregunta tipo tabla
-                          return this.authHttp.get(`${SERVER_URL}/api/questions/findPreguntasOfTable/${pr.pregunta.codigo}`).map(
-                            preguntatabla => {
-                              this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '', pr.pregunta.adjuntos, preguntatabla.json()['header']['cuerpo']);
-                              if (preguntatabla.json()) {
-                                console.log('preguntastabla2', preguntatabla.json());
-
-                                preguntatabla.json().preguntaTabla.forEach(element => {
-                                  if (element.observacion === true) {
-                                    element.observacion = 1;
-                                    return this.database.guardarpreguntatabla(
-                                      element.preguntaTablaId.codigoPreguntaPadre.codigo,
-                                      element.preguntaTablaId.codigoPregunta.codigo,
-                                      element.preguntaTablaId.codigoPregunta.enunciado,
-                                      element.fila,
-                                      element.preguntaTablaId.codigoPregunta.cataTipeCodigo.codigo,
-                                      0,
-                                      element.preguntaTablaId.codigoPregunta.requerido,
-                                      null,
-                                      element.observacion);
-                                  } else {
-                                    element.observacion = 0;
-                                    return this.database.guardarpreguntatabla(
-                                      element.preguntaTablaId.codigoPreguntaPadre.codigo,
-                                      element.preguntaTablaId.codigoPregunta.codigo,
-                                      element.preguntaTablaId.codigoPregunta.enunciado,
-                                      element.fila,
-                                      element.preguntaTablaId.codigoPregunta.cataTipeCodigo.codigo,
-                                      0,
-                                      element.preguntaTablaId.codigoPregunta.requerido,
-                                      element.preguntaTablaId.codigoPregunta.respCodigo.codigo,
-                                      element.observacion).then(() => {
-                                        element.preguntaTablaId.codigoPregunta.respCodigo.valores.forEach(respuestastabla => {
-
-                                          return this.database.guardarrespuestatabla(
-                                            respuestastabla.codigo,
-                                            respuestastabla.nombre,
-                                            respuestastabla.valor,
-                                            respuestastabla.valorConstante,
-                                            respuestastabla.tipoDato,
-                                            element.preguntaTablaId.codigoPregunta.codigo,
-                                            respuestastabla.respCodigo);
-                                        });
-                                      }, (err) => {
-                                      }
-                                      );
-                                  }
-
-
-                                });
-                              }
-                            }
-                          );
-                        } else {
-                          console.log(pr);
-                          return this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '', pr.pregunta.adjuntos, '');
-
-                        }
-                      } else {
-                        if (pr.pregunta.cataTipeCodigo.codigo === 3007) {
-
-                          return this.authHttp.get(`${SERVER_URL}/api/questions/findPreguntasOfTable/${pr.pregunta.codigo}`).map(
-                            preguntatabla => {
-                              this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, '', pr.pregunta.adjuntos, preguntatabla.json()['header']['cuerpo']);
-                              if (preguntatabla.json()) {
-                                console.log('preguntastabla3', preguntatabla.json());
-
-                                preguntatabla.json().preguntaTabla.forEach(element => {
-                                  return this.database.guardarpreguntatabla(
-                                    element.preguntaTablaId.codigoPreguntaPadre.codigo,
-                                    element.preguntaTablaId.codigoPregunta.codigo,
-                                    element.preguntaTablaId.codigoPregunta.enunciado,
-                                    element.fila,
-                                    element.preguntaTablaId.codigoPregunta.cataTipeCodigo.codigo,
-                                    0,
-                                    element.preguntaTablaId.codigoPregunta.requerido,
-                                    element.preguntaTablaId.codigoPregunta.respCodigo.codigo,
-                                    element.observacion).then(() => {
-                                      element.preguntaTablaId.codigoPregunta.respCodigo.valores.forEach(respuestastabla => {
-                                        return this.database.guardarrespuestatabla(
-                                          respuestastabla.codigo,
-                                          respuestastabla.nombre,
-                                          respuestastabla.valor,
-                                          respuestastabla.valorConstante,
-                                          respuestastabla.tipoDato,
-                                          element.preguntaTablaId.codigoPregunta.codigo,
-                                          respuestastabla.respCodigo);
-                                      });
-                                    }, (err) => {
-                                    }
-                                    );
-                                });
-                              }
-                            }
-                          );
-                        } else {
-                          this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, gid, requerido, pr.pregunta.respCodigo.codigo, pr.pregunta.adjuntos, '');
-                          return this.authHttp.get(`${SERVER_URL}/api/answers/find/${pr.pregunta.respCodigo.codigo}`).map(
-                            respuestas => {
-                              console.log('respuestas3', respuestas);
-                              if (respuestas.json()) {
-                                respuestas.json().valores.forEach(resp => {
-                                  return this.database.guardarrespuesta(resp.codigo, resp.nombre, resp.valor, resp.tipoDato, pregunt, respuestas.json().codigo).then(
-                                    (ok) => {
-                                    }, (err) => {
-                                    });
-                                });
-                              }
-                            }
-                          );
-                        }
-                      }
-                    });
-                  }
-                }
-              );
-            });
-
-            loading.dismiss();
-            this.authHttp.post(`${SERVER_URL}/api/inquiries/changeStatus/${element.codigo}`, 'CLOSED').map((responde) => {
-              console.log(responde);
-            }, err => this.handleError(err));
-          });
-        } else {
-          this.handleError('No existe formulario asignado');
-          //          this.auth.logout();
-          loading.dismiss();
-          return false;
-        }
-      }, err => {
-        this.handleError('Error en el servidor al descaegar formularios,  contactese con el administrador ');
-        //       this.auth.logout();
-        console.log(err);
-      })
-  } */
-
+formularioid(caso){
+  return this.database.formularioid(caso).then((data: any) => {
+   return this.items = data;
+  });
+}
   gruposbase(caso) {
     return this.database.formularioid(caso).then((data: any) => {
       console.log('idf', data);
@@ -237,10 +56,17 @@ export class FormulariosProvider {
     });
   }
   respuestasporpreguntas(codigosrespuesta, up, grupo, tipo) {
+    let loading= this.loadingCtrl.create({
+      spinner: 'bubbles',
+      content: 'Cargando informacion...'
+    });
+    loading.present();
     return this.database.respuestasporpregunta(codigosrespuesta).then(data => {
       console.log(data)
       this.items = data;
       return this.items;
+    }, err=>{loading.dismiss();
+      this.handleError('Error cargando informacion, intentelo nuevamente');
     }).then(() => {
       return this.database.respuestasguardadas(up, grupo, tipo).then((dt) => {
         let da: any;
@@ -249,22 +75,23 @@ export class FormulariosProvider {
           this.items.forEach(respuestas => {
             if (da != false) {
               da.forEach(valores => {
-                if (respuestas.preguntaid == valores.pregunta) {
+                if (respuestas.codigorespuestapadre == valores.codigorespuestapadre) {
                   respuestas.observacion = valores.observacion;
                   if (respuestas.tipo == 210001) {
-                    respuestas.respuesta = valores.valor;
+                    respuestas.respuesta = valores.valorseleccionado;
                     respuestas.ruta = valores.ruta;
                   } else if (respuestas.tipo == 210003) {
-                    respuestas.respuesta = valores.valor;
+                    console.log('prueba',valores.valorseleccionado);
+                    respuestas.respuesta = valores.valorseleccionado;
                     respuestas.ruta = valores.ruta;
                   } else if (respuestas.tipo == 210002) {
                     respuestas.ruta = valores.ruta;
-                    respuestas.respuesta = parseInt(valores.valor);
+                    respuestas.respuesta = parseInt(valores.valorseleccionado);
                   } else if (respuestas.tipo == 210004) {
                     respuestas.ruta = valores.ruta;
                     let arrayvalores;
-                    if (valores.valor) {
-                      arrayvalores = valores.valor.split('_');
+                    if (valores.valorrespuestaseleccionada) {
+                      arrayvalores = valores.valorrespuestaseleccionada.split('_');
                       if (arrayvalores.indexOf(respuestas.valor.toString()) != -1) {
                         respuestas.respuesta = true;
                       } else {
@@ -282,10 +109,12 @@ export class FormulariosProvider {
 
           });
         }
-
+        loading.dismiss();
         return this.items;
       })
-    }).catch(err => { console.log(err) });
+    }).catch(err => {         loading.dismiss();
+      this.handleError('Error cargando informacion, intentelo nuevamente');
+ });
   }
 
 
@@ -315,31 +144,35 @@ export class FormulariosProvider {
       return this.items;
     })
   }
-
-  respuestastablas(codigorespuesta, up, grupo, preguntapadre, tipo) {
-    console.log('tabla');
+//codigorespuestadelapregunta, unidadp, grupo, preguntaid(hijadela tabla),tipodeformulario
+  respuestastablas(codigorespuesta, up, grupo, preguntapadre, tipo, preguntaid) {
+    let loading= this.loadingCtrl.create({
+      spinner: 'bubbles',
+      content: 'Cargando informacion...'
+    });
+    loading.present();
+    
     return this.database.respuestasapreguntastablas(codigorespuesta).then((data) => {
       this.items = data;
       return this.items;
     }).then(() => {
+      let inicial=0;
+      let cant=this.items.length;
       this.items.forEach(element => {
-
-        return this.database.respuestasguardadastabla(up, grupo, preguntapadre, element.preguntaid, element.codigo, tipo).then((respuesta) => {
+        return this.database.respuestasguardadastabla(up, grupo, preguntapadre, preguntaid, element.codigo, tipo).then((respuesta) => {
+          console.log('encontro una respuesta',respuesta);
           let respues = respuesta;
-          element.respuesta = respuesta;
           if (element.tipo == 210001) {
             if (!respuesta) {
               element.respuesta = '';
             } else {
               element.respuesta = respuesta;
             }
-
           } else if (element.tipo == 210002) {
             if (!respuesta) {
               element.respuesta = '';
             } else {
               element.respuesta = parseInt(respues.toString());
-
             }
           } else if (element.tipo == 210003) {
             if (!respuesta) {
@@ -350,21 +183,34 @@ export class FormulariosProvider {
           } else if (element.tipo == 210004) {
             element.respuesta = respuesta;
           }
-        });
+         inicial=inicial+1;
+         if(inicial == cant){
+          loading.dismiss();
+          console.log('termino');
+         } 
+        },err=>{
+          inicial=inicial+1;
+          if(inicial == cant){
+           loading.dismiss();
+           console.log('termino');
+          }
+          this.handleError('error cargando informacion, intento nuevamente');});
       });
       return this.items;
     }).catch((err) => {
+      this.handleError('error cargando informacion, intento nuevamente');
+      loading.dismiss();
       console.log(err);
     });
-
+ 
   }
   guardarpreguntatabla(unidadp, grup, codigopararespuestas, preguntapadre, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario) {
     this.database.guardarrespuestaporpreguntatabla(unidadp, grup, codigopararespuestas, preguntapadre, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario);
   }
   guardarrespuestatabla(up, grupoidselected, codrespuesta, preguntaid, preguntapadre, valorcodigo, valorvalor, valor, tipocuestionario) {
-    this.database.guardarrespuestaporpreguntatabla(up, grupoidselected, codrespuesta, preguntapadre, preguntaid, valorcodigo, valorvalor, valor, tipocuestionario);
-
+    this.database.guardarrespuestaporpreguntatabla(up, grupoidselected, codrespuesta, preguntapadre, preguntaid, valorcodigo, valorvalor, valor, tipocuestionario).then((ok)=>{console.log('ok se guardo',ok)},(err)=>{console.log('este es el erorr',err)});
   }
+  
   guardarnoconformidades(unidadproductiva, tipo_formulario, categoria, detalle, descripcion, fechacreacion, fechaposiblecierre, estado) {
     return this.database.agregarnoconformidad(unidadproductiva, tipo_formulario, categoria, detalle, descripcion, fechacreacion, fechaposiblecierre, estado).then((dt) => {
       this.items = dt;
@@ -448,8 +294,8 @@ export class FormulariosProvider {
       return this.items;
     }, err => { console.log(err) })
   }
-  guardarubicacion(unidad, valor, caso) {
-    this.database.guardarubicacion(unidad, valor, caso);
+  guardarubicacion(unidad, datofecha, latitud, longitud, caso) {
+    this.database.guardarubicacion(unidad, datofecha, latitud, longitud, caso).then((d)=>{console.log(d)},err=>{console.log(err)});
   }
 
   enviarrespuesta(formularioaenviar, up, tipo) {
@@ -470,7 +316,7 @@ export class FormulariosProvider {
 
   cambiarunidadproductiva(up) {
     console.log(up);
-    this.database.cambiarestado(up.idUnidadProductiva, 2).then(() => {
+    this.database.cambiarestado(up.idUnidadProductiva, 2, up.tipo).then(() => {
       this.handleError('unidad ' + up.nombre + ' editada exitosamente');
     }, () => {
       this.handleError('No se puedo editar la unidad ' + up.nombre + ' a finalizada');

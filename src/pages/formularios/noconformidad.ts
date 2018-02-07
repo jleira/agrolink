@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ViewController, NavParams, AlertController, LoadingController, ToastController, ModalController } from 'ionic-angular';
+import { ViewController, NavParams, AlertController, LoadingController, ToastController, ModalController, NavController } from 'ionic-angular';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
 import { DateTime } from 'ionic-angular/components/datetime/datetime';
 import {tareaPage} from './tarea';
@@ -34,6 +34,7 @@ export class NuevanoconformidadPage {
     public navParams: NavParams,
     public formulario: FormulariosProvider,
     public modalCtrl: ModalController,
+    public navCtrl: NavController
   ) {
     let dt = new Date();
     let month = ("0" + (dt.getMonth() + 1)).slice(-2);
@@ -75,6 +76,7 @@ export class NuevanoconformidadPage {
         return this.tareas;
       });
       this.formulario.noconformidadid(this.id).then((data) => {
+        console.log(data);
         this.descripcion = data[0].descripcion;
         this.detalle = data[0].detalle;
         this.fecha = data[0].fechaposiblecierre;
@@ -150,8 +152,8 @@ export class NuevanoconformidadPage {
   }
 
   agregartarea() {
-    let modal = this.modalCtrl.create(tareaPage, {'caso':1, 'noconformidad': this.id, 'fecha':this.fecha });
-    modal.present();
+    let modal = this.navCtrl.push(tareaPage, {'caso':1, 'noconformidad': this.id, 'fecha':this.fecha });
+
   }
 
   handleError(error: string) {
@@ -197,8 +199,7 @@ export class NuevanoconformidadPage {
   }
 
   editartarea(item: any) {
-    let modal = this.modalCtrl.create(tareaPage, {'caso':3, 'noconformidad': this.id, 'fecha':this.fecha, 'tarea':item });
-    modal.present();
+    let modal = this.navCtrl.push(tareaPage, {'caso':3, 'noconformidad': this.id, 'fecha':this.fecha, 'tarea':item });
   }
   verdetalles(tareaid) {
     let modal = this.modalCtrl.create(tareaPage, {'caso':2, 'noconformidad': this.id, 'fecha':this.fecha, 'tarea':tareaid });
@@ -233,22 +234,29 @@ export class NuevanoconformidadPage {
 
   finalizarnoconformidad() {
     let habilitarfinalizar=true;
-    this.tareas.forEach(element => {
-      if(element.estado==0){
-        habilitarfinalizar=false;
-      }
-    });
+    if(this.tareas){
+      this.tareas.forEach(element => {
+        if(element.estado==0){
+          habilitarfinalizar=false;
+        }
+      });
+    }
+    
+
 
     if(habilitarfinalizar==true){
       let dt = new Date();
-      let month = dt.getMonth() + 1;
-      let day = dt.getDate();
+      let month = ("0" + (dt.getMonth() + 1)).slice(-2);
+      let day = ("0" + dt.getDate()).slice(-2);
       let year = dt.getFullYear();
-      this.formulario.editarnoconformidad(this.id, 'fechafinalizado', year + '-' + month + '-' + day).then((data) => {
+        this.formulario.editarnoconformidad(this.id, 'fechafinalizado', year + '-' + month + '-' + day).then((data) => {
+
+
 
       }).then(() => {
         this.formulario.editarnoconformidad(this.id, 'estado', 1).then(() => {
           this.habilitartarea = false;
+          this.fechadecierre=year + '-' + month + '-' + day;
           this.habilitarcreacion = false;
         });
   

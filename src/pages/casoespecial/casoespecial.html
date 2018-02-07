@@ -13,51 +13,209 @@
 </ion-header>
 
 
-<ion-content padding>
-  <div *ngIf="caso == 1">
-      <ion-list  style="margin-top:2%">
-          <button ion-item  (click)="casoespecial()">
-            <ion-icon name="leaf" item-start></ion-icon>
-          <h3 style="font-weight:bold">Casos especiales</h3>
-          <p>
-            Esta seccion es reservada para crear nuevas unidades productivas, y llenar sus respectivas encuestas.
-          </p>
-        </button> 
-          </ion-list>
+<ion-content>
+
+  <div *ngIf="caso === 2">
+    <form #form="ngForm" (ngSubmit)="agregarunidadn(form.value)" novalidate>
+      <ion-item>
+        <ion-label floating>Nombre Productor</ion-label>
+        <ion-input type="text" name='nombrep' ngModel required #nombrep="ngModel" [class.invalid]="nombrep.errors && nombrep.dirty"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Identificacion</ion-label>
+        <ion-input type="number" name='identificacion' ngModel required #identificacion="ngModel" [class.invalid]="identificacion.errors && identificacion.dirty"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Telefono</ion-label>
+        <ion-input type="number" name='telefono' ngModel required #telefono="ngModel" [class.invalid]="telefono.errors && telefono.dirty"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Fecha de Nacimiento</ion-label>
+        <ion-datetime displayFormat="{{TIPO_FECHA}}" cancelText="Cancelar" doneText="Guardar" name="fechan" ngModel required #fechan="ngModel"
+          [class.invalid]="fechan.errors && fechan.dirty"></ion-datetime>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Grupo Etnico</ion-label>
+        <ion-input type="text" name='grupoe' ngModel required #grupoe="ngModel" [class.invalid]="grupoe.errors && grupoe.dirty"></ion-input>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label>Genero</ion-label>
+        <ion-select name="genero" okText="Seleccionar" cancelText="Cancelar" ngModel required #genero="ngModel" [class.invalid]="genero.errors && genero.dirty">
+          <ion-option [value]="'F'">FEMENINO</ion-option>
+          <ion-option [value]="'M'">MASCULINO</ion-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label floating>Nombre Unidad Productiva</ion-label>
+        <ion-input type="text" name='nombreu' ngModel required #nombreu="ngModel" [class.invalid]="nombreu.errors && nombreu.dirty"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Region</ion-label>
+        <ion-select name="region" okText="Seleccionar" cancelText="Cancelar" ngModel required #region="ngModel" [class.invalid]="region.errors && region.dirty">
+          <ion-option *ngFor="let region of regiones" [value]="region.id">{{region.nombre}}</ion-option>
+        </ion-select>
+      </ion-item>
+
+
+      <div padding>
+        <button ion-button color="pesto-light" style="border: 1px green solid;" block type="submit">GUARDAR</button>
+      </div>
+
+
+    </form>
+
   </div>
-  <div *ngIf="caso == 2">
-      <ion-list  style="margin-top:2%">
-          <button ion-item  (click)="casoespecial()">
-            <ion-icon name="leaf" item-start></ion-icon>
-          <h3 style="font-weight:bold">Casos especiales</h3>
-          <p>
-            Esta seccion es reservada para crear nuevas unidades productivas, y llenar sus respectivas encuestas.
-          </p>
-        </button> 
-          </ion-list>
+
+  <div *ngIf="caso=== 1">
+
+    <ion-list-header color="pesto-light">
+      <ion-thumbnail item-start>
+        <img src="assets/imgs/finca.png">
+      </ion-thumbnail>
+      <h2>Unidades Creadas</h2>
+    </ion-list-header>
+
+    <ion-list>
+      <div *ngFor="let item of items">
+        <div *ngIf="item.tipo==1001">
+
+          <ion-card *ngIf="item.terminado === 0">
+            <ion-item-sliding>
+              <ion-item>
+                <ion-row>
+                  <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+                    <br>
+                  </ion-col>
+                  <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+                  <ion-col col-6 text-center>
+                    <span> {{item.region}} </span>
+                  </ion-col>
+                  <ion-col col-6 text-center>
+                    <span> {{item.productor}} </span>
+                  </ion-col>
+                </ion-row>
+              </ion-item>
+              <ion-item-options side="right">
+                <button ion-button color="pesto-secondary" (click)="abrirformulario(item)">
+                  <ion-icon name="clipboard"></ion-icon>
+                  Formulario
+                </button>
+                <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="pesto-primary">
+                  <ion-icon name="eye"></ion-icon>
+                  Detalles
+                </button>
+              </ion-item-options>
+            </ion-item-sliding>
+          </ion-card>
+
+
+          <ion-card *ngIf="item.terminado === 1" style="border-top:2px solid yellow">
+            <ion-item-sliding>
+              <ion-item>
+                <ion-row>
+                  <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+                    <br>
+                  </ion-col>
+                  <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+                  <ion-col col-6 text-center>
+                    <span> {{item.region}} </span>
+                  </ion-col>
+                  <ion-col col-6 text-center>
+                    <span> {{item.productor}} </span>
+                  </ion-col>
+                </ion-row>
+              </ion-item>
+              <ion-item-options side="right">
+                <button ion-button color="pesto-secondary" (click)="abrirformulario(item)">
+                  <ion-icon name="clipboard"></ion-icon>
+                  Formulario
+                </button>
+                <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="pesto-primary">
+                  <ion-icon name="eye"></ion-icon>
+                  Detalles
+                </button>
+              </ion-item-options>
+            </ion-item-sliding>
+          </ion-card>
+
+          <ion-card *ngIf="item.terminado === 2" style="border-top:2px solid mediumseagreen">
+            <ion-item-sliding>
+              <ion-item>
+                <ion-row>
+                  <ion-col col-6 text-center> {{item.idUnidadProductiva}}
+                    <br>
+                  </ion-col>
+                  <ion-col col-6 text-center> {{item.nombre}}</ion-col>
+                  <ion-col col-6 text-center>
+                    <span> {{item.region}} </span>
+                  </ion-col>
+                  <ion-col col-6 text-center>
+                    <span> {{item.productor}} </span>
+                  </ion-col>
+                </ion-row>
+              </ion-item>
+              <ion-item-options side="right">
+                <button ion-button color="pesto-secondary" (click)="abrirformulario(item)">
+                  <ion-icon name="clipboard"></ion-icon>
+                  Formulario
+                </button>
+                <button ion-button (click)="abrirdetalles(item.idUnidadProductiva)" color="pesto-primary">
+                  <ion-icon name="eye"></ion-icon>
+                  Detalles
+                </button>
+              </ion-item-options>
+            </ion-item-sliding>
+          </ion-card>
+
+        </div>
+
+      </div>
+    </ion-list>
+    <div *ngIf="items.length > 0">
+      <div padding>
+        <button ion-button color="pesto-light" block (click)="enviarunidades()">Enviar unidades</button>
+      </div>
+    </div>
+    <div padding>
+      <button ion-button color="pesto-dark" block (click)="agregarunidad()">Agregar Unidad</button>
+    </div>
   </div>
 
   <div *ngIf="caso == 3">
-      <ion-list  style="margin-top:2%">
-          <button ion-item  (click)="casoespecial()">
-            <ion-icon name="leaf" item-start></ion-icon>
-          <h3 style="font-weight:bold">Casos especiales</h3>
+    <ion-item>
+      <ion-label>Unidades iniciadas</ion-label>
+      <ion-select multiple (ionChange)="comprobarunidades(1001,$event)">
+        <div *ngFor="let item of items">
+          <ion-option [value]="item">{{item.nombre}}</ion-option>
+        </div>
+      </ion-select>
+    </ion-item>
+
+
+    <div *ngIf="!habilitarenvio">
+        <ion-item no-lines>
+            <label>Pregunta sin responder </label>
+            </ion-item>
+      <ion-item *ngFor="let pregunta of preguntassinresponder" text-wrap (click)="abrirpagina(pregunta)">
+          <h2>{{pregunta.preguntaid.enunciado}}</h2>
           <p>
-            Esta seccion es reservada para crear nuevas unidades productivas, y llenar sus respectivas encuestas.
+            {{pregunta.up.nombre}}- {{pregunta.grupo.nombre}}
           </p>
-        </button> 
-          </ion-list>
-  </div>
-  <div *ngIf="caso == 4">
-      <ion-list  style="margin-top:2%">
-          <button ion-item  (click)="casoespecial()">
-            <ion-icon name="leaf" item-start></ion-icon>
-          <h3 style="font-weight:bold">Casos especiales</h3>
-          <p>
-            Esta seccion es reservada para crear nuevas unidades productivas, y llenar sus respectivas encuestas.
-          </p>
-        </button> 
-          </ion-list>
+          </ion-item>
+    
+    </div>
+    <div padding *ngIf="habilitarenvio">
+        <button ion-button color="pesto-light" style="border: 1px green solid;" block (click)="enviartodo()">Enviar</button>
+      </div>
+
   </div>
 
 

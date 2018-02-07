@@ -97,7 +97,6 @@ export class UnidadproductivaPage {
     this.prueba=id;
       let modal = this.modalCtrl.create(UpdetallesPage,{'ids': this.prueba});
     modal.present();
-
   }
 
   showPrompt() {

@@ -15,8 +15,8 @@
       <ion-item>
           <ion-label>Tipo de formulario</ion-label>
           <ion-select (ionChange)="habilitartipo($event)">
-              <ion-option  [value]="1001" *ngIf="auditor">Promotoria</ion-option>        
-              <ion-option  [value]="1002" *ngIf="promotor">Auditoria</ion-option>        
+              <ion-option  [value]="1001" *ngIf="promotor">Promotoria</ion-option>        
+              <ion-option  [value]="1002" *ngIf="auditor">Auditoria</ion-option>        
 
           </ion-select>
         </ion-item>
@@ -56,6 +56,6 @@
 
 </div>
 <div padding *ngIf="habilitarenvio">
-    <button ion-button color="pesto-secondary" style="border: 1px green solid;" block (click)="login()">Enviar</button>
+    <button ion-button color="pesto-light" style="border: 1px green solid;" block (click)="enviartodo()">Enviar</button>
   </div>
      </ion-content>

@@ -34,7 +34,10 @@ export class FormulariosPage {
   tipocuestionario;
   tipo;
   productor;
-  datoguardar: any;
+  datofecha: any;
+  datolongitud:any;
+  datolatitud:any;
+
 
   constructor(
     private toastCtrl: ToastController,
@@ -52,6 +55,7 @@ export class FormulariosPage {
     public popoverCtrl: PopoverController) {
     this.caso = navParams.get('caso');
       console.log(this.caso);
+      this.db.cambiarestado('OPTS1', 1 , 1001).then(()=>{console.log('echo ')});
   }
 
 
@@ -150,7 +154,6 @@ export class FormulariosPage {
     if (itemspendientes.length > 0) {
       let modal = this.popoverCtrl.create(ImagePage, { 'caso': 2, 'pendientes': itemspendientes, 'msj': msj });
       modal.present();
-
     }
   }
 
@@ -323,10 +326,13 @@ export class FormulariosPage {
       fechaentro = new Date();
       fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' + ("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
        this.geolocation.getCurrentPosition().then((resp) => {
-        this.datoguardar = fechaentro + ',' + resp.coords.latitude.toString() + ',' + resp.coords.longitude.toString();
-
+       this.datofecha=fechaentro;
+       this.datolatitud=resp.coords.latitude.toString();
+       this.datolongitud=resp.coords.longitude.toString();
       }).catch((error) => {
-        this.datoguardar = fechaentro + ',' + error.message + ',' + error.message;
+        this.datofecha=fechaentro;
+        this.datolatitud=null;
+        this.datolongitud=null;
         this.handleError('no se pudo acceder a la ubicacion del telefono ' + error.message);
       }).then(() => {
       });
@@ -351,7 +357,7 @@ export class FormulariosPage {
                   this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
                     if (data) {
                       data.forEach(pregunta => {
-                        return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario).then((respu) => {
+                        return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario, pregunta.preguntaid).then((respu) => {
                           pregunta.respuesta = respu;
                         });
                       });
@@ -385,13 +391,14 @@ export class FormulariosPage {
               if (element.tipo == 3007) {
                 element.encabezado = JSON.parse(atob(element.encabezado));
                 this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
+                  console.log('datos de preguntas',data);
                   if (data) {
                     data.forEach(pregunta => {
-                      return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario).then((respu) => {
+                      return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario,pregunta.preguntaid).then((respu) => {
                         pregunta.respuesta = respu;
                       },err=>{});
                     });
-                  }
+                  }//codigorespuestadelapregunta, unidadp, grupo, preguntaid(hijadela tabla),tipodeformulario
                   element.preguntas = data;
                   this.final=this.items;
                   loading.dismiss();
@@ -401,7 +408,7 @@ export class FormulariosPage {
                 })
               }
             })
-          }
+          } 
 
         } else {
           loading.dismiss();
@@ -438,8 +445,7 @@ export class FormulariosPage {
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden agregar inconformidades una vez envidadas las respuestas');
     } else {
-      let modal = this.modalCtrl.create(NuevanoconformidadPage, { 'up': this.up, 'tipo': this.tipo, 'id': cas, 'productor': this.productor });
-      modal.present();
+      let modal = this.navCtrl.push(NuevanoconformidadPage, { 'up': this.up, 'tipo': this.tipo, 'id': cas, 'productor': this.productor });
     }
   }
 
@@ -451,7 +457,7 @@ export class FormulariosPage {
       this.recargaritem;
     } else {
       this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, event, this.tipocuestionario);
-      this.guardarubicacion(this.up, this.datoguardar);
+      this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
     }
   }
   guardar3003(valor, preguntaid, respcodigo, respuestafinal) {
@@ -459,9 +465,9 @@ export class FormulariosPage {
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem;
     } else {
+ 
       this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, respuestafinal, this.tipocuestionario);
-      this.guardarubicacion(this.up, this.datoguardar);
-    }
+      this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);    }
   }
 
   guardar3001(valor, preguntaid, respcodigo) {
@@ -469,8 +475,9 @@ export class FormulariosPage {
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem;
     } else {
-      this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, valor.valor, this.tipocuestionario);
-      this.guardarubicacion(this.up, this.datoguardar);
+      console.log(valor, preguntaid, respcodigo);
+      this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, true, this.tipocuestionario);
+      this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
     }
   }
 
@@ -480,7 +487,7 @@ export class FormulariosPage {
       this.recargaritem;
     } else {
       this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, respuestafinal, this.tipocuestionario);
-      this.guardarubicacion(this.up, this.datoguardar);
+      this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
     }
   }
   guardar3002(valor, preguntaid, respcodigo) {
@@ -488,6 +495,7 @@ export class FormulariosPage {
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem;
     } else {
+      console.log(valor, preguntaid, respcodigo);
       let codigosrespuestas: any = [];
       let valoresrespuesta: any = [];
       valor.forEach(element => {
@@ -496,13 +504,14 @@ export class FormulariosPage {
       });
       codigosrespuestas = codigosrespuestas.join('_');
       valoresrespuesta = valoresrespuesta.join('_');
-      this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, codigosrespuestas, valoresrespuesta, valoresrespuesta, this.tipocuestionario);
-      this.guardarubicacion(this.up, this.datoguardar);
+      this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, codigosrespuestas, valoresrespuesta, true, this.tipocuestionario);
+      this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
     }
   }
 
   guardarobservacion(preguntaid, respcodigo, observacion) {
     this.formulario.guardarobservacion(this.up, this.grupoidselected, respcodigo, preguntaid, observacion, this.tipocuestionario);
+    this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
   }
 
   mostrargrupos(tipop, upva, productor) {
@@ -589,7 +598,7 @@ export class FormulariosPage {
           targetPath + `/${nombrecarpetapadre}/${idgrupo.toString()}`,
           imageData.replace(this.file.externalCacheDirectory, "")).then(() => {
             this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imageData.replace(this.file.externalCacheDirectory, ""), this.tipocuestionario);
-            this.guardarubicacion(this.up, this.datoguardar);
+            this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
           }, () => { });
       }).then((ok
       ) => {
@@ -630,7 +639,7 @@ export class FormulariosPage {
           spinner: 'bubbles',
           content: 'Cargando informacion...'
         });
-        loading.present();
+        loading.present(); 
 
         let image = "data:image/png;base64," + imageData;
         let block = image.split(";");
@@ -646,7 +655,7 @@ export class FormulariosPage {
           return this.file.writeFile(targetPath + `${nombrecarpetapadre}/${idgrupo.toString()}/`, imgname, blob).then((ok) => { }, (err) => { });
         }).then(() => {
           return this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imgname, this.tipocuestionario).then(() => {
-            this.guardarubicacion(this.up, this.datoguardar);
+            this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
           }, () => { });
         }).then(() => {
           return this.recargaritem().then(() => { }, () => { }).then(() => { }, () => { });
@@ -726,7 +735,7 @@ export class FormulariosPage {
             element.encabezado = JSON.parse(atob(element.encabezado));
             this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
               data.forEach(pregunta => {
-                return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario).then((respu) => {
+                return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario,pregunta.preguntaid).then((respu) => {
                   pregunta.respuesta = respu;
                 });
               });
@@ -758,7 +767,7 @@ export class FormulariosPage {
 
   }
 
-  guardarfechapadre(valor, preguntapadre, preguntaid, fecha) {
+  guardarfechapadre(valor, preguntapadre, preguntaid, fecha) { 
 
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
@@ -766,7 +775,8 @@ export class FormulariosPage {
     } else {
       if (fecha == "") {
       } else {
-        this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, fecha, this.tipocuestionario);
+        this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuesta, preguntaid, preguntapadre, valor.codigo, valor.valor, fecha, this.tipocuestionario);
+        this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
       }
     }
   }
@@ -778,13 +788,13 @@ console.log(valor, preguntapadre, preguntaid, event);
     } else {
 
       if (event) {
-        this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
+        this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuesta, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
+        this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
       } else {
         if (event === false) {
-          this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuestapadre, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
+          this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuesta, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
 
         }
-
       }
     }
   }
@@ -794,6 +804,7 @@ console.log(valor, preguntapadre, preguntaid, event);
       this.recargaritem;
     } else {
       this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, null, preguntaid, preguntapadre, '', '', $event.target.value, this.tipocuestionario);
+      this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
     }
   }
 
@@ -808,20 +819,16 @@ console.log(valor, preguntapadre, preguntaid, event);
     });
     toast.present();
   }
-  guardarubicacion(unidad, valor) {
-    if (valor == null) {
-      let fechaentro: any = new Date();
-      fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' + fechaentro.getHours() + ':' + fechaentro.getMinutes() + ':00';
-      this.datoguardar = fechaentro + ',error,error';
-      valor = this.datoguardar;
-    }
+  guardarubicacion(unidad, datofecha, latitud, longitud ) {
+    
     let c;
     if (this.tipocuestionario == 1002) {
       c = 2;
     } else {
       c = 1;
     }
-    this.formulario.guardarubicacion(unidad, valor, c);
+    console.log('ubicacion',unidad, datofecha, latitud, longitud);
+    this.formulario.guardarubicacion(unidad, datofecha, latitud, longitud, this.tipocuestionario);
   }
 
 

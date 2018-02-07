@@ -44,7 +44,7 @@
       <ion-label>
         Fecha Pautada de cierre
       </ion-label>
-      <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar"  min={{fechaminima}} name="fecha" ngModel required #fecha="ngModel"
+      <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" doneText="Guardar"  min={{fechaminima}} max={{fechamaxima}} name="fecha" ngModel required #fecha="ngModel"
         [class.invalid]="fecha.errors && fecha.dirty"></ion-datetime>
     </ion-item>
     <ion-item class="error-message"  no-lines *ngIf="fecha.errors?.required && fecha.dirty">

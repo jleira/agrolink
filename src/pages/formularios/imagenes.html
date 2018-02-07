@@ -16,8 +16,8 @@
         </ion-item>
     </ion-list>
 </ion-content>
-<div *ngIf="caso == 3">
-  <ion-header>
+
+  <ion-header *ngIf="caso == 3">
     <ion-toolbar color="pesto-primary">
       <ion-title>
         Mapa para la unidad {{unidad.nombre}}
@@ -30,13 +30,13 @@
     </ion-toolbar>
   </ion-header>
   
-  <ion-content fullscreen>
+  <ion-content fullscreen  *ngIf="caso == 3">
 <ion-card *ngIf="unidad.mapa">
-    <img  src="{{'data:image/jpeg;base64,'+unidad.mapa}}" />
-</ion-card>      
+    <img  src="{{'data:image/png;base64,'+unidad.mapa}}" />
+</ion-card>
            <div padding>
-                <button ion-button color="pesto-light" block (click)="escogerimagen()" >Actualizar Mapa</button>
+            <button ion-button  block color="pesto-dark" (click)="escogerimagen()" >Actualizar Mapa</button>      
+           
         </div>
       </ion-content>
-</div>              
  
