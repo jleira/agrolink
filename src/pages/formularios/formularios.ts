@@ -54,8 +54,8 @@ export class FormulariosPage {
     public db: DbProvider,
     public popoverCtrl: PopoverController) {
     this.caso = navParams.get('caso');
-      console.log(this.caso);
-      this.db.cambiarestado('OPTS1', 1 , 1001).then(()=>{console.log('echo ')});
+ //     console.log(this.caso);
+//      this.db.cambiarestado('OPTS1', 1 , 1001).then(()=>{console.log('echo ')});
   }
 
 
@@ -454,7 +454,7 @@ export class FormulariosPage {
   guardarfecha(valor, preguntaid, respcodigo, event) {
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
-      this.recargaritem;
+      this.recargaritem();
     } else {
       this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, event, this.tipocuestionario);
       this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
@@ -463,7 +463,7 @@ export class FormulariosPage {
   guardar3003(valor, preguntaid, respcodigo, respuestafinal) {
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
-      this.recargaritem;
+      this.recargaritem();
     } else {
  
       this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, respuestafinal, this.tipocuestionario);
@@ -473,7 +473,7 @@ export class FormulariosPage {
   guardar3001(valor, preguntaid, respcodigo) {
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
-      this.recargaritem;
+      this.recargaritem();
     } else {
       console.log(valor, preguntaid, respcodigo);
       this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, true, this.tipocuestionario);
@@ -713,65 +713,117 @@ export class FormulariosPage {
       spinner: 'bubbles',
       content: 'Cargando informacion...'
     });
-    this.productor = this.navParams.get('productor');
     loading.present();
+    this.productor = this.navParams.get('productor');
     this.tipocuestionario = this.navParams.get('tipo');
+    this.tipo = this.tipocuestionario;
     this.grupoidselected = this.navParams.get('grupo');
     this.unidadproductiva = this.navParams.get('up');
     this.up = this.unidadproductiva.idUnidadProductiva;
     this.grupo = this.navParams.get('gruponombre');
     this.rutaimg = this.file.externalDataDirectory + `${this.up}/${this.grupoidselected.toString()}`;
-    return this.formulario.preguntasgrupo(this.grupoidselected, this.tipo).then(preguntasg => {
-      this.items = preguntasg;
-      let r = [];
-      this.items.forEach(element => {
-        r.push(element.codigo);
-      });
-      this.resp = r;
-      return this.formulario.respuestasporpreguntas(this.resp, this.up, this.grupoidselected, this.tipocuestionario).then(data => {
-        this.resp = data;
-        this.items.forEach(element => {
-          if (element.tipo == 3007) {
-            element.encabezado = JSON.parse(atob(element.encabezado));
-            this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
-              data.forEach(pregunta => {
-                return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario,pregunta.preguntaid).then((respu) => {
-                  pregunta.respuesta = respu;
-                });
-              });
-              element.preguntas = data;
-              return this.items;
-            }, (err) => {
-              this.handleError('Error al consultar respuestas ');
-            }).then((data) => {
-            });
-          }
-          let vr: any;
-          if (this.resp) {
-            this.resp.forEach(element2 => {
-              if (element2.preguntaid == element.codigo) {
-                element.respuestas.push(element2);
-              }
-            });
-          }
-
-        })
-        this.resp = JSON.stringify(this.resp);
-      }).
-        then(() => {
-          this.final = this.items;
-          loading.dismiss();
-          return this.final;
-        });
+    let fechaentro;
+    fechaentro = new Date();
+    fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' + ("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
+     this.geolocation.getCurrentPosition().then((resp) => {
+     this.datofecha=fechaentro;
+     this.datolatitud=resp.coords.latitude.toString();
+     this.datolongitud=resp.coords.longitude.toString();
+    }).catch((error) => {
+      this.datofecha=fechaentro;
+      this.datolatitud=null;
+      this.datolongitud=null;
+      this.handleError('no se pudo acceder a la ubicacion del telefono ' + error.message);
+    }).then(() => {
     });
+    this.formulario.preguntasgrupo(this.grupoidselected, this.tipo).then(preguntasg => {
+      console.log(preguntasg);
+      this.items = preguntasg;
+      if (this.items) {
+        let r = [];
+        this.items.forEach(element => {
+          if(element.codigorespuesta!==""){
+            r.push(element.codigorespuesta);
+          }
+        });
+        this.resp = r;
+        console.log(this.resp);
+        if(this.resp.length>0){
+          return this.formulario.respuestasporpreguntas(this.resp, this.up, this.grupoidselected, this.tipocuestionario).then(data => {
+            this.resp = data;
+            this.items.forEach(element => {
+              if (element.tipo == 3007) {
+                element.encabezado = JSON.parse(atob(element.encabezado));
+                this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
+                  if (data) {
+                    data.forEach(pregunta => {
+                      return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario, pregunta.preguntaid).then((respu) => {
+                        pregunta.respuesta = respu;
+                      });
+                    });
+                  }
+                  element.preguntas = data;
+                  return this.items;
+                }, (err) => {
+                })
+              }
+              let vr: any;
+              if (this.resp) {
+                this.resp.forEach(element2 => {
+                  if (element2.codigorespuestapadre == element.codigorespuesta) {
+                    element.respuestas.push(element2);
+                  }
+                });
+              }
+            })
+            this.resp = JSON.stringify(this.resp);
+          }).
+            then(() => {
+              this.final = this.items;
+              console.log('final',this.final);
+              loading.dismiss();
+              return this.final;
+            }).catch(()=>{
+              loading.dismiss();              
+            });
+        }else{
+          this.items.forEach(element => {
+            if (element.tipo == 3007) {
+              element.encabezado = JSON.parse(atob(element.encabezado));
+              this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
+                console.log('datos de preguntas',data);
+                if (data) {
+                  data.forEach(pregunta => {
+                    return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario,pregunta.preguntaid).then((respu) => {
+                      pregunta.respuesta = respu;
+                    },err=>{});
+                  });
+                }//codigorespuestadelapregunta, unidadp, grupo, preguntaid(hijadela tabla),tipodeformulario
+                element.preguntas = data;
+                this.final=this.items;
+                loading.dismiss();
+                return this.final;
+              }, (err) => {
+                loading.dismiss();
+              })
+            }
+          })
+        } 
 
+      } else {
+        loading.dismiss();
+        this.handleError('No existen preguntas registradas en este grupo');
+      }
+    },err=>{
+
+    }).catch(()=>{}); 
   }
 
   guardarfechapadre(valor, preguntapadre, preguntaid, fecha) { 
 
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
-      this.recargaritem;
+      this.recargaritem();
     } else {
       if (fecha == "") {
       } else {
@@ -784,7 +836,7 @@ export class FormulariosPage {
 console.log(valor, preguntapadre, preguntaid, event);
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
-      this.recargaritem;
+      this.recargaritem();
     } else {
 
       if (event) {
@@ -801,7 +853,7 @@ console.log(valor, preguntapadre, preguntaid, event);
   guardarobservacionpadre($event, preguntapadre, preguntaid) {
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
-      this.recargaritem;
+      this.recargaritem();
     } else {
       this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, null, preguntaid, preguntapadre, '', '', $event.target.value, this.tipocuestionario);
       this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);

@@ -233,8 +233,8 @@ export class EnviardatosPage {
     this.authService.login2(this.usuario, pass.pass, this.empresa).finally(() => {
       loading.dismiss();
     }).subscribe(() => {
-      //      this.enviartodo();
-      this.trampita();
+            this.enviartodo();
+     // this.trampita();
     },
       (err) => {
         console.log(err);
@@ -491,13 +491,15 @@ export class EnviardatosPage {
         });
 
       });
-
-      /*       this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
+            this.evento=[];
+            this.habilitarenvio=false;
+             this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
               this.upa = data;
               if (this.upa.length == 0) {
                 this.upa = false;
               }
             });
+
             this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
               this.upp = data;
               if (this.upp.length == 0) {
@@ -519,7 +521,7 @@ export class EnviardatosPage {
               }
             });
       
-            this.handleError('Debe recargar la pagina para enviar nuevamente los formularios');  */
+            this.handleError('Debe recargar la pagina para enviar nuevamente los formularios');
     }
   }
 

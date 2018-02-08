@@ -225,7 +225,7 @@ export class HomePage {
   }
 
 
-  cambiarestado() {
+  cmabiarestado() {
     this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/1`, 'ACTIVE').subscribe((d) => { console.log(d) }, err => { console.log(err) })
 
   }

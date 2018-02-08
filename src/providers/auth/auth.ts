@@ -49,10 +49,10 @@ export class AuthProvider {
     return this.http.post(`${apiUrl}api/login`, '{"identificador":"' + values.username + '","clave":"' + values.password + '"}', options)
       .map(response => (response.headers.get('authorization').substring(7))).map(
       jwt => {
-        this.handleJwtResponse(jwt, values.empresa);
+        this.handleJwtResponse(jwt, values.empresa, 1);
       });
   }
-  private handleJwtResponse(jwt: string, empresa) {
+  private handleJwtResponse(jwt: string, empresa, caso) {
     this.storage.set('jwt', jwt)
       .then(() => {
 
@@ -140,16 +140,25 @@ export class AuthProvider {
                     if (data.json()) {
                       let tform;
                       let per;
+                      let ultimaiteracion=data.json().length;
+                      let iteracion = 0;
                       data.json().forEach(element => {
+                        iteracion= iteracion+1;  
                         console.log('dtos de formulario', element);
                         if (element.periodo == null) {
                           per = null;
                         } else {
                           per = element.periodo.alias;
                         }
+
                         this.database.guardarformulario(element.codigo, element.nombre, element.observaciones, element.cataTienCodigo.codigo, per).then((ok) => {
+                          if(ultimaiteracion==iteracion){
+                            loadingform.dismiss();
+                            this.authUser.next(jwt);
+                          }
                           this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'CLOSED').subscribe((d)=>{console.log(d)},err=>{console.log(err)})  
                         }, err => {
+                          loadingform.dismiss();
                           if (this.cancelar == 0) {
                             this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
                             this.logout();
@@ -396,13 +405,14 @@ export class AuthProvider {
                         });
                       });
                     } else {
+                      loadingform.dismiss();
                       if (this.cancelar == 0) {
                         this.handleError2('No existen formularios habilitados para descarga');
                         this.logout();
                         this.cancelar = 1;
                       }
                     }
-                    loadingform.dismiss();
+
 
                   }, err => {
                     loadingform.dismiss();
@@ -418,6 +428,10 @@ export class AuthProvider {
                   this.authHttp.get(`${SERVER_URL}/api/asignaciones/user`).subscribe(
                   data => {
                     if (data.json()) {
+                      console.log('IDSUPPERIODO',data.json()[0].subPeriodo.idSubPeriodo);
+                      
+                      this.storage.set('subperiodo', data.json()[0].subPeriodo.idSubPeriodo);
+
                       this.storage.get('codigo').then((micodigo) => {
                         data.json().forEach(element => {
                           let tipo;
@@ -465,8 +479,6 @@ export class AuthProvider {
 
               }
               loading.dismiss();
-
-              this.authUser.next(jwt);
             },
             err => {
 
@@ -521,7 +533,7 @@ export class AuthProvider {
     this.storage.remove('mail');
     this.storage.remove('reload');
     this.storage.remove('empresa');
-
+    this.storage.remove('subperiodo');
   }
   guardarinfo(value, empresa) {
     this.storage.set('codigo', value['codigo']);

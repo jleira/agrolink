@@ -1255,6 +1255,23 @@ export class DbProvider {
   }
   //
 
+
+    respuestasguardadast(){
+      return this.isReady(
+      ).then(() => {
+        return this.database.executeSql(`SELECT * FROM respuestasguardadas `, []).then((data) => {
+          let todos = [];
+          if (data.rows.length) {
+            for (let i = 0; i < data.rows.length; i++) {
+              let todo = data.rows.item(i);
+              todo.respuesta = [];
+              todos.push(todo);
+            }
+          }
+          return todos;
+        })
+      })
+    }
   guardarpreguntatabla(preguntaid, preguntapadre, enunciado, fila, codigorespuesta, observacion) {
     return this.isReady()
       .then(() => {
@@ -1723,8 +1740,27 @@ export class DbProvider {
       })
   }
 
+  cambiarunidades(id,idnuevo){
+
+    return this.isReady().then(()=>{
+      return this.database.executeSql(
+        `UPDATE noconformidades SET unidadproductiva = (?) WHERE unidadproductiva = '${id}' ;`,
+        [idnuevo])
+    }).then(()=>{
+      return this.database.executeSql(
+        `UPDATE unidades_productivas SET idUnidadProductiva = (?) WHERE idUnidadProductiva = '${id}' ;`,
+        [idnuevo])
+  }).then(() => {
+      return this.database.executeSql(
+        `UPDATE respuestasguardadas SET unidadproductiva = (?) WHERE unidadproductiva = '${id}' ;`,
+        [idnuevo])
+    }).then(()=>{
+      return this.database.executeSql(
+        `UPDATE respuestasguardadastabla SET unidadproductiva = (?) WHERE unidadproductiva = '${id}' ;`,
+        [idnuevo])
+    })
+
+  }
 
 
-
-
-}//                     unidadproductiva TEXT,tipo INTEGER,
+}

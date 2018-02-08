@@ -230,14 +230,14 @@
                 <ion-label class="enunciadopregunta" floating>
                   {{item.enunciado}}
                 </ion-label>
-                <ion-input type="number" [(ngModel)]="opciones.respuesta" (change)="guardarnumero(opciones, item.codigo, item.codigorespuesta, opciones.respuesta)"></ion-input>
+                <ion-input type="number" [(ngModel)]="opciones.respuesta" (change)="guardar3003(opciones, item.codigo, item.codigorespuesta, opciones.respuesta)"></ion-input>
               </ion-item>
 
             </div>
             <div *ngIf="!opciones.respuesta">
               <ion-item text-wrap no-lines>
                 <ion-label class="enunciadopregunta" floating>{{item.enunciado}} </ion-label>
-                <ion-input type="number" [(ngModel)]="item.identificador" (change)="guardarnumero(opciones, item.codigo, item.codigorespuesta,item.identificador )"></ion-input>
+                <ion-input type="number" (change)="guardar3003(opciones, item.codigo, item.codigorespuesta,$event.target.value)"></ion-input>
               </ion-item>
             </div>
 

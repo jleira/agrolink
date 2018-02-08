@@ -45,7 +45,7 @@ formularioid(caso){
         return this.items;
       });
       
-//      return this.items;
+//      return this.items; 
     });
   }
   preguntasgrupo(grupo,tipo ) {
@@ -69,6 +69,7 @@ formularioid(caso){
       this.handleError('Error cargando informacion, intentelo nuevamente');
     }).then(() => {
       return this.database.respuestasguardadas(up, grupo, tipo).then((dt) => {
+        console.log('guardado',dt);
         let da: any;
         da = dt;
         if (this.items) {
@@ -126,8 +127,10 @@ formularioid(caso){
   }
 
   guardar3001(unidadp, grup, codigopararespuestas, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario) {
-    this.database.guardarrespuestaporpregunta(unidadp, grup, codigopararespuestas, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario).catch((err) => { console.log(err) });
-
+    this.database.guardarrespuestaporpregunta(unidadp, grup, codigopararespuestas, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario).then(()=>
+      this.database.respuestasguardadast().then((d)=>{console.log('d',d)},err=>{console.log('e',err)})
+    ).catch((err) => { console.log(err) });
+    
   }
   guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion, tipof) {
     this.database.guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion, tipof);
@@ -160,7 +163,7 @@ formularioid(caso){
       let cant=this.items.length;
       this.items.forEach(element => {
         return this.database.respuestasguardadastabla(up, grupo, preguntapadre, preguntaid, element.codigo, tipo).then((respuesta) => {
-          console.log('encontro una respuesta',respuesta);
+//          console.log('encontro una respuesta',respuesta);
           let respues = respuesta;
           if (element.tipo == 210001) {
             if (!respuesta) {
@@ -186,13 +189,13 @@ formularioid(caso){
          inicial=inicial+1;
          if(inicial == cant){
           loading.dismiss();
-          console.log('termino');
+
          } 
         },err=>{
           inicial=inicial+1;
           if(inicial == cant){
            loading.dismiss();
-           console.log('termino');
+
           }
           this.handleError('error cargando informacion, intento nuevamente');});
       });
@@ -208,7 +211,7 @@ formularioid(caso){
     this.database.guardarrespuestaporpreguntatabla(unidadp, grup, codigopararespuestas, preguntapadre, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario);
   }
   guardarrespuestatabla(up, grupoidselected, codrespuesta, preguntaid, preguntapadre, valorcodigo, valorvalor, valor, tipocuestionario) {
-    this.database.guardarrespuestaporpreguntatabla(up, grupoidselected, codrespuesta, preguntapadre, preguntaid, valorcodigo, valorvalor, valor, tipocuestionario).then((ok)=>{console.log('ok se guardo',ok)},(err)=>{console.log('este es el erorr',err)});
+    this.database.guardarrespuestaporpreguntatabla(up, grupoidselected, codrespuesta, preguntapadre, preguntaid, valorcodigo, valorvalor, valor, tipocuestionario).then((ok)=>{},(err)=>{console.log('este es el erorr',err)});
   }
   
   guardarnoconformidades(unidadproductiva, tipo_formulario, categoria, detalle, descripcion, fechacreacion, fechaposiblecierre, estado) {
