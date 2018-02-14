@@ -338,6 +338,7 @@ export class FormulariosPage {
         this.handleError('no se pudo acceder a la ubicacion del telefono ' + error.message);
       }).then(() => {
       });
+      this.formulario.preguntasgrupo2(this.up, this.grupoidselected, this.tipo);
       this.formulario.preguntasgrupo(this.grupoidselected, this.tipo).then(preguntasg => {
         console.log(preguntasg);
         this.items = preguntasg;

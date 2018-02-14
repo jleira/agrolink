@@ -869,6 +869,28 @@ export class DbProvider {
 
   }
 
+  respuestasporpreguntaf(codigosrespuesta) {
+    let ids = codigosrespuesta;
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM respuestas WHERE codigorespuestapadre = ${ids}`, []).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todo.respuesta = false;
+            todo.observacion = '';
+            todo.ruta = '';
+            todos.push(todo);
+          }
+        } 
+        return todos;
+      })
+    })
+
+  }
+
+
   
   respuestasguardadas(up, grupo, tipo) {
     let upi = up;
@@ -893,7 +915,38 @@ export class DbProvider {
     })
 
   }
+  respuestasguardadasporpregunta(up, grupo, tipo,codigopregunta) {
+    let upi = up;
+    let grupoi = grupo;
+    let tipoe = tipo;
+    let pregunta = codigopregunta;
+    return this.isReady(
+    ).then(() => {
+      return this.database.executeSql(`SELECT * FROM respuestasguardadas WHERE unidadproductiva = (?)  AND grupo =(?) AND tipoformulario =(?) AND pregunta =(?)`, [upi, grupoi, tipo, pregunta]).then((data) => {
+        let todos = [];
+        if (data.rows.length) {
+          for (let i = 0; i < data.rows.length; i++) {
+            let todo = data.rows.item(i);
+            todos=todo;
+          }
+        }
+        return todos;
+      })
+    })
 
+  }
+/*   id INTEGER PRIMARY KEY,
+  unidadproductiva TEXT,
+  grupo INTEGER,
+  pregunta INTEGER,
+  codigorespuestapadre INTEGER, 
+  codigorespuestaseleccionada TEXT,
+  valorrespuestaseleccionada TEXT,
+  valorseleccionado TEXT,
+  observacion TEXT,
+  ruta TEXT,
+  tipoformulario INTEGER
+ */
   todasuproductivas() {
     return this.isReady()
       .then(() => {
