@@ -395,10 +395,10 @@ export class DbProvider {
   }
 
 
-  unidadproductivaporid(id) {
+  unidadproductivaporid(id,tipo) {
     return this.isReady()
       .then(() => {
-        return this.database.executeSql(`SELECT * from unidades_productivas WHERE  idUnidadProductiva =  (?)`, [id])
+        return this.database.executeSql(`SELECT * from unidades_productivas WHERE  idUnidadProductiva =  (?) and tipo = (?)`, [id,tipo])
           .then((data) => {
             let todas = [];
             for (let i = 0; i < data.rows.length; i++) {
@@ -550,6 +550,7 @@ export class DbProvider {
     return this.isReady()
       .then(() => {
         let ids = id;
+
         return this.database.executeSql(`SELECT id from municipios WHERE departamentoid IN (${ids})`, [])
           .then((data) => {
             let todos = [];
@@ -577,132 +578,6 @@ export class DbProvider {
       })
   }
 
-  unidadesporregiontodas(id: any, orientacion) {
-    return this.isReady()
-      .then(() => {
-        let regi = id;
-        let ori = orientacion;
-        if (orientacion == "") {
-          return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado from unidades_productivas WHERE regionId IN (${regi})`, [])
-            .then((data) => {
-              let todas = [];
-              for (let i = 0; i < data.rows.length; i++) {
-                let todo = data.rows.item(i);
-                this.nombreregion(todo.regionId).then((data: any) => {
-                  todo.region = data;
-                });
-                this.nombreproductor(todo.IdProductor).then((data: any) => {
-                  todo.productor = data;
-                });
-                todas.push(todo);
-              }
-              return todas;
-            })
-        } else {
-          return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado from unidades_productivas WHERE regionId IN (${regi}) ORDER BY terminado ${orientacion} `, [])
-            .then((data) => {
-              let todas = [];
-              for (let i = 0; i < data.rows.length; i++) {
-                let todo = data.rows.item(i);
-                this.nombreregion(todo.regionId).then((data: any) => {
-                  todo.region = data;
-                });
-                this.nombreproductor(todo.IdProductor).then((data: any) => {
-                  todo.productor = data;
-                });
-                todas.push(todo);
-              }
-              return todas;
-            })
-        }
-      })
-  }
-
-  unidadespendientes() {
-    return this.isReady()
-      .then(() => {
-        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado from unidades_productivas WHERE terminado = 0`, [])
-          .then((data) => {
-            let todas = [];
-            for (let i = 0; i < data.rows.length; i++) {
-              let todo = data.rows.item(i);
-              this.nombreregion(todo.regionId).then((data: any) => {
-                todo.region = data;
-              });
-              this.nombreproductor(todo.IdProductor).then((data: any) => {
-                todo.productor = data;
-              });
-              todas.push(todo);
-            }
-            return todas;
-          })
-      })
-  }
-
-  unidadesporregionpendientes(id: any) {
-    return this.isReady()
-      .then(() => {
-        let regi = id;
-        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado from unidades_productivas WHERE regionId IN (${regi}) AND terminado = 0`, [])
-          .then((data) => {
-            let todas = [];
-            for (let i = 0; i < data.rows.length; i++) {
-              let todo = data.rows.item(i);
-              this.nombreregion(todo.regionId).then((data: any) => {
-                todo.region = data;
-              });
-              this.nombreproductor(todo.IdProductor).then((data: any) => {
-                todo.productor = data;
-              });
-              todas.push(todo);
-            }
-            return todas;
-          })
-      })
-  }
-
-  unidadesterminadas() {
-    return this.isReady()
-      .then(() => {
-        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado from unidades_productivas WHERE terminado = 1`, [])
-          .then((data) => {
-            let todas = [];
-            for (let i = 0; i < data.rows.length; i++) {
-              let todo = data.rows.item(i);
-              this.nombreregion(todo.regionId).then((data: any) => {
-                todo.region = data;
-              });
-              this.nombreproductor(todo.IdProductor).then((data: any) => {
-                todo.productor = data;
-              });
-              todas.push(todo);
-            }
-            return todas;
-          })
-      })
-  }
-
-  unidadesporregionterminadas(id: any) {
-    return this.isReady()
-      .then(() => {
-        let regi = id;
-        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado from unidades_productivas WHERE regionId IN (${regi}) AND terminado =1`, [])
-          .then((data) => {
-            let todas = [];
-            for (let i = 0; i < data.rows.length; i++) {
-              let todo = data.rows.item(i);
-              this.nombreregion(todo.regionId).then((data: any) => {
-                todo.region = data;
-              });
-              this.nombreproductor(todo.IdProductor).then((data: any) => {
-                todo.productor = data;
-              });
-              todas.push(todo);
-            }
-            return todas;
-          })
-      })
-  }
 
   todoslospaisesid() {
     return this.isReady()
@@ -1393,7 +1268,7 @@ export class DbProvider {
                 
                 }
                 todos = data.rows.item(0).valor;
-                console.log('todos', todos);
+
               } else {
                 let todo;
                 todo = false;
@@ -1580,7 +1455,7 @@ export class DbProvider {
   }
 
   guardarubicacion(idUnidadProductiva,  datofecha, latitud, longitud, caso) {
-    console.log('giuardamos ',idUnidadProductiva,  datofecha, latitud, longitud, caso)
+
     let idseleccion = idUnidadProductiva;
     return this.isReady()
       .then(() => {
@@ -1588,17 +1463,15 @@ export class DbProvider {
           .then((data) => {
             let todo = data.rows.item(0);
               if (todo.fechainicio === null) {
-                console.log('inicio lleno')
                 return this.database.executeSql(
                   `UPDATE unidades_productivas SET fechainicio = (?), latitudinicio = (?), longitudinicio=(?) , terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' AND tipo = ${todo.tipo};`,
                   [datofecha, latitud, longitud]).then((datae) => { return data; }).catch(err => { return err; });
               } else {
-                console.log('fin lleno')
                 return this.database.executeSql(
                   `UPDATE unidades_productivas SET fechafin = (?), latitudfin = (?), longitudfin=(?) WHERE idUnidadProductiva = '${idseleccion}' AND tipo = ${todo.tipo};`,
                   [datofecha, latitud, longitud]).then((datae) => { }).catch(err => { return err; });
               }
-          },er=>{console.log(er)})
+          },er=>{})
       })
   }
 
@@ -1740,7 +1613,7 @@ export class DbProvider {
       })
   }
 
-  cambiarunidades(id,idnuevo){
+  cambiarunidades(id,idnuevo,idAsignacion){
 
     return this.isReady().then(()=>{
       return this.database.executeSql(
@@ -1748,8 +1621,8 @@ export class DbProvider {
         [idnuevo])
     }).then(()=>{
       return this.database.executeSql(
-        `UPDATE unidades_productivas SET idUnidadProductiva = (?) WHERE idUnidadProductiva = '${id}' ;`,
-        [idnuevo])
+        `UPDATE unidades_productivas SET idUnidadProductiva = (?), idAsignacion= (?) WHERE idUnidadProductiva = '${id}' ;`,
+        [idnuevo, idAsignacion])
   }).then(() => {
       return this.database.executeSql(
         `UPDATE respuestasguardadas SET unidadproductiva = (?) WHERE unidadproductiva = '${id}' ;`,
@@ -1759,6 +1632,42 @@ export class DbProvider {
         `UPDATE respuestasguardadastabla SET unidadproductiva = (?) WHERE unidadproductiva = '${id}' ;`,
         [idnuevo])
     })
+
+  }
+
+  unidadesfiltro(regiones,terminado,tipo,orientacion){
+    let stringregiones;
+    if(regiones){
+      stringregiones='regionId IN ('+ regiones+') AND ';
+    }else{
+      stringregiones='';
+    }
+
+    let stringorientacion;
+    if(orientacion){
+      stringorientacion='ORDER BY terminado '+ orientacion;
+    }else{
+      stringorientacion='';
+    }
+    return this.isReady()
+    .then(() => {
+      return this.database.executeSql(`SELECT * from unidades_productivas WHERE ${stringregiones} terminado IN (${terminado}) AND tipo IN (${tipo},1003) ${stringorientacion}`, []).then((data) => {
+        let todas = [];
+        for (let i = 0; i < data.rows.length; i++) {
+          let todo = data.rows.item(i);
+          this.nombreregion(todo.regionId).then((data: any) => {
+            todo.region = data;
+          });
+          this.nombreproductor(todo.IdProductor).then((data: any) => {
+            todo.productor = data;
+          });
+
+          todas.push(todo);
+        }
+        return todas;
+      }, err => { })
+    })
+ 
 
   }
 

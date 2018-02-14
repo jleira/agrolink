@@ -21,10 +21,9 @@ export class UpdetallesPage {
   }
 
   ionViewWillEnter() {
-    this.idup=this.navParams.get('ids');
-    this.uproductiva.detallesf(this.idup).then((data:any)=>{
+   let uni=this.navParams.get('ids');
+    this.uproductiva.detallesf(uni.idUnidadProductiva,uni.tipo).then((data:any)=>{
       this.detalles=data;    
-      this.productor=JSON.stringify(this.detalles); 
       this.datosregion(data[0]['regionId']);
     });
 

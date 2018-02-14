@@ -302,19 +302,24 @@ formularioid(caso){
   }
 
   enviarrespuesta(formularioaenviar, up, tipo) {
-    return this.storage.get('jwt').then(jwt => {
-      return this.authHttp.post(`${SERVER_URL}/api/formulario/create/`, formularioaenviar).subscribe((data) => {
+    let loading= this.loadingCtrl.create({
+      spinner: 'bubbles',
+      content: 'Enviando informacion para la unidad'+ up.nombre + ' ...'
+    });
+    loading.present();
+
+     return this.authHttp.post(`${SERVER_URL}/api/formulario/create/`, formularioaenviar).subscribe((data) => {
+        loading.dismiss();
         console.log(data);
         if (data.status == 200) {
           this.cambiarunidadproductiva(up);
           this.handleError('Formulario para la unidad ' + up.nombre + ' Enviado exitosamente');
-
-          return true;
-        } else {
-          return false;
+   } else {
+    this.handleError('Error al enviar formulario ' + up.nombre);
         }
+        return data;
       })
-    });
+
   }
 
   cambiarunidadproductiva(up) {
@@ -334,11 +339,13 @@ formularioid(caso){
   }
 
 
-  enviarfotoprueba(ruta, imgname) {
-    this.handleError(ruta);
-    this.handleError(imgname)
-
-    return this.storage.get('jwt').then((jwt) => {
+  enviarfotoprueba(ruta, imgname, idunidad) {
+    let loading= this.loadingCtrl.create({
+      spinner: 'bubbles',
+      content: 'Enviando foto ...'
+    });
+    loading.present();
+    this.storage.get('jwt').then((jwt) => {
       let options: FileUploadOptions = {
         fileKey: 'file',
         fileName: imgname.replace(".png", ""),
@@ -346,17 +353,16 @@ formularioid(caso){
           'Authorization': 'Bearer ' + jwt,
           'Content-Type': undefined
         },
-        mimeType: 'image/*',
+        mimeType: 'image/*'
       }
 
-      return this.fileTransfer.upload(ruta, `${SERVER_URL}api/photoupload/`, options)
+      return this.fileTransfer.upload(ruta, `${SERVER_URL}api/photoupload/${idunidad}`, options)
         .then((data) => {
-          this.handleError(JSON.stringify(data))
-          return JSON.stringify(data);
+          this.handleError('foto enviada');
+          loading.dismiss();
         }, (err) => {
-          this.handleError(JSON.stringify(err))
-
-          return JSON.stringify(err);
+          this.handleError(JSON.stringify(err));
+          loading.dismiss();
         })
 
     })

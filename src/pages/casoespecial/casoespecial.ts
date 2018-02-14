@@ -1,17 +1,17 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, ModalController, ToastController, AlertController, LoadingController } from 'ionic-angular';
-import { TIPO_FECHA, FORMULARIO_AUDITORIA } from "../../config";
+import { TIPO_FECHA } from "../../config";
+import { FORMULARIO_PROMOTORIA } from "../../config";
 import { Geolocation } from '@ionic-native/geolocation';
 import { DbProvider } from '../../providers/db/db';
-import { FORMULARIO_PROMOTORIA } from "../../config";
 import { UpdetallesPage } from '../updetalles/updetalles';
 import { FormulariosPage } from '../formularios/formularios';
-import { JwtHelper, AuthHttp, AuthConfig } from "angular2-jwt";
+import { JwtHelper, AuthHttp} from "angular2-jwt";
 import { Http } from '@angular/http';
 import { SERVER_URL } from "../../config";
 import { Storage } from "@ionic/storage";
 import { FormulariosProvider } from '../../providers/formularios/formularios';
-import { File, DirectoryEntry } from '@ionic-native/file';
+import { File } from '@ionic-native/file';
 import { AuthProvider } from '../../providers/auth/auth';
 /**
  * Generated class for the CasoespecialPage page.
@@ -38,14 +38,13 @@ export class CasoespecialPage {
   preguntassinresponder: any;
   evento;
   habilitarenvio;
-  subperiodo:number;
   tipo;
   empresa;
   usuario;
   constructor(
     public authService: AuthProvider,
     public loadingCtrl: LoadingController,
-    public http: Http, 
+    public http: Http,
     jwtHelper: JwtHelper,
     private readonly authHttp: AuthHttp,
     public navCtrl: NavController,
@@ -61,16 +60,13 @@ export class CasoespecialPage {
     public file: File
   ) {
     this.rutaimg = this.file.externalDataDirectory;
-    this.evento=[];
-    this.storage.get('subperiodo').then((data)=>{
-      console.log('id s ', data);
-      this.subperiodo=data;
-    })
+    this.evento = [];
+
 
     this.habilitarenvio = false;
     this.items = [];
     this.generarid();
-    this.tipo=FORMULARIO_PROMOTORIA;
+    this.tipo = FORMULARIO_PROMOTORIA;
     this.caso = navParams.get('caso');
     if (this.caso == 2) {
       this.geolocation.getCurrentPosition().then((resp) => {
@@ -85,7 +81,7 @@ export class CasoespecialPage {
         this.regiones = data;
       });
 
-  
+
 
     }
 
@@ -194,7 +190,7 @@ export class CasoespecialPage {
     console.log('id generado');
     let codigogenerado = this.rand_code('0123456789ABCDEFGHUIJK', 5);
 
-    this.db.unidadproductivaporid(codigogenerado).then((ok) => {
+    this.db.unidadproductivaporid(codigogenerado,1001).then((ok) => {
       if (ok.length > 0) {
         this.generarid();
       } else {
@@ -263,81 +259,50 @@ export class CasoespecialPage {
     this.preguntassinresponder = [];
     this.evento = $event;
     $event.forEach(up => {
-      let productor = JSON.parse(up.datosproductor);
-      let nunidad = {
-        "id_subperiodo": this.subperiodo,
-        "productor": {
-          idProductor: null,
-          nombre: productor.nombre,
-          identificacion: productor.identificacion,
-          telefono: productor.telefono,
-          fechaNacimiento: productor.fechaNacimiento,
-          grupoEtnico: productor.grupoEtnico,
-          genero: productor.genero,
-          estado: true,
-          annoIngreso:null,
-          createdBy: null,
-          created: null,
-          modified: null
-        },
-        UnidadProductiva:{
-          idUnidadProductiva:null,
-          nombre: up.nombre,
-          fechaIngreso: null,
-          idRegion: up.regionId,
-          nivel:1,
-          estado: true,
-          longitud: up.localizacion_longitude,
-          latitud: up.localizacion_latitude
-        }
-      }
+      let formulario;
+      this.db.formularioid(tipo).then((formularioid) => {
+        formulario = formularioid;
+        if (formulario == null) {
+          if (tipo == 1001) {
+            this.handleError('No se encuentran formularios para audiotoria registrados en el movil');
+            this.habilitarenvio = false;
+          } else {
+            this.handleError('No se encuentran formularios para promotoria registrados en el movil');
+            this.habilitarenvio = false;
+          }
+        } else {
+          this.db.gruposbyid(formulario).then((grupo) => {
+            let grupos = grupo;
+            if (grupos) {
+              grupos.forEach(grupoi => {
+                this.db.preguntasporgruporequeridas(grupoi.idgrupobase).then((pregunta) => {
+                  if (pregunta) {
+                    pregunta.forEach(preguntaid => {
+                      console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
+                      return this.db.verficarrespuestas(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo).then(tienerespuesta => {
+                        console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
+                        console.log(tienerespuesta);
 
-             let formulario;
-            let enviar = [];
-            this.db.formularioid(tipo).then((formularioid) => { 
-              formulario = formularioid;
-              if (formulario == null) {
-                if (tipo == 1001) {
-                  this.handleError('No se encuentran formularios para audiotoria registrados en el movil');
-                  this.habilitarenvio = false;
-                } else {
-                  this.handleError('No se encuentran formularios para promotoria registrados en el movil');
-                  this.habilitarenvio = false;
-                }
-              } else {
-                this.db.gruposbyid(formulario).then((grupo) => {
-                  let grupos = grupo;
-                  let preguntas = [];
-                  if (grupos) {
-                    grupos.forEach(grupoi => {
-                      this.db.preguntasporgruporequeridas(grupoi.idgrupobase).then((pregunta) => {
-                        if (pregunta) {
-                          pregunta.forEach(preguntaid => {
-                            console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
-                            return this.db.verficarrespuestas(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo).then(tienerespuesta => {
-                              console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
-                              console.log(tienerespuesta);
-      
-                              if (tienerespuesta) {
-                                if (this.preguntassinresponder.length == 0) {
-                                  this.habilitarenvio = true;
-                                }
-                              } else {
-                                let datatopush = { 'preguntaid': preguntaid, 'grupo': grupoi, 'up': up, 'tipo': tipo };
-                                this.habilitarenvio = false;
-                                this.preguntassinresponder.push(datatopush);
-                              }
-                            })
-                          });
+                        if (tienerespuesta) {
+                          if (this.preguntassinresponder.length == 0) {
+                            this.habilitarenvio = true;
+                          }
+                        } else {
+                          let datatopush = { 'preguntaid': preguntaid, 'grupo': grupoi, 'up': up, 'tipo': tipo };
+                          this.habilitarenvio = false;
+                          this.preguntassinresponder.push(datatopush);
                         }
-                      });
+                      })
                     });
-                  } else {
-                    this.handleError('No se encuentran preguntas registradas para este formulario');
                   }
                 });
-              }
-            }) 
+              });
+            } else {
+              this.handleError('No se encuentran preguntas registradas para este formulario');
+            }
+          });
+        }
+      })
     });
 
   }
@@ -390,8 +355,8 @@ export class CasoespecialPage {
     this.authService.login2(this.usuario, pass.pass, this.empresa).finally(() => {
       loading.dismiss();
     }).subscribe(() => {
-            this.enviartodo();
-     // this.trampita();
+      this.enviartodo();
+      // this.trampita();
     },
       (err) => {
         console.log(err);
@@ -399,310 +364,290 @@ export class CasoespecialPage {
       });
   }
 
-enviartodo(){
-if(this.evento){
-  this.evento.forEach(up => {
-    let productor = JSON.parse(up.datosproductor);
-    let nunidad = {
-      "id_subperiodo": this.subperiodo,
-      "productor": {
-        idProductor: null,
-        nombre: productor.nombre,
-        identificacion: productor.identificacion,
-        telefono: productor.telefono,
-        fechaNacimiento: productor.fechaNacimiento,
-        grupoEtnico: productor.grupoEtnico,
-        genero: productor.genero,
-        estado: true,
-        annoIngreso:null,
-        createdBy: null,
-        created: null,
-        modified: null
-      },
-      unidadProductiva:{
-        idUnidadProductiva:null,
-        nombre: up.nombre,
-        fechaIngreso: null,
-        idRegion: up.regionId,
-        nivel:1,
-        estado: true,
-        longitud: up.localizacion_longitude,
-        latitud: up.localizacion_latitude
-      }
-    }
-    console.log('unidad enviada', nunidad);
-    this.authHttp.post(`${SERVER_URL}/api/unidadesproductivas/create/movil`, nunidad).subscribe((data) => {
-      console.log('id unidad respuesta',data['_body']);
-      this.db.cambiarunidades(up.idUnidadProductiva, data['_body']).then((ok)=>{
-        console.log(ok);
-        up.idUnidadProductiva=data['_body'];
-        console.log('up', up);
-        if(up.mapa){
-          up.mapa="data:image/png:base64,"+up.mapa;
+  enviartodo() {
+    if (this.evento) {
+      this.evento.forEach(up => {
+        let productor = JSON.parse(up.datosproductor);
+        let nunidad = {
+          "productor": {
+            idProductor: null,
+            nombre: productor.nombre,
+            identificacion: productor.identificacion,
+            telefono: productor.telefono,
+            fechaNacimiento: productor.fechaNacimiento,
+            grupoEtnico: productor.grupoEtnico,
+            genero: productor.genero,
+            estado: true,
+            annoIngreso: null,
+            createdBy: null,
+            created: null,
+            modified: null
+          },
+          unidadProductiva: {
+            idUnidadProductiva: null,
+            nombre: up.nombre,
+            fechaIngreso: null,
+            idRegion: up.regionId,
+            nivel: 1,
+            estado: true,
+            longitud: up.localizacion_longitude,
+            latitud: up.localizacion_latitude
+          }
         }
+        console.log('unidad enviada', nunidad);
+        this.authHttp.post(`${SERVER_URL}/api/unidadesproductivas/create/movil`, nunidad).subscribe((data) => {
 
-        let enviar = [];
-        console.log(up);
-        this.db.formularioid(this.tipo).then((formularioid) => {
-          let formulario = formularioid;
-          let datosdeinicio;
-          let datosdefinalizacion;
-          let fechainicio;
-          let fechafin;
-          let latitudeinicio;
-          let longitudeinicio;
-          let latitudefin;
-          let longitudefin;
 
-          let formularioRespuesta = [];
-          this.db.respuestasparaunidad(up.idUnidadProductiva, this.tipo).then((data) => {
-            data.forEach((respuestasdigitadas) => {
-              if (respuestasdigitadas.ruta) {
-                this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta);
-              }
-              let valor = respuestasdigitadas.codigorespuestaseleccionada.split('_');
-              if (valor.length > 0) {
-                let i = 0;
-                let indicador = respuestasdigitadas.valorrespuestaseleccionada.split('_');
-                valor.forEach(element => {
+          console.log('id unidad respuesta', data.json().idAsignacion);
+          this.db.cambiarunidades(up.idUnidadProductiva, data.json().unidadProductiva.idUnidadProductiva, data.json().idAsignacion).then((ok) => {
+            console.log(ok);
+            let unidadantigua = up.idUnidadProductiva;
+            up.idUnidadProductiva = data.json().unidadProductiva.idUnidadProductiva;
+          
+            up.idAsignacion=data.json().idAsignacion;
+            console.log('up', up);
+            if (up.mapa) {
+              up.mapa = "data:image/png:base64," + up.mapa;
+            }
 
-                  let respuestassacadas;
-                  respuestassacadas = {
-                    formularioRespuestaId: {
-                      idGrupoBase: respuestasdigitadas.grupo,
-                      idPregunta: respuestasdigitadas.pregunta,
-                      idRespuesta: respuestasdigitadas.codigorespuestapadre,
-                      idValorRespuesta: parseInt(valor[i])
-                    },
-                    valor: respuestasdigitadas.valorseleccionado,
-                    valorIndicador: parseInt(indicador[i]),
-                    photoSrc: respuestasdigitadas.ruta,
-                    observacion: respuestasdigitadas.observacion
+
+            console.log(up);
+            this.db.formularioid(this.tipo).then((formularioid) => {
+              let formulario = formularioid;
+
+              let formularioRespuesta = [];
+              this.db.respuestasparaunidad(up.idUnidadProductiva, this.tipo).then((data) => {
+                data.forEach((respuestasdigitadas) => {
+                  if (respuestasdigitadas.ruta) {
+                    this.formulario.enviarfotoprueba(this.rutaimg + `${unidadantigua}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta, respuestasdigitadas.unidadproductiva);
                   }
-                  formularioRespuesta.push(respuestassacadas);
-                  i = i + 1;
+                  let valor = respuestasdigitadas.codigorespuestaseleccionada.split('_');
+                  if (valor.length > 0) {
+                    let i = 0;
+                    let indicador = respuestasdigitadas.valorrespuestaseleccionada.split('_');
+                    valor.forEach(element => {
+
+                      let respuestassacadas;
+                      respuestassacadas = {
+                        formularioRespuestaId: {
+                          idGrupoBase: respuestasdigitadas.grupo,
+                          idPregunta: respuestasdigitadas.pregunta,
+                          idRespuesta: respuestasdigitadas.codigorespuestapadre,
+                          idValorRespuesta: parseInt(valor[i])
+                        },
+                        valor: respuestasdigitadas.valorseleccionado,
+                        valorIndicador: parseInt(indicador[i]),
+                        photoSrc: respuestasdigitadas.ruta,
+                        observacion: respuestasdigitadas.observacion
+                      }
+                      formularioRespuesta.push(respuestassacadas);
+                      i = i + 1;
+                    });
+                  } else {
+                    let respuestassacadas;
+                    respuestassacadas = {
+                      formularioRespuestaId: {
+                        idGrupoBase: respuestasdigitadas.grupo,
+                        idPregunta: respuestasdigitadas.pregunta,
+                        idRespuesta: respuestasdigitadas.codigorespuestapadre,
+                        idValorRespuesta: parseInt(respuestasdigitadas.codigorespuestaseleccionada)
+                      },
+                      valor: respuestasdigitadas.valorseleccionado,
+                      valorIndicador: parseInt(respuestasdigitadas.valorrespuestaseleccionada),
+                      photoSrc: respuestasdigitadas.ruta,
+                      observacion: respuestasdigitadas.observacion
+                    }
+                    formularioRespuesta.push(respuestassacadas);
+                  }
                 });
-              } else {
-                let respuestassacadas;
-                respuestassacadas = {
-                  formularioRespuestaId: {
-                    idGrupoBase: respuestasdigitadas.grupo,
-                    idPregunta: respuestasdigitadas.pregunta,
-                    idRespuesta: respuestasdigitadas.codigorespuestapadre,
-                    idValorRespuesta: parseInt(respuestasdigitadas.codigorespuestaseleccionada)
-                  },
-                  valor: respuestasdigitadas.valorseleccionado,
-                  valorIndicador: parseInt(respuestasdigitadas.valorrespuestaseleccionada),
-                  photoSrc: respuestasdigitadas.ruta,
-                  observacion: respuestasdigitadas.observacion
-                }
-                formularioRespuesta.push(respuestassacadas);
-              }
-            });
-          }).then(() => {
-            return this.db.respuestastablaparaunidad(up.idUnidadProductiva, this.tipo).then((respuestastabla) => {
-              if (respuestastabla) {
-                respuestastabla.forEach((respuestasdigitadas) => {
+              }).then(() => {
+                return this.db.respuestastablaparaunidad(up.idUnidadProductiva, this.tipo).then((respuestastabla) => {
+                  if (respuestastabla) {
+                    respuestastabla.forEach((respuestasdigitadas) => {
 
-                  let respuestassacadas;
-                  respuestassacadas = {
-                    formularioRespuestaId: {
-                      idGrupoBase: respuestasdigitadas.grupo,
-                      idPregunta: respuestasdigitadas.preguntaid,
-                      idRespuesta: respuestasdigitadas.respuestascodigo,
-                      idValorRespuesta: parseInt(respuestasdigitadas.codigorespuesta)
-                    },
-                    valor: respuestasdigitadas.valor,
-                    valorIndicador: parseInt(respuestasdigitadas.valorrespuesta),
-                    photoSrc: null,
-                    observacion: null
+                      let respuestassacadas;
+                      respuestassacadas = {
+                        formularioRespuestaId: {
+                          idGrupoBase: respuestasdigitadas.grupo,
+                          idPregunta: respuestasdigitadas.preguntaid,
+                          idRespuesta: respuestasdigitadas.respuestascodigo,
+                          idValorRespuesta: parseInt(respuestasdigitadas.codigorespuesta)
+                        },
+                        valor: respuestasdigitadas.valor,
+                        valorIndicador: parseInt(respuestasdigitadas.valorrespuesta),
+                        photoSrc: null,
+                        observacion: null
+                      }
+                      formularioRespuesta.push(respuestassacadas);
+                    })
                   }
-                  formularioRespuesta.push(respuestassacadas);
                 })
-              }
-            })
 
-          }).then(() => {
-            return this.db.noconformidades(up.idUnidadProductiva, this.tipo).then((noconformidad) => {
-              console.log('nconformidad', noconformidad);
-              if (noconformidad) {
-                let noconformidade = noconformidad;
-                let no_conformidades = [];
-                noconformidad.forEach((nconformidad) => {
+              }).then(() => {
+                return this.db.noconformidades(up.idUnidadProductiva, this.tipo).then((noconformidad) => {
 
-                  this.db.tareas(nconformidad.id).then((tareas) => {
-                    let no_conformidadesf;
-                    let codigonc: any;
-                    let asignacionc;
-                    if (nconformidad.heredada == 1) {
-                      codigonc = nconformidad.id;
-                    } else {
-                      codigonc = null;
-                    }
-                    if (nconformidad.asignacion) {
-                      asignacionc = nconformidad.asignacion;
-                    } else {
-                      asignacionc = up.idAsignacion;
-                    }
-                    if (tareas) {
-                      let tareajson = [];
-                      tareas.forEach((elementa) => {
-                        let codigota: any;
-                        console.log(elementa);
-                        if (elementa.heredada == 1) {
-                          codigota = elementa.id;
+                  if (noconformidad) {
+                    let no_conformidades = [];
+                    noconformidad.forEach((nconformidad) => {
+
+                      this.db.tareas(nconformidad.id).then((tareas) => {
+                        let no_conformidadesf;
+                        let codigonc: any;
+                        let asignacionc;
+                        if (nconformidad.heredada == 1) {
+                          codigonc = nconformidad.id;
                         } else {
-                          codigota = null;
+                          codigonc = null;
                         }
+                        if (nconformidad.asignacion) {
+                          asignacionc = nconformidad.asignacion;
+                        } else {
+                          asignacionc = up.idAsignacion;
+                        }
+                        if (tareas) {
+                          let tareajson = [];
+                          tareas.forEach((elementa) => {
+                            let codigota: any;
+                            console.log(elementa);
+                            if (elementa.heredada == 1) {
+                              codigota = elementa.id;
+                            } else {
+                              codigota = null;
+                            }
 
-                        tareajson.push({
-                          "codigo": codigota,
-                          "noConformidad": codigonc,
-                          "nombre": elementa.nombre,
-                          "descripcion": elementa.detalle,
-                          "encargado": elementa.encargado,
-                          "estado": elementa.estado,
-                          "fechaPautadaCierre": elementa.fechaPautadaCierre,
-                          "fechaRealCierre": elementa.fechaRealCierre,
-                          "fechaCreacion": elementa.fechaCreacion,
-                          "activo": 1,
-                          "fechaModificacion": null,
-                          "usuarioCreacion": 1,
-                          "usuarioModificacion": 1
-                        });
+                            tareajson.push({
+                              "codigo": codigota,
+                              "noConformidad": codigonc,
+                              "nombre": elementa.nombre,
+                              "descripcion": elementa.detalle,
+                              "encargado": elementa.encargado,
+                              "estado": elementa.estado,
+                              "fechaPautadaCierre": elementa.fechaPautadaCierre,
+                              "fechaRealCierre": elementa.fechaRealCierre,
+                              "fechaCreacion": elementa.fechaCreacion,
+                              "activo": 1,
+                              "fechaModificacion": null,
+                              "usuarioCreacion": 1,
+                              "usuarioModificacion": 1
+                            });
+                          })
+                          no_conformidadesf = {
+                            "noConformidad": {
+                              "codigo": codigonc,
+                              "asignacion": asignacionc,
+                              "categoria": nconformidad.categoria,
+                              "detalle": nconformidad.detalle,
+                              "descripcion": nconformidad.descripcion,
+                              "fechaPautadaCierre": nconformidad.fechaposiblecierre,
+                              "fechaModificacion": null,
+                              "fechaRealCierre": nconformidad.fechafinalizado,
+                              "status": nconformidad.estado,
+                              "fechaCreacion": nconformidad.fechacreacion,
+                              "usuarioCreacion": null,
+                              "usuarioModificacion": null,
+                              "activo": 1
+                            },
+                            "tareas": tareajson
+                          }
+                          no_conformidades.push(no_conformidadesf);
+
+                        } else {
+                          no_conformidadesf = {
+                            "noConformidad": {
+                              "codigo": codigonc,
+                              "asignacion": asignacionc,
+                              "categoria": nconformidad.categoria,
+                              "detalle": nconformidad.detalle,
+                              "descripcion": nconformidad.descripcion,
+                              "fechaPautadaCierre": nconformidad.fechaposiblecierre,
+                              "fechaModificacion": null,
+                              "fechaRealCierre": nconformidad.fechafinalizado,
+                              "status": nconformidad.estado,
+                              "fechaCreacion": nconformidad.fechacreacion,
+                              "usuarioCreacion": null,
+                              "usuarioModificacion": null,
+                              "activo": 1
+                            },
+                            "tareas": null
+                          }
+                          no_conformidades.push(no_conformidadesf);
+                        }
                       })
-                      no_conformidadesf = {
-                        "noConformidad": {
-                          "codigo": codigonc,
-                          "asignacion": asignacionc,
-                          "categoria": nconformidad.categoria,
-                          "detalle": nconformidad.detalle,
-                          "descripcion": nconformidad.descripcion,
-                          "fechaPautadaCierre": nconformidad.fechaposiblecierre,
-                          "fechaModificacion": null,
-                          "fechaRealCierre": nconformidad.fechafinalizado ,
-                          "status": nconformidad.estado,
-                          "fechaCreacion": nconformidad.fechacreacion,
-                          "usuarioCreacion": null,
-                          "usuarioModificacion": null,
-                          "activo": 1
+                    });
+                    let datosaenviar = {
+                      formulario: {
+                        "formularioBase": { codigo: formulario },
+                        "asignacion": up.idAsignacion,
+                        'mapa': up.mapa,
+                        fechaInicial: up.fechainicio,
+                        localizacionInicial: {
+                          "longitude": 10.10001,
+                          "latitude": 10.000
                         },
-                        "tareas": tareajson
-                      }
-                      no_conformidades.push(no_conformidadesf);
-
-                    } else {
-                      no_conformidadesf = {
-                        "noConformidad": {
-                          "codigo": codigonc,
-                          "asignacion": asignacionc,
-                          "categoria": nconformidad.categoria,
-                          "detalle": nconformidad.detalle,
-                          "descripcion": nconformidad.descripcion,
-                          "fechaPautadaCierre": nconformidad.fechaposiblecierre,
-                          "fechaModificacion": null,
-                          "fechaRealCierre": nconformidad.fechafinalizado,
-                          "status": nconformidad.estado,
-                          "fechaCreacion": nconformidad.fechacreacion,
-                          "usuarioCreacion": null,
-                          "usuarioModificacion": null,
-                          "activo": 1
+                        fechaFinal: up.fechafin,
+                        localizacionFinal: {
+                          "longitude": 10.0000,
+                          "latitude": 10.000
+                        }
+                      }, formularioRespuesta,
+                      no_conformidades
+                    };
+                    console.log('prueba', datosaenviar);
+                    this.formulario.enviarrespuesta(datosaenviar, up, this.tipo)
+                  } else {
+                    let datosaenviar = {
+                      formulario: {
+                        "formularioBase": { codigo: formulario },
+                        "asignacion": up.idAsignacion,
+                        'mapa': up.mapa,
+                        fechaInicial: up.fechainicio,
+                        localizacionInicial: {
+                          "longitude": 10.0000,
+                          "latitude": 10.000
                         },
-                        "tareas": null
-                      }
-                      no_conformidades.push(no_conformidadesf);
-                    }
-                  })
-                });
-                let datosaenviar = {
-                  formulario: {
-                    "formularioBase": { codigo: formulario },
-                    "asignacion": up.idAsignacion,
-                    'mapa': up.mapa,
-                    fechaInicial: up.fechainicio,
-                    localizacionInicial: {
-                      "longitude": 10.10001,
-                      "latitude": 10.000
-                    },
-                    fechaFinal: up.fechafin,
-                    localizacionFinal: {
-                      "longitude": 10.0000,
-                      "latitude": 10.000
-                    }
-                  }, formularioRespuesta,
-                  no_conformidades
-                };
-                console.log('prueba', datosaenviar);
-                 this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
-                  let envio = ok;
-                  if (ok) {
-                  } else {
-                    this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
+                        fechaFinal: up.fechafin,
+                        localizacionFinal: {
+                          "longitude": 10.000,
+                          "latitude": 10.000
+                        },
+                      }, formularioRespuesta
+                    };
+
+
+                    console.log('pruebas sin no conformidades', datosaenviar);
+                    this.formulario.enviarrespuesta(datosaenviar, up, this.tipo)
                   }
-                }); 
 
 
-              }else {
-                let datosaenviar = {
-                  formulario: {
-                    "formularioBase": { codigo: formulario },
-                    "asignacion": up.idAsignacion,
-                    'mapa': up.mapa, 
-                    fechaInicial: up.fechainicio,
-                localizacionInicial: {
-                  "longitude": 10.0000,
-                  "latitude": 10.000
-                },
-                fechaFinal: up.fechafin,
-                localizacionFinal: {
-                  "longitude": 10.000,
-                  "latitude": 10.000
-                },
-                  }, formularioRespuesta
-                };
-                
-
-                console.log('pruebas sin no conformidades', datosaenviar);
-                this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
-                  let envio = ok;
-                  if (ok) {
-                    this.handleError('formulario de la unidad productiva ' + up.nombre + ' envidado correctamente');
-                  } else {
-                    this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
-                  }
                 });
-              }
+              });
+
 
 
             });
+
           });
 
 
 
-        });
 
-      });
+        }, err => {
+          console.log('err', err);
+        })
+      })
+      this.items=[];
+      this.evento = [];
+      this.habilitarenvio = false;
+//      this.traerunidades('1');
 
+    } else {
+//      this.traerunidades('1');
 
-
-
-    },err=>{
-      console.log('err', err);
-    })
-  })
-
-  this.evento=[];
-  this.habilitarenvio=false;
-  this.traerunidades('1');
-
-} else {
-  this.traerunidades('1');
-
-  this.handleError('Debe recargar la pagina para enviar nuevamente los formularios');
-}
+      this.handleError('Debe recargar la pagina para enviar nuevamente los formularios');
+    }
 
 
-}
+  }
 
 
 }

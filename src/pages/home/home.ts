@@ -1,18 +1,16 @@
 import { Component } from '@angular/core';
-import { NavController, ToastController, LoadingController } from 'ionic-angular';
+import {ModalController, NavController, ToastController, LoadingController, AlertController } from 'ionic-angular';
 import { Storage } from "@ionic/storage";
-import { Nav, Platform, ModalController } from 'ionic-angular';
 import { UnidadproductivaPage } from '../unidadproductiva/unidadproductiva';
 import { CasoespecialPage } from '../casoespecial/casoespecial';
 import { FormulariosPage } from '../formularios/formularios';
 import { EnviardatosPage } from './sinc';
-import { Camera, CameraOptions } from '@ionic-native/camera';
-import { File, DirectoryEntry } from '@ionic-native/file';
 import { FormulariosProvider } from '../../providers/formularios/formularios';
-import { audit } from 'rxjs/operators/audit';
 import { AuthHttp } from "angular2-jwt";
-import { SERVER_URL, FORMULARIO_AUDITORIA } from "../../config";
+import { FORMULARIO_AUDITORIA } from "../../config";
 import { FORMULARIO_PROMOTORIA } from "../../config";
+import { AuthProvider } from '../../providers/auth/auth';
+
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
@@ -26,19 +24,29 @@ export class HomePage {
   productor: any;
   auditor: boolean;
   promotor: boolean;
+  empresa;
+  usuario;
   constructor(
+    public authService: AuthProvider,
     public formulario: FormulariosProvider,
     public modalCtrl: ModalController,
     public navCtrl: NavController,
     private readonly storage: Storage,
-    private camera: Camera,
-    private file: File,
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
-    public authHttp: AuthHttp
+    public authHttp: AuthHttp,
+    public alertCtrl: AlertController
 
   ) {
-    //this.formulario.formularioid(1002).then((idf)=>{console.log('id formulario', idf)})
+  }
+
+  ionViewWillEnter() {
+    this.storage.get('empresa').then((empresa) => {
+      this.empresa = empresa;
+    });
+    this.storage.get('identificador').then(usuario => {
+      this.usuario = usuario;
+    });
 
     this.auditor = false;
     this.promotor = false;
@@ -67,18 +75,8 @@ export class HomePage {
 
     }
     );
-
-
-
   }
 
-  ionViewWillEnter() {
-
-  }
-
-  abririmagen(ruta) {
-    console.log(ruta);
-  }
 
   openPage(caso) {
     if (caso == 1) {
@@ -101,133 +99,102 @@ export class HomePage {
     this.navCtrl.push(CasoespecialPage, { caso: 1 });
   }
 
-  /*   getPicture() {
-      this.mensajes="";
-      let options: CameraOptions = {
-        quality: 100,
-        destinationType: this.camera.DestinationType.FILE_URI,
-        sourceType: this.camera.PictureSourceType.CAMERA,
-        encodingType: this.camera.EncodingType.PNG,
-        mediaType: this.camera.MediaType.PICTURE
-      }
-      let targetPath = this.file.externalDataDirectory;
-      let nombrecarpetapadre = 'UNIDAD1';// unidad productiva 
-      let idgrupo = '1';
-      let preguntaid = 1;
-  
-  
-      this.camera.getPicture(options).then(imageData => {
-  
-        return this.file.createDir(targetPath, nombrecarpetapadre, false).then(() => {
-        }, () => {
-        }).then(() => {
-          return this.file.createDir(targetPath + `/${nombrecarpetapadre}`, idgrupo.toString(), false).then(() => {
-          }, () => { });
-        }).then(() => {
-          return this.file.copyFile(
-            this.file.externalCacheDirectory, imageData.replace(this.file.externalCacheDirectory, ""),
-            targetPath + `/${nombrecarpetapadre}/${idgrupo.toString()}`,
-            imageData.replace(this.file.externalCacheDirectory, "")).then(() => {
-              this.handleError('imagen ruta: '+targetPath + `/${nombrecarpetapadre}/${idgrupo.toString()}`);
-                this.formulario.enviarfotoprueba(targetPath + `${nombrecarpetapadre}/${idgrupo.toString()}`,imageData.replace(this.file.externalCacheDirectory, "")).then((data)=>{
-                  this.mensajes=data
-                },(err)=>{
-                  this.mensajes=err
-                });
-                        }, () => { });
-        }).then((ok
-        ) => {
-          this.file.removeFile(this.file.externalCacheDirectory, imageData.replace(this.file.externalCacheDirectory, ""
-          )).then((ok) => {
-            console.log(JSON.stringify(ok));
-          }, (err) => { console.log(JSON.stringify(err)) });
-        })
-      }
-      ).catch(error => {
-        console.error(JSON.stringify(error));
-      });
-    }
-  
-    galeria() {
-      this.mensajes="";
-      
-      let targetPath = this.file.externalDataDirectory;
-      let nombrecarpetapadre = 'Unidad2';// unidad productiva 
-      let idgrupo = '2';
-      let preguntaid = '2';
-  
-      let options: CameraOptions = {
-        sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
-        destinationType: this.camera.DestinationType.DATA_URL,
-        mediaType: this.camera.MediaType.PICTURE,
-        saveToPhotoAlbum: true,
-        encodingType: this.camera.EncodingType.PNG
-      }
-      this.camera.getPicture(options)
-        .then(imageData => {
-          let image = "data:image/png;base64," + imageData;
-          let block = image.split(";");
-          let contentType = block[0].split(":")[1];
-          let realData = block[1].split(",")[1];
-          let blob = this.b64toBlob(realData, contentType, 512);
-          let imgname = Date.now().toString() + '.png';
-          
-          return this.file.createDir(targetPath, nombrecarpetapadre, false).then(() => { }, () => { }).then(() => {
-            return this.file.createDir(targetPath + `/${nombrecarpetapadre}`, idgrupo.toString(), false).then(() => {
-            }, () => { });
-          }).then(() => {
-            return this.file.writeFile(targetPath + `${nombrecarpetapadre}/${idgrupo.toString()}/`, imgname, blob).then((ok) => { }, (err) => { });
-          }).then(() => {
-            this.formulario.enviarfotoprueba(targetPath + `${nombrecarpetapadre}/${idgrupo.toString()}`,imgname).then((data)=>{
-              this.mensajes=data
-            },(err)=>{
-              this.mensajes=err
-            });
-          })
-        }).catch(error => {
-          console.error('error', error);
-        });
-    }
-  
-    b64toBlob(b64Data, contentType, sliceSize) {
-      contentType = contentType || '';
-      sliceSize = sliceSize || 512;
-  
-      var byteCharacters = atob(b64Data);
-      var byteArrays = [];
-  
-      for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-        var slice = byteCharacters.slice(offset, offset + sliceSize);
-  
-        var byteNumbers = new Array(slice.length);
-        for (var i = 0; i < slice.length; i++) {
-          byteNumbers[i] = slice.charCodeAt(i);
-        }
-  
-        var byteArray = new Uint8Array(byteNumbers);
-  
-        byteArrays.push(byteArray);
-      }
-  
-      var blob = new Blob(byteArrays, { type: contentType });
-      return blob;
-    } */
 
   handleError(error: string) {
     let message: string;
     message = error;
     const toast = this.toastCtrl.create({
       message,
-      duration: 5000,
+      duration: 7000,
       position: 'bottom'
     });
     toast.present();
   }
 
+  descargardatos(){
+    let alert = this.alertCtrl.create({
 
-  cmabiarestado() {
-    this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/1`, 'ACTIVE').subscribe((d) => { console.log(d) }, err => { console.log(err) })
+      title: 'Descargar datos',
+      message: 'Unez vez descargada la informacion, se borraran todos los datos diligenciados del telefono',
+      buttons: [
+        {
+          text: 'Validar',
+          handler: () => {
 
+           }
+        },
+        {
+          text: 'Aceptar',
+          handler: (datos) => {
+            this.login();
+  //          this.precargardatos(datos);   
+          }
+        }
+      ]
+    });
+    alert.present();
   }
+  
+  login(){
+    let alert = this.alertCtrl.create({
+
+      title: 'Login',
+      message: 'Una vez se valide la contraseña todos los datos de la app seran borrados',
+      inputs: [
+        {
+          name: 'pass',
+          placeholder: 'contraseña',
+          type: 'password',
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          handler: () => {
+
+           }
+        },
+        {
+          text: 'Aceptar',
+          handler: (datos) => {
+            this.precargardatos(datos);
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
+
+  precargardatos(value: any) {
+
+    let datos={
+      username:this.usuario,
+      password:value.pass,
+      empresa:this.empresa
+    }
+      let loading = this.loadingCtrl.create({
+      spinner: 'bubbles',
+      content: 'Validando datos...'
+    });
+    loading.present();
+    
+    this.authService.precarguededatos(datos).finally(()=>{
+      loading.dismiss();
+    }).subscribe(() => {
+
+      this.ionViewWillEnter();  
+      },
+      (error) => {
+
+        if (error.status && error.status === 401) {
+          this.handleError('Usuario y/o contraseña incorrecto');
+
+        }
+        else {
+          this.handleError(`Error : ${error.statusText}`);
+        }
+        }); 
+  }
+
 
 }

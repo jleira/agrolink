@@ -63,6 +63,6 @@ export class PerfilPage {
     );
   }
   logout() {
-    this.auth.logout();
+    this.auth.logout(1);
   } 
 }

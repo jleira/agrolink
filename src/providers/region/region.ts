@@ -121,7 +121,8 @@ export class RegionProvider {
   }
   municipiosendepartamentos(departamentos) {
     return this.database.municipiosendepa(departamentos).then((datadepa: any) => {
-      this.depa = datadepa.join();
+
+      this.depa = datadepa.join(',');
       return this.depa;
     });
   }

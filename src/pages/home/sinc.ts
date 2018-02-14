@@ -200,6 +200,7 @@ export class EnviardatosPage {
         {
           name: 'pass',
           placeholder: 'contraseña',
+          type: 'password'
         }
       ],
       buttons: [
@@ -267,7 +268,7 @@ export class EnviardatosPage {
           this.db.respuestasparaunidad(up.idUnidadProductiva, this.tipo).then((data) => {
             data.forEach((respuestasdigitadas) => {
               if (respuestasdigitadas.ruta) {
-                this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta);
+                this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta,respuestasdigitadas.unidadproductiva);
               }
               let valor = respuestasdigitadas.codigorespuestaseleccionada.split('_');
               if (valor.length > 0) {
@@ -442,13 +443,7 @@ export class EnviardatosPage {
                   no_conformidades
                 };
                 console.log('prueba', datosaenviar);
-                 this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
-                  let envio = ok;
-                  if (ok) {
-                  } else {
-                    this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
-                  }
-                }); 
+                 this.formulario.enviarrespuesta(datosaenviar, up, this.tipo) 
 
 
               }else {
@@ -472,14 +467,7 @@ export class EnviardatosPage {
                 
 
                 console.log('pruebas sin no conformidades', datosaenviar);
-                this.formulario.enviarrespuesta(datosaenviar, up, this.tipo).then((ok) => {
-                  let envio = ok;
-                  if (ok) {
-                    this.handleError('formulario de la unidad productiva ' + up.nombre + ' envidado correctamente');
-                  } else {
-                    this.handleError('formulario de la unidad productiva ' + up.nombre + ' no se puedo enviar, intentelonuevamente');
-                  }
-                });
+                this.formulario.enviarrespuesta(datosaenviar, up, this.tipo)
               }
 
 

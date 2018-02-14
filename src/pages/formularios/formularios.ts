@@ -325,10 +325,12 @@ export class FormulariosPage {
       let fechaentro;
       fechaentro = new Date();
       fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' + ("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
+      this.datofecha=fechaentro;
+
        this.geolocation.getCurrentPosition().then((resp) => {
-       this.datofecha=fechaentro;
        this.datolatitud=resp.coords.latitude.toString();
        this.datolongitud=resp.coords.longitude.toString();
+       this.handleError('ESTA ES LA UNICACION DEL TELEFONO, '+ this.datolatitud +' '+this.datolongitud);
       }).catch((error) => {
         this.datofecha=fechaentro;
         this.datolatitud=null;
@@ -736,7 +738,7 @@ export class FormulariosPage {
       this.handleError('no se pudo acceder a la ubicacion del telefono ' + error.message);
     }).then(() => {
     });
-    this.formulario.preguntasgrupo(this.grupoidselected, this.tipo).then(preguntasg => {
+    return this.formulario.preguntasgrupo(this.grupoidselected, this.tipo).then(preguntasg => {
       console.log(preguntasg);
       this.items = preguntasg;
       if (this.items) {

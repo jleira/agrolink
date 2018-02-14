@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams , ViewController} from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
 import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 
 
@@ -11,95 +11,130 @@ import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 export class FiltroupPage {
 
   opciones: any;
-  mostrar: any = '';//todas , pendientes, terminadas
-  vereda :any; // por defecto se muestran todas, en caso de que quiera ver una o varias en especifico
-  ordenar_por:any;
+  vereda: any; // por defecto se muestran todas, en caso de que quiera ver una o varias en especifico
+  mostrar = '0,1,2';//todas , pendientes, terminadas
+  ordenar_por: any;
   orientacion: any;
   loading: any;
   items: any;
-  veredaselec:any;
-  territorio:any;
-  seccion:boolean;
+  veredaselec: any;
+  territorio: any;
+  seccion: boolean;
   seccion_select;
   todo;
   constructor(
-    public navCtrl: NavController, 
+    public navCtrl: NavController,
     public navParams: NavParams,
     public uproductiva: UproductivaProvider,
-  public viewCtrl: ViewController
+    public viewCtrl: ViewController
   ) {
+    this.seccion = true;
   }
 
-  enviar(){
-    if(this.mostrar ==""){
-      this.mostrar=1;
-     }    
-     if( typeof this.orientacion =="undefined"){
-       this.orientacion='DESC';
-      };
-      if( typeof this.vereda =="undefined"){
-        this.vereda=this.veredaselec;
-       };
-       if( typeof this.territorio =="undefined"){
-        this.territorio=1;
-       };
-       if( typeof this.ordenar_por =="undefined"){
-        this.ordenar_por="";
-       };
+  enviar() {
 
-     this.viewCtrl.dismiss({
-       territorio:this.territorio,
-       mostrar : this.mostrar, 
-       vereda : this.vereda, 
-       ordenar_por: this.ordenar_por,
-       orientacion:  this.orientacion
-      } );
-   }
-   close(){
-    this.viewCtrl.dismiss();        
-  }
-  enviar2(){
-    
-      console.log(this.territorio);
-      if(this.territorio==1){
-        this.seccion=true; 
-        this.seccion_select="";
-        this.todo="";
-      }
-      if(this.territorio==2){
-        this.seccion=false;
-        this.seccion_select="Paises";
-        this.uproductiva.todoslospaises().then((data:any)=>{this.veredaselec=data;return this.vereda})
-        this.opciones=this.uproductiva.paises2().then((data:any)=>{this.opciones=data;return this.opciones});
-
-        this.todo="todos";
-      }
-      if(this.territorio==3){
-        this.seccion=false;
-        this.seccion_select="Departamentos";
-        this.uproductiva.todoslosdepartamentos().then((data:any)=>{this.veredaselec=data;return this.vereda})
-        this.opciones=this.uproductiva.departamentos2().then((data:any)=>{this.opciones=data;return this.opciones});
-        this.todo="todos";
-        
-      }
-      if(this.territorio==4){
-        this.seccion=false;
-        this.seccion_select="Municipios";
-        this.uproductiva.todoslosmunicipios().then((data:any)=>{this.veredaselec=data;return this.vereda})
-        this.opciones=this.uproductiva.municipios2().then((data:any)=>{this.opciones=data;return this.opciones});
-        this.todo="todos";
-        
-      }
-      if(this.territorio==5){
-        this.seccion=false;
-        this.seccion_select="Regiones";
-        this.uproductiva.todoslosregiones().then((data:any)=>{this.veredaselec=data;return this.vereda})
-        this.opciones=this.uproductiva.regiones2().then((data:any)=>{this.opciones=data;return this.opciones});    
-        this.todo="todas";
-      }
-      
-      return this.seccion, this.seccion_select, this.opciones,this.todo;
+    if (!this.mostrar) {
+      this.mostrar = '0,1,2';
     }
 
+    if (this.territorio) {
+      if (this.territorio > 1) {
+
+        if(this.vereda){
+          this.vereda = this.vereda.join(',');
+          if (this.vereda == "") {
+            let veredas=[];
+            this.opciones.forEach(element => {
+              veredas.push(element.id);
+            });
+            console.log('this',veredas);
+            this.vereda = veredas.join(',');
+  
+    
+            }
+        }else{
+          let veredas=[];
+          this.opciones.forEach(element => {
+            veredas.push(element.id);
+          });
+          console.log('this',veredas);
+          this.vereda = veredas.join(',');        
+        }
+      } else {
+        this.vereda = false;
+      }
+    } else {
+      this.territorio = 1;
+      this.vereda = false;
+    }
+
+
+    if (!this.orientacion) {
+      this.orientacion = false;
+    }
+
+
+    console.log(this.mostrar, this.territorio, this.vereda, this.orientacion);
+
+    this.viewCtrl.dismiss({
+      territorio: this.territorio,
+      mostrar: this.mostrar,
+      vereda: this.vereda,
+      orientacion: this.orientacion
+    });
+  }
+  close() {
+    this.viewCtrl.dismiss(false);
+  }
+  enviar2() {
+
+    console.log(this.territorio);
+    if (this.territorio == 1) {
+      this.seccion = true;
+      this.seccion_select = "";
+      this.todo = "";
+      this.opciones = [];
+      this.vereda = [];
+    }
+    if (this.territorio == 2) {
+      this.seccion = false;
+      this.seccion_select = "Paises";
+      this.uproductiva.paises2().then((data: any) => { console.log(data); this.opciones = data; return this.opciones }, err => {
+        console.log(err);
+      });
+
+      this.todo = "todos";
+    }
+    if (this.territorio == 3) {
+      this.seccion = false;
+      this.seccion_select = "Departamentos";
+      this.uproductiva.departamentos2().then((data: any) => { console.log(data); this.opciones = data; return this.opciones }, err => {
+        console.log(err);
+      });
+      this.todo = "todos";
+
+    }
+    if (this.territorio == 4) {
+      this.seccion = false;
+      this.seccion_select = "Municipios";
+      this.uproductiva.municipios2().then((data: any) => { console.log(data); this.opciones = data; return this.opciones }, err => {
+        console.log(err);
+      });
+      this.todo = "todos";
+
+    }
+    if (this.territorio == 5) {
+      this.seccion = false;
+      this.seccion_select = "Regiones";
+      this.uproductiva.regiones2().then((data: any) => { console.log(data); this.opciones = data; return this.opciones }, err => {
+        console.log(err);
+      });
+      this.todo = "todas";
+    }
+
+    //    return this.seccion, this.seccion_select, this.opciones, this.todo;
+
+
+  }
 
 }

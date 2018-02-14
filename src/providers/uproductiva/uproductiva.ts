@@ -59,7 +59,7 @@ export class UproductivaProvider {
   agregar(element,long,lat,tipo){
     this.database.agregarunidadproductiva(element.unidadProductiva['idUnidadProductiva'],element.unidadProductiva['nombre'],element.unidadProductiva['fechaIngreso'],
       element.unidadProductiva['region']['idRegion'],long,lat,element.unidadProductiva['productor']['idProductor'],tipo,element.idAsignacion
-    ).then((ok) => {console.log('ok',ok);
+    ).then((ok) => {
         this.validarproductor(element.unidadProductiva['productor']['idProductor']).then((data: any) => {
             if (data == 0) {
               this.database.agregarproductor(
@@ -70,66 +70,19 @@ export class UproductivaProvider {
                 element.unidadProductiva['productor']['annoIngreso'],
                 element.unidadProductiva['productor']['ultimaAplicacion']
               ).then(
-                (ok) => {console.log('ok',ok)},
-                (err) => {console.log('err',err) }
+                (ok) => {},
+                (err) => {}
                 );
             }
-          },err=>{console.log('err',err) }
+          },err=>{ }
         )
       },
-      (err) => {console.log('err',err) }
+      (err) => { }
       );
   }
 
 
 
-
-  filterItems(searchTerm) {
-
-
-    /*        
-   if(searchTerm==""){
-    return this.items;
-           }
-    return this.items.filter((item) => {
-             return item.region == searchTerm ;
-           });    
-    */
-  }
-  unidadespendientesporregiones(regs: any, orientacion) {
-    let reg = regs;
-    return this.database.unidadesporregionpendientes(reg).then((data: any) => {
-      this.items = data;
-      return this.items;
-    });
-  }
-  unidadesterminadasporregiones(regs: any, orientacion) {
-    let reg = regs;
-    return this.database.unidadesporregionterminadas(reg).then((data: any) => {
-      this.items = data;
-      return this.items;
-    });
-  }
-  unidadestodasporregiones(regs: any, orientacion) {
-    let reg = regs;
-
-    return this.database.unidadesporregiontodas(reg, orientacion).then((data: any) => {
-      this.items = data;
-      return this.items;
-    });
-  }
-  unidadespendientes() {
-    return this.database.unidadespendientes().then((data: any) => {
-      this.items = data;
-      return this.items;
-    });
-  }
-  unidadesterminadas() {
-    return this.database.unidadesterminadas().then((data: any) => {
-      this.items = data;
-      return this.items;
-    });
-  }
   detallesregion(id: any) {
     let idups = id;
     return this.database.detallesregion(idups).then((data: any) => {
@@ -159,9 +112,9 @@ export class UproductivaProvider {
     });
   }
 
-  detallesf(id: any) {
+  detallesf(id: any, tipo) {
     this.idup = id;
-    return this.database.unidadproductivaporid(this.idup).then((data: any) => {
+    return this.database.unidadproductivaporid(this.idup, tipo).then((data: any) => {
       this.items = data;
       return this.items;
     });
@@ -196,10 +149,6 @@ export class UproductivaProvider {
         }
       );
   }
-  
-  
-
-
 
   validarproductor(idproductor: number) {
     return this.database.existeproductor(idproductor).then(
@@ -234,29 +183,13 @@ export class UproductivaProvider {
       return regiones;
     })
   }
-  todoslospaises() {
-    return this.database.todoslospaisesid().then((data: any) => {
-      let regio = data;
-      return regio;
-    })
-  }
-  todoslosdepartamentos() {
-    return this.database.todoslosdepartamentosid().then((data: any) => {
-      let regio = data;
-      return regio;
-    })
-  }
-  todoslosmunicipios() {
-    return this.database.todoslosmunicipiosid().then((data: any) => {
-      let regio = data;
-      return regio;
-    })
-  }
-  todoslosregiones() {
-    return this.database.todoslosregionesid().then((data: any) => {
-      let regio = data;
-      return regio;
-    })
-  }
+
+todaslasunidades(regiones,terminado,tipo,orientacion){
+  return this.database.unidadesfiltro(regiones,terminado,tipo,orientacion).then((data)=>{
+    this.items=data;
+    return this.items;
+  })
+}
 
 }
+ 

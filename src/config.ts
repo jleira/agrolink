@@ -1,4 +1,4 @@
-export const SERVER_URL = "http://10.0.0.6:10080/Agrolink/";
+export const SERVER_URL = "http://vps152534.vps.ovh.ca:10080/Agrolink/";
 export const NIVEL_BASICO=1;
 export const TIPO_FECHA='YYYY-MM-DD';
 export const FORMULARIO_AUDITORIA= 1002;
