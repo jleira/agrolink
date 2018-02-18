@@ -6,7 +6,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { DbProvider } from '../../providers/db/db';
 import { UpdetallesPage } from '../updetalles/updetalles';
 import { FormulariosPage } from '../formularios/formularios';
-import { JwtHelper, AuthHttp} from "angular2-jwt";
+import { JwtHelper, AuthHttp } from "angular2-jwt";
 import { Http } from '@angular/http';
 import { SERVER_URL } from "../../config";
 import { Storage } from "@ionic/storage";
@@ -190,7 +190,7 @@ export class CasoespecialPage {
     console.log('id generado');
     let codigogenerado = this.rand_code('0123456789ABCDEFGHUIJK', 5);
 
-    this.db.unidadproductivaporid(codigogenerado,1001).then((ok) => {
+    this.db.unidadproductivaporid(codigogenerado, 1001).then((ok) => {
       if (ok.length > 0) {
         this.generarid();
       } else {
@@ -390,8 +390,8 @@ export class CasoespecialPage {
             idRegion: up.regionId,
             nivel: 1,
             estado: true,
-            longitud: up.localizacion_longitude,
-            latitud: up.localizacion_latitude
+            longitud: Number(up.localizacion_longitude),
+            latitud: Number(up.localizacion_latitude)
           }
         }
         console.log('unidad enviada', nunidad);
@@ -403,8 +403,8 @@ export class CasoespecialPage {
             console.log(ok);
             let unidadantigua = up.idUnidadProductiva;
             up.idUnidadProductiva = data.json().unidadProductiva.idUnidadProductiva;
-          
-            up.idAsignacion=data.json().idAsignacion;
+
+            up.idAsignacion = data.json().idAsignacion;
             console.log('up', up);
             if (up.mapa) {
               up.mapa = "data:image/png:base64," + up.mapa;
@@ -581,13 +581,13 @@ export class CasoespecialPage {
                         'mapa': up.mapa,
                         fechaInicial: up.fechainicio,
                         localizacionInicial: {
-                          "longitude": 10.10001,
-                          "latitude": 10.000
+                          "longitude": Number(up.longitudinicio),
+                          "latitude": Number(up.latitudinicio)
                         },
                         fechaFinal: up.fechafin,
                         localizacionFinal: {
-                          "longitude": 10.0000,
-                          "latitude": 10.000
+                          "longitude": Number(up.longitudfin),
+                          "latitude": Number(up.latitudfin)
                         }
                       }, formularioRespuesta,
                       no_conformidades
@@ -602,13 +602,14 @@ export class CasoespecialPage {
                         'mapa': up.mapa,
                         fechaInicial: up.fechainicio,
                         localizacionInicial: {
-                          "longitude": 10.0000,
-                          "latitude": 10.000
+                          "longitude": Number(up.longitudinicio),
+                          "latitude": Number(up.latitudinicio)
                         },
                         fechaFinal: up.fechafin,
                         localizacionFinal: {
-                          "longitude": 10.000,
-                          "latitude": 10.000
+                          "longitude": Number(up.longitudfin),
+                          "latitude": Number(up.latitudfin)
+
                         },
                       }, formularioRespuesta
                     };
@@ -635,13 +636,13 @@ export class CasoespecialPage {
           console.log('err', err);
         })
       })
-      this.items=[];
+      this.items = [];
       this.evento = [];
       this.habilitarenvio = false;
-//      this.traerunidades('1');
+      //      this.traerunidades('1');
 
     } else {
-//      this.traerunidades('1');
+      //      this.traerunidades('1');
 
       this.handleError('Debe recargar la pagina para enviar nuevamente los formularios');
     }

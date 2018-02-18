@@ -156,7 +156,6 @@ export class AuthProvider {
                       let ultimaiteracion=data.json().length;
                       let iteracion = 0;
                       data.json().forEach(element => {
-                        iteracion= iteracion+1;  
                         if (element.periodo == null) {
                           per = null;
                         } else {
@@ -164,11 +163,13 @@ export class AuthProvider {
                         }
 
                         this.database.guardarformulario(element.codigo, element.nombre, element.observaciones, element.cataTienCodigo.codigo, per).then((ok) => {
+                          iteracion= iteracion+1;  
+                          console.log('igualdad',ultimaiteracion,iteracion)
                           if(ultimaiteracion==iteracion){
                             loadingform.dismiss();
                             this.authUser.next(jwt);
                           }
-                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'CLOSED').subscribe((d)=>{},err=>{})  
+//                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'CLOSED').subscribe((d)=>{},err=>{})  
                         }, err => {
                           loadingform.dismiss();
                           if (this.cancelar == 0) {
@@ -222,8 +223,9 @@ export class AuthProvider {
                                         if (preguntatabla.json()) {
                                           preguntatabla.json().preguntaTabla.forEach(preguntatablanueva => {
                                             if (preguntatablanueva.observacion === true) {
+                                              console.log(preguntatablanueva);
                                               preguntatablanueva.observacion = 1;
-                                              this.database.guardarpreguntatabla(
+ /*                                              this.database.guardarpreguntatabla(
                                                 preguntatablanueva.preguntaTablaId.codigoPregunta.codigo,
                                                 preguntatablanueva.preguntaTablaId.codigoPreguntaPadre.codigo,
                                                 preguntatablanueva.preguntaTablaId.codigoPregunta.enunciado,
@@ -242,8 +244,9 @@ export class AuthProvider {
                                                   }
                                                   
                                                 });
-                                            } else {
+  */                                           } else{
                                               preguntatablanueva.observacion = 0;
+                                            }
                                               this.database.guardarpreguntatabla(
                                                 preguntatablanueva.preguntaTablaId.codigoPregunta.codigo,
                                                 preguntatablanueva.preguntaTablaId.codigoPreguntaPadre.codigo,
@@ -283,7 +286,7 @@ export class AuthProvider {
                                                   }
                                                 }
                                                 );
-                                            }
+                                            
                                           });
                                         } else {
                                           if (this.cancelar == 0) {
@@ -525,6 +528,7 @@ export class AuthProvider {
 
 
   logout(caso) {
+    console.log(caso);
     if(caso==1){
       this.database.limpiardb().then((ok) => { }, () => { });
       this.storage.remove('jwt').then(() => this.authUser.next(null));
@@ -539,7 +543,7 @@ export class AuthProvider {
       this.storage.remove('subperiodo');
   
     }else if(caso== 2){
-      
+            
     }
   }
   guardarinfo(value, empresa) {

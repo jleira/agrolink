@@ -118,7 +118,7 @@ export class HomePage {
       message: 'Unez vez descargada la informacion, se borraran todos los datos diligenciados del telefono',
       buttons: [
         {
-          text: 'Validar',
+          text: 'Cancelar',
           handler: () => {
 
            }

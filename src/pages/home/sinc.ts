@@ -53,14 +53,14 @@ export class EnviardatosPage {
         console.log('roll', roll);
         if (roll.indexOf("Auditor") > -1) {
           this.formulario.formularioid(FORMULARIO_AUDITORIA).then((idf) => {
-            if(idf){
+            if (idf) {
               this.auditor = true;
             }
           });
         }
         if (roll.indexOf("Promotor") > -1) {
           this.formulario.formularioid(FORMULARIO_PROMOTORIA).then((idf) => {
-            if(idf){
+            if (idf) {
               this.promotor = true;
             }
           });
@@ -98,7 +98,7 @@ export class EnviardatosPage {
     this.viewCtrl.dismiss();
   }
   habilitartipo($event) {
-    console.log($event);
+    //   console.log($event);
     if ($event == 1001) {
       this.auditorseleccionado = false;
       this.promotorseleccionado = true;
@@ -110,7 +110,7 @@ export class EnviardatosPage {
   }
 
   comprobarunidades(tipo, $event) {
-    console.log(tipo, $event);
+    //    console.log(tipo, $event);
     this.tipo = tipo;
     this.preguntassinresponder = [];
     this.evento = $event;
@@ -136,10 +136,10 @@ export class EnviardatosPage {
                 this.db.preguntasporgruporequeridas(grupoi.idgrupobase).then((pregunta) => {
                   if (pregunta) {
                     pregunta.forEach(preguntaid => {
-                      console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
+                      //                      console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
                       return this.db.verficarrespuestas(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo).then(tienerespuesta => {
-                        console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
-                        console.log(tienerespuesta);
+                        //                        console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
+                        //                        console.log(tienerespuesta);
 
                         if (tienerespuesta) {
                           if (this.preguntassinresponder.length == 0) {
@@ -207,7 +207,7 @@ export class EnviardatosPage {
         {
           text: 'Cancelar',
           handler: data => {
-            console.log('Cancel clicked');
+            //            console.log('Cancel clicked');
           }
         },
         {
@@ -234,8 +234,8 @@ export class EnviardatosPage {
     this.authService.login2(this.usuario, pass.pass, this.empresa).finally(() => {
       loading.dismiss();
     }).subscribe(() => {
-            this.enviartodo();
-     // this.trampita();
+      this.enviartodo();
+      // this.trampita();
     },
       (err) => {
         console.log(err);
@@ -246,13 +246,13 @@ export class EnviardatosPage {
     if (this.evento) {
 
       this.evento.forEach(up => {
-        console.log('up', up);
-        if(up.mapa){
-          up.mapa="data:image/png:base64,"+up.mapa;
+        //        console.log('up', up);
+        if (up.mapa) {
+          up.mapa = "data:image/png:base64," + up.mapa;
         }
 
         let enviar = [];
-        console.log(up);
+        //        console.log(up);
         this.db.formularioid(this.tipo).then((formularioid) => {
           let formulario = formularioid;
           let datosdeinicio;
@@ -270,7 +270,13 @@ export class EnviardatosPage {
               if (respuestasdigitadas.ruta) {
                 this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta,respuestasdigitadas.unidadproductiva);
               }
-              let valor = respuestasdigitadas.codigorespuestaseleccionada.split('_');
+              console.log(respuestasdigitadas);
+              let valor;
+              if(respuestasdigitadas.codigorespuestaseleccionada){
+                valor = respuestasdigitadas.codigorespuestaseleccionada.split('_');
+              }else{
+                valor=[];
+              }
               if (valor.length > 0) {
                 let i = 0;
                 let indicador = respuestasdigitadas.valorrespuestaseleccionada.split('_');
@@ -334,7 +340,7 @@ export class EnviardatosPage {
 
           }).then(() => {
             return this.db.noconformidades(up.idUnidadProductiva, this.tipo).then((noconformidad) => {
-              console.log('nconformidad', noconformidad);
+              //              console.log('nconformidad', noconformidad);
               if (noconformidad) {
                 let noconformidade = noconformidad;
                 let no_conformidades = [];
@@ -358,7 +364,7 @@ export class EnviardatosPage {
                       let tareajson = [];
                       tareas.forEach((elementa) => {
                         let codigota: any;
-                        console.log(elementa);
+                        //                        console.log(elementa);
                         if (elementa.heredada == 1) {
                           codigota = elementa.id;
                         } else {
@@ -390,7 +396,7 @@ export class EnviardatosPage {
                           "descripcion": nconformidad.descripcion,
                           "fechaPautadaCierre": nconformidad.fechaposiblecierre,
                           "fechaModificacion": null,
-                          "fechaRealCierre": nconformidad.fechafinalizado ,
+                          "fechaRealCierre": nconformidad.fechafinalizado,
                           "status": nconformidad.estado,
                           "fechaCreacion": nconformidad.fechacreacion,
                           "usuarioCreacion": null,
@@ -424,6 +430,7 @@ export class EnviardatosPage {
                     }
                   })
                 });
+
                 let datosaenviar = {
                   formulario: {
                     "formularioBase": { codigo: formulario },
@@ -431,42 +438,44 @@ export class EnviardatosPage {
                     'mapa': up.mapa,
                     fechaInicial: up.fechainicio,
                     localizacionInicial: {
-                      "longitude": 10.10001,
-                      "latitude": 10.000
+                      "longitude": Number(up.longitudinicio),
+                      "latitude": Number(up.latitudinicio)
                     },
                     fechaFinal: up.fechafin,
                     localizacionFinal: {
-                      "longitude": 10.0000,
-                      "latitude": 10.000
+                      "longitude": Number(up.longitudfin),
+                      "latitude": Number(up.latitudfin)
                     }
                   }, formularioRespuesta,
                   no_conformidades
                 };
                 console.log('prueba', datosaenviar);
-                 this.formulario.enviarrespuesta(datosaenviar, up, this.tipo) 
+                console.log('json', JSON.stringify(datosaenviar));
+
+                this.formulario.enviarrespuesta(datosaenviar, up, this.tipo)
 
 
-              }else {
+              } else {
                 let datosaenviar = {
                   formulario: {
                     "formularioBase": { codigo: formulario },
                     "asignacion": up.idAsignacion,
-                    'mapa': up.mapa, 
+                    'mapa': up.mapa,
                     fechaInicial: up.fechainicio,
-                localizacionInicial: {
-                  "longitude": 10.0000,
-                  "latitude": 10.000
-                },
-                fechaFinal: up.fechafin,
-                localizacionFinal: {
-                  "longitude": 10.000,
-                  "latitude": 10.000
-                },
+                    localizacionInicial: {
+                      "longitude": Number(up.longitudinicio),
+                      "latitude": Number(up.latitudinicio)
+                    },
+                    fechaFinal: up.fechafin,
+                    localizacionFinal: {
+                      "longitude": Number(up.longitudfin),
+                      "latitude": Number(up.latitudfin)
+                    }
                   }, formularioRespuesta
                 };
-                
 
                 console.log('pruebas sin no conformidades', datosaenviar);
+                console.log('json', JSON.stringify(datosaenviar));
                 this.formulario.enviarrespuesta(datosaenviar, up, this.tipo)
               }
 
@@ -479,37 +488,37 @@ export class EnviardatosPage {
         });
 
       });
-            this.evento=[];
-            this.habilitarenvio=false;
-             this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
-              this.upa = data;
-              if (this.upa.length == 0) {
-                this.upa = false;
-              }
-            });
+      this.evento = [];
+      this.habilitarenvio = false;
+      this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
+        this.upa = data;
+        if (this.upa.length == 0) {
+          this.upa = [];
+        }
+      });
 
-            this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
-              this.upp = data;
-              if (this.upp.length == 0) {
-                this.upa = false;
-              }
-            });
-      
-          } else {
-            this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
-              this.upa = data;
-              if (this.upa.length == 0) {
-                this.upa = false;
-              }
-            });
-            this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
-              this.upp = data;
-              if (this.upp.length == 0) {
-                this.upa = false;
-              }
-            });
-      
-            this.handleError('Debe recargar la pagina para enviar nuevamente los formularios');
+      this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
+        this.upp = data;
+        if (this.upp.length == 0) {
+          this.upa = [];
+        }
+      });
+
+    } else {
+      this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
+        this.upa = data;
+        if (this.upa.length == 0) {
+          this.upa = [];
+        }
+      });
+      this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
+        this.upp = data;
+        if (this.upp.length == 0) {
+          this.upa = [];
+        }
+      });
+
+      this.handleError('Debe recargar la pagina para enviar nuevamente los formularios');
     }
   }
 

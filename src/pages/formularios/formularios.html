@@ -453,9 +453,6 @@
             </tr>
             <tr class="cuerpotabla" *ngFor="let preguntas of item.preguntas">
               <td *ngIf="preguntas.observacion==1">{{preguntas.enunciado}}</td>
-              <td *ngIf="preguntas.observacion==1">
-                <ion-input type="text" (change)="guardarobservacionpadre($event,preguntas.preguntapadre,preguntas.preguntaid)"></ion-input>
-              </td>
               <td *ngFor="let respuestas of preguntas.respuesta" >
                 <div *ngIf="respuestas.tipo==210000" align="left">
                   {{respuestas.constante}}

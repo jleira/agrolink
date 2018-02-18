@@ -3,6 +3,7 @@ import { Platform } from 'ionic-angular';
 import 'rxjs/add/operator/map';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { LoadingController, ToastController } from 'ionic-angular';
 
 
 @Injectable()
@@ -12,6 +13,7 @@ export class DbProvider {
   private dbReady = new BehaviorSubject<boolean>(false);
 
   constructor(
+    private toastCtrl: ToastController,
     private platform: Platform,
     private sqlite: SQLite
   ) {
@@ -162,7 +164,7 @@ export class DbProvider {
       }).then(() => {
         return this.database.executeSql(
           `CREATE TABLE IF NOT EXISTS preguntastabla (
-            preguntaid INTEGER PRIMARY KEY,
+            preguntaid INTEGER,
             preguntapadre INTEGER,
             enunciado TEXT,
             fila INTEGER,
@@ -1036,7 +1038,6 @@ export class DbProvider {
 
   }
 
-
   guardarobservacion(unidadp, grup, respuestascodigo, preguntaid, observacion, tipof) {
     let up = unidadp;
     let gr = grup;
@@ -1056,15 +1057,10 @@ export class DbProvider {
             }
             return id;
           }).then((idseleccion) => {
-
+            console.log(idseleccion);
             if (idseleccion == false) {
-
-              return this.database.executeSql(
-                `INSERT INTO respuestasguardadas 
-          (unidadproductiva, grupo, respuestascodigo ,pregunta, observacion, tipoformulario )
-          VALUES (?, ?, ?, ?, ?);`,
-                [unidadp, grup, respuestascodigo, preguntaid, observacion, tipop]);
-
+              this.handleError2('Debe guardar antes la respuesta, para asi poder asiganar una observacion');
+              return false;
             } else {
               return this.database.executeSql(
                 `UPDATE respuestasguardadas SET observacion = (?) WHERE id=${idseleccion} ;`,
@@ -1074,6 +1070,8 @@ export class DbProvider {
       });
 
   }
+
+
 
   guardarimagen(unidadp, grup, respuestascodigo, preguntaid, ruta, tipof) {
     let up = unidadp;
@@ -1095,19 +1093,9 @@ export class DbProvider {
           }).then((idseleccion) => {
 
             if (idseleccion == false) {
+              this.handleError2('Debe guardar antes la respuesta, para asi poder asiganar una imagen');
 
-              return this.database.executeSql(
-                `INSERT INTO respuestasguardadas 
-          (unidadproductiva, grupo, respuestascodigo ,pregunta, ruta, tipoformulario )
-          VALUES (?, ?, ?, ?, ?, ?);`,
-                [unidadp, grup, respuestascodigo, preguntaid, ruta, tipop]).then(
-                (ok) => {
-                  return ok;
-                },
-                (err) => {
-                  return err;
-                });
-
+              return false;
             } else {
               return this.database.executeSql(
                 `UPDATE respuestasguardadas SET ruta = (?) WHERE id=${idseleccion} ;`,
@@ -1123,6 +1111,18 @@ export class DbProvider {
       });
 
   }
+  handleError2(mensaje: string) {
+    let message: string;
+    message = mensaje;
+    const toast = this.toastCtrl.create({
+      message,
+      duration: 15000,
+      position: 'bottom'
+    });
+
+    toast.present();
+  }
+
 
   limpiardb() {
 
@@ -1200,19 +1200,38 @@ export class DbProvider {
         })
       })
     }
+    
   guardarpreguntatabla(preguntaid, preguntapadre, enunciado, fila, codigorespuesta, observacion) {
     return this.isReady()
-      .then(() => {
+    .then(() => {
+      return this.database.executeSql(`SELECT preguntaid FROM preguntastabla WHERE preguntapadre= ${preguntapadre} AND preguntaid =${preguntaid}`,
+        []).then((data)=>{
+          if(data.rows.length){
+            return false;
+          }else{
+            return true;
+           }
+        });
+    }, err=>{
+    }).then((data)=>{
+      if(data){
+        console.log('true');
         return this.database.executeSql(`INSERT INTO preguntastabla 
         (preguntaid, preguntapadre, enunciado, fila, codigorespuesta, observacion) VALUES (?, ?, ?, ?, ?, ?);`,
           [preguntaid, preguntapadre, enunciado, fila, codigorespuesta, observacion]);
-      });
+
+      }else{
+        console.log('false');
+
+        return false;
+      }
+    })
   }
-  //                 INTEGER,
+ 
   preguntastablaporid(preguntaid) {
     return this.isReady(
     ).then(() => {
-      return this.database.executeSql(`SELECT * FROM preguntastabla WHERE preguntapadre = ${preguntaid}`, []).then((data) => {
+      return this.database.executeSql(`SELECT * FROM preguntastabla WHERE preguntapadre = ${preguntaid} GROUP BY preguntaid ORDER BY fila`, []).then((data) => {
         let todos = [];
         if (data.rows.length) {
           for (let i = 0; i < data.rows.length; i++) {
@@ -1228,7 +1247,6 @@ export class DbProvider {
         return todos;
       })
     })
-
   }
   respuestasapreguntastablas(codigorespuestapadre) {
     return this.isReady(
@@ -1515,10 +1533,10 @@ export class DbProvider {
         return this.database.executeSql(`SELECT * from unidades_productivas WHERE  idUnidadProductiva =  (?) AND tipo =(?) `, [idseleccion, caso])
           .then((data) => {
             let todo = data.rows.item(0);
-              if (todo.fechainicio === null) {
+              if (todo.latitudinicio === null) {
                 return this.database.executeSql(
-                  `UPDATE unidades_productivas SET fechainicio = (?), latitudinicio = (?), longitudinicio=(?) , terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' AND tipo = ${todo.tipo};`,
-                  [datofecha, latitud, longitud]).then((datae) => { return data; }).catch(err => { return err; });
+                  `UPDATE unidades_productivas SET fechainicio = (?), latitudinicio = (?), longitudinicio=(?),fechafin = (?), latitudfin = (?), longitudfin=(?) , terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' AND tipo = ${todo.tipo};`,
+                  [datofecha, latitud, longitud,datofecha, latitud, longitud]).then((datae) => { return data; }).catch(err => { return err; });
               } else {
                 return this.database.executeSql(
                   `UPDATE unidades_productivas SET fechafin = (?), latitudfin = (?), longitudfin=(?) WHERE idUnidadProductiva = '${idseleccion}' AND tipo = ${todo.tipo};`,
@@ -1527,6 +1545,7 @@ export class DbProvider {
           },er=>{})
       })
   }
+
 
 
 

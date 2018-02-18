@@ -1,6 +1,6 @@
 {
   "name": "agrolink_v1.0",
-  "app_id": "",
+  "app_id": "b17a6870",
   "type": "ionic-angular",
   "integrations": {
     "cordova": {}

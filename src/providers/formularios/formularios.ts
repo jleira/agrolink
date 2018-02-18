@@ -203,7 +203,10 @@ export class FormulariosProvider {
 
   }
   guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion, tipof) {
-    this.database.guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion, tipof);
+   return this.database.guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion, tipof).then((d)=>{
+     this.items=d;
+     return this.items;
+   })
   }
   guardarimagen(up, grupoidselected, respcodigo, preguntaid, imagen, tipof) {
     return this.database.guardarimagen(up, grupoidselected, respcodigo, preguntaid, imagen, tipof).then((dt) => {
@@ -214,6 +217,7 @@ export class FormulariosProvider {
   preguntasconrespuestastabla(preguntaid) {
     return this.database.preguntastablaporid(preguntaid).then((dt) => {
       this.items = dt;
+      console.log('preguntas tabla',dt);
       return this.items;
     })
   }
@@ -223,7 +227,7 @@ export class FormulariosProvider {
       spinner: 'bubbles',
       content: 'Cargando informacion...'
     });
-    loading.present();
+//    loading.present();
 
     return this.database.respuestasapreguntastablas(codigorespuesta).then((data) => {
       this.items = data;
@@ -258,13 +262,13 @@ export class FormulariosProvider {
           }
           inicial = inicial + 1;
           if (inicial == cant) {
-            loading.dismiss();
+//            loading.dismiss();
 
           }
         }, err => {
           inicial = inicial + 1;
           if (inicial == cant) {
-            loading.dismiss();
+//            loading.dismiss();
 
           }
         });
@@ -272,7 +276,7 @@ export class FormulariosProvider {
       return this.items;
     }).catch((err) => {
       this.handleError('error cargando informacion, intento nuevamente');
-      loading.dismiss();
+//      loading.dismiss();
       console.log(err);
     });
 
@@ -374,20 +378,26 @@ export class FormulariosProvider {
   enviarrespuesta(formularioaenviar, up, tipo) {
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
-      content: 'Enviando informacion para la unidad' + up.nombre + ' ...'
+      content: 'Enviando informacion para la unidad ' + up.nombre + ' ...'
     });
     loading.present();
 
     return this.authHttp.post(`${SERVER_URL}/api/formulario/create/`, formularioaenviar).subscribe((data) => {
-      loading.dismiss();
       console.log(data);
       if (data.status == 200) {
         this.cambiarunidadproductiva(up);
         this.handleError('Formulario para la unidad ' + up.nombre + ' Enviado exitosamente');
+
       } else {
         this.handleError('Error al enviar formulario ' + up.nombre);
       }
+      loading.dismiss();
+
       return data;
+    },err=>{
+      loading.dismiss();
+      this.handleError('Error al enviar formulario para la unidad ' + up.nombre);
+            
     })
 
   }
@@ -395,7 +405,7 @@ export class FormulariosProvider {
   cambiarunidadproductiva(up) {
     console.log(up);
     this.database.cambiarestado(up.idUnidadProductiva, 2, up.tipo).then(() => {
-      this.handleError('unidad ' + up.nombre + ' editada exitosamente');
+      this.handleError('unidad ' + up.nombre + ' finalizada exitosamente');
     }, () => {
       this.handleError('No se puedo editar la unidad ' + up.nombre + ' a finalizada');
     });
@@ -435,6 +445,10 @@ export class FormulariosProvider {
           loading.dismiss();
         })
 
+    }, err=>{
+      loading.dismiss();
+      this.handleError('error al subir imagen para la unidad '+ idunidad);
+      console.log('err',err);
     })
 
   }

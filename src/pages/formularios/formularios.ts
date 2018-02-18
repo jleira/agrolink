@@ -11,6 +11,7 @@ import { DbProvider } from '../../providers/db/db';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { File, DirectoryEntry } from '@ionic-native/file';
 import { Geolocation } from '@ionic-native/geolocation';
+import { Loading } from 'ionic-angular/components/loading/loading';
 
 
 @IonicPage()
@@ -35,8 +36,8 @@ export class FormulariosPage {
   tipo;
   productor;
   datofecha: any;
-  datolongitud:any;
-  datolatitud:any;
+  datolongitud: any;
+  datolatitud: any;
 
 
   constructor(
@@ -54,8 +55,6 @@ export class FormulariosPage {
     public db: DbProvider,
     public popoverCtrl: PopoverController) {
     this.caso = navParams.get('caso');
- //     console.log(this.caso);
-//      this.db.cambiarestado('OPTS1', 1 , 1001).then(()=>{console.log('echo ')});
   }
 
 
@@ -312,7 +311,6 @@ export class FormulariosPage {
       })
 
     } else if (this.caso == 4) {//promotoria
-    
       loading.present();
       this.productor = this.navParams.get('productor');
       this.tipocuestionario = this.navParams.get('tipo');
@@ -325,101 +323,129 @@ export class FormulariosPage {
       let fechaentro;
       fechaentro = new Date();
       fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' + ("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
-      this.datofecha=fechaentro;
+      this.datofecha = fechaentro;
 
-       this.geolocation.getCurrentPosition().then((resp) => {
-       this.datolatitud=resp.coords.latitude.toString();
-       this.datolongitud=resp.coords.longitude.toString();
-       this.handleError('ESTA ES LA UNICACION DEL TELEFONO, '+ this.datolatitud +' '+this.datolongitud);
+      this.geolocation.getCurrentPosition().then((resp) => {
+        this.datolatitud = resp.coords.latitude.toString();
+        this.datolongitud = resp.coords.longitude.toString();
+        //        this.handleError('ESTA ES LA UNICACION DEL TELEFONO, ' + this.datolatitud + ' ' + this.datolongitud);
       }).catch((error) => {
-        this.datofecha=fechaentro;
-        this.datolatitud=null;
-        this.datolongitud=null;
+        this.datofecha = fechaentro;
+        this.datolatitud = null;
+        this.datolongitud = null;
         this.handleError('no se pudo acceder a la ubicacion del telefono ' + error.message);
       }).then(() => {
       });
-      this.formulario.preguntasgrupo2(this.up, this.grupoidselected, this.tipo);
-      this.formulario.preguntasgrupo(this.grupoidselected, this.tipo).then(preguntasg => {
-        console.log(preguntasg);
-        this.items = preguntasg;
-        if (this.items) {
-          let r = [];
-          this.items.forEach(element => {
-            if(element.codigorespuesta!==""){
-              r.push(element.codigorespuesta);
-            }
-          });
-          this.resp = r;
-          console.log(this.resp);
-          if(this.resp.length>0){
-            return this.formulario.respuestasporpreguntas(this.resp, this.up, this.grupoidselected, this.tipocuestionario).then(data => {
-              this.resp = data;
-              this.items.forEach(element => {
-                if (element.tipo == 3007) {
-                  element.encabezado = JSON.parse(atob(element.encabezado));
-                  this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
-                    if (data) {
-                      data.forEach(pregunta => {
-                        return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario, pregunta.preguntaid).then((respu) => {
-                          pregunta.respuesta = respu;
-                        });
-                      });
-                    }
-                    element.preguntas = data;
-                    return this.items;
-                  }, (err) => {
-                  })
+
+
+
+      this.db.preguntasporgrupo(this.grupoidselected, this.tipo).then((data: any) => {
+        this.items = data;
+        this.items.forEach(preguntas => {
+          if (preguntas.tipo == 3007) {
+            preguntas.encabezado = JSON.parse(atob(preguntas.encabezado));
+            console.log(preguntas.encabezado);
+            preguntas.celdas = 1;
+            preguntas.encabezado.forEach(element => {                
+                if(element.columnas.length>preguntas.celdas){
+                  preguntas.celdas=element.columnas.length;
                 }
-                let vr: any;
-                if (this.resp) {
-                  this.resp.forEach(element2 => {
-                    if (element2.codigorespuestapadre == element.codigorespuesta) {
-                      element.respuestas.push(element2);
+            });
+            let loading = this.loadingCtrl.create({
+              spinner: 'bubbles',
+              content: `Cargando informacion de ${preguntas.enunciado}`
+            });
+            loading.present();
+            return this.formulario.preguntasconrespuestastabla(preguntas.codigo).then((datatabla) => {
+              if (datatabla) {
+                let cantidadpreguntas = datatabla.length;
+                let contadordepreguntas = 0;
+                datatabla.forEach(preguntatabla => {
+                  return this.formulario.respuestastablas(preguntatabla.codigorespuesta, this.up, this.grupoidselected, preguntas.codigo, this.tipo, preguntatabla.preguntaid).then((respu) => {
+                    contadordepreguntas = contadordepreguntas + 1;
+                    preguntatabla.respuesta = respu;
+                    if (contadordepreguntas == cantidadpreguntas) {
+                      loading.dismiss();
+                    }
+                  }, err => {
+                    contadordepreguntas = contadordepreguntas + 1;
+                    if (contadordepreguntas == cantidadpreguntas) {
+                      loading.dismiss();
                     }
                   });
-                }
-              })
-              this.resp = JSON.stringify(this.resp);
-            }).
-              then(() => {
-                this.final = this.items;
-                console.log('final',this.final);
+                });
+                preguntas.preguntas = datatabla;
+              } else {
                 loading.dismiss();
-                return this.final;
-              }).catch(()=>{
-                loading.dismiss();              
-              });
-          }else{
-            this.items.forEach(element => {
-              if (element.tipo == 3007) {
-                element.encabezado = JSON.parse(atob(element.encabezado));
-                this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
-                  console.log('datos de preguntas',data);
-                  if (data) {
-                    data.forEach(pregunta => {
-                      return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario,pregunta.preguntaid).then((respu) => {
-                        pregunta.respuesta = respu;
-                      },err=>{});
-                    });
-                  }//codigorespuestadelapregunta, unidadp, grupo, preguntaid(hijadela tabla),tipodeformulario
-                  element.preguntas = data;
-                  this.final=this.items;
-                  loading.dismiss();
-                  return this.final;
-                }, (err) => {
-                  loading.dismiss();
-                })
+                preguntas.preguntas = [];
               }
+
+            }, (err) => {
+              loading.dismiss();
             })
-          } 
+          } else {
+            if (preguntas.codigorespuesta) {
+              return this.db.respuestasporpreguntaf(preguntas.codigorespuesta).then((respuestasdisponibles: any) => {
 
-        } else {
-          loading.dismiss();
-          this.handleError('No existen preguntas registradas en este grupo');
-        }
-      },err=>{
+                //              console.log('err', respuestasdisponibles);
+                this.resp = respuestasdisponibles;
+                preguntas.prueba = [];
+                this.resp.forEach(posiblerespuesta => {
+                  return this.db.respuestasguardadasporpregunta(this.up, this.grupoidselected, this.tipo, preguntas.codigo).then((dataguardada: any) => {
+                    if (dataguardada.length == 0) {
+                      posiblerespuesta.respuesta = false;
+                    } else {
+                      posiblerespuesta.observacion = dataguardada.observacion;
+                      if (posiblerespuesta.tipo == 210001) {
+                        posiblerespuesta.respuesta = dataguardada.valorseleccionado;
+                        posiblerespuesta.ruta = dataguardada.ruta;
+                      } else if (posiblerespuesta.tipo == 210003) {
+                        posiblerespuesta.respuesta = dataguardada.valorseleccionado;
+                        posiblerespuesta.ruta = dataguardada.ruta;
+                      } else if (posiblerespuesta.tipo == 210002) {
+                        posiblerespuesta.ruta = dataguardada.ruta;
+                        posiblerespuesta.respuesta = parseInt(dataguardada.valorseleccionado);
+                      } else if (posiblerespuesta.tipo == 210004) {
 
-      }).catch(()=>{}); 
+                        posiblerespuesta.ruta = dataguardada.ruta;
+                        let arrayvalores;
+                        if (dataguardada.codigorespuestaseleccionada) {
+                          arrayvalores = dataguardada.codigorespuestaseleccionada.split('_');
+                          if (arrayvalores.indexOf(posiblerespuesta.codigo.toString()) != -1) {
+//                            console.log('res', posiblerespuesta, 'array valores', arrayvalores);
+
+                            posiblerespuesta.respuesta = true;
+                            preguntas.prueba.push(posiblerespuesta);
+                          } else {
+                            posiblerespuesta.respuesta = false;
+                          }
+                        } else {
+                          posiblerespuesta.respuesta = false;
+                        }
+
+                      } else {
+                        posiblerespuesta.ruta = dataguardada.ruta;
+                      }
+                    }
+                    return preguntas.respuestas.push(posiblerespuesta);
+                  }, ERR => { })
+                });
+
+              }, ERR => { })
+            }
+          }
+        });
+        this.items = data;
+        return this.items;
+      }).then((datafinal) => {
+        this.final = datafinal;
+        console.log(this.final);
+
+        loading.dismiss();
+        //        return this.final;
+
+      });
+
     }
     else if (this.caso == 5) {
       this.productor = this.navParams.get('productor');
@@ -459,6 +485,7 @@ export class FormulariosPage {
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem();
     } else {
+      console.log('fecha', event);
       this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, event, this.tipocuestionario);
       this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
     }
@@ -468,9 +495,10 @@ export class FormulariosPage {
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem();
     } else {
- 
+
       this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, respuestafinal, this.tipocuestionario);
-      this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);    }
+      this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
+    }
   }
 
   guardar3001(valor, preguntaid, respcodigo) {
@@ -513,8 +541,13 @@ export class FormulariosPage {
   }
 
   guardarobservacion(preguntaid, respcodigo, observacion) {
-    this.formulario.guardarobservacion(this.up, this.grupoidselected, respcodigo, preguntaid, observacion, this.tipocuestionario);
-    this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
+    this.formulario.guardarobservacion(this.up, this.grupoidselected, respcodigo, preguntaid, observacion, this.tipocuestionario).then((datos) => {
+      console.log('observacion', datos);
+      if (!datos) {
+        this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
+
+      }
+    });
   }
 
   mostrargrupos(tipop, upva, productor) {
@@ -536,8 +569,8 @@ export class FormulariosPage {
   }
 
   mostrarpreguntas(grupoid, nbre) {
-      this.navCtrl.push(FormulariosPage, {
-        caso: 4, grupo: grupoid, up: this.unidadproductiva, gruponombre: nbre, tipo: this.navParams.get('tipo')
+    this.navCtrl.push(FormulariosPage, {
+      caso: 4, grupo: grupoid, up: this.unidadproductiva, gruponombre: nbre, tipo: this.navParams.get('tipo')
     });
   }
 
@@ -582,14 +615,16 @@ export class FormulariosPage {
     let nombrecarpetapadre = this.up;// unidad productiva 
     let idgrupo = this.grupoidselected;
     let preguntaid = codigo;
-
+    let nombreimg;
 
     this.camera.getPicture(options).then(imageData => {
+      let nombreimg = imageData.replace(this.file.externalCacheDirectory, "");
       let loading = this.loadingCtrl.create({
         spinner: 'bubbles',
-        content: 'Cargando informacion...'
+        content: 'guardando imagen...'
       });
       loading.present();
+
       return this.file.createDir(targetPath, nombrecarpetapadre, false).then(() => {
       }, () => {
       }).then(() => {
@@ -600,8 +635,20 @@ export class FormulariosPage {
           this.file.externalCacheDirectory, imageData.replace(this.file.externalCacheDirectory, ""),
           targetPath + `/${nombrecarpetapadre}/${idgrupo.toString()}`,
           imageData.replace(this.file.externalCacheDirectory, "")).then(() => {
-            this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imageData.replace(this.file.externalCacheDirectory, ""), this.tipocuestionario);
-            this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
+            return this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imageData.replace(this.file.externalCacheDirectory, ""), this.tipocuestionario).then(
+              (ok) => {
+                if (!ok) {
+                  nombreimg = null;
+                } else {
+                  this.final.forEach(element => {
+                    if (element.codigo == codigo) {
+                      element.respuestas[0].ruta = nombreimg;
+                    }
+                  });
+                  this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
+                }
+                return true;
+              });
           }, () => { });
       }).then((ok
       ) => {
@@ -612,13 +659,11 @@ export class FormulariosPage {
 
         });
       }).then(() => {
-        return this.recargaritem().then(() => { }, () => { });
-      }).then(() => {
         loading.dismiss();
       });
     }
     ).catch(error => {
-     
+
     });
   }
 
@@ -640,10 +685,11 @@ export class FormulariosPage {
       .then(imageData => {
         let loading = this.loadingCtrl.create({
           spinner: 'bubbles',
-          content: 'Cargando informacion...'
+          content: 'Guardando imagen...'
         });
-        loading.present(); 
+        loading.present();
 
+        console.log('1', imageData);
         let image = "data:image/png;base64," + imageData;
         let block = image.split(";");
         let contentType = block[0].split(":")[1];
@@ -651,22 +697,36 @@ export class FormulariosPage {
         let blob = this.b64toBlob(realData, contentType, 512);
         let imgname = Date.now().toString() + '.png';
 
-        return this.file.createDir(targetPath, nombrecarpetapadre, false).then(() => { }, () => { }).then(() => {
+        return this.file.createDir(targetPath, nombrecarpetapadre, false).then(() => { }, (e) => { console.log('2', e); }).then(() => {
           return this.file.createDir(targetPath + `/${nombrecarpetapadre}`, idgrupo.toString(), false).then(() => {
-          }, () => { });
+          }, (e) => { console.log('3', e); });
         }).then(() => {
-          return this.file.writeFile(targetPath + `${nombrecarpetapadre}/${idgrupo.toString()}/`, imgname, blob).then((ok) => { }, (err) => { });
+          return this.file.writeFile(targetPath + `${nombrecarpetapadre}/${idgrupo.toString()}/`, imgname, blob).then((ok) => { }, (e) => { console.log('2', e); });
         }).then(() => {
-          return this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imgname, this.tipocuestionario).then(() => {
-            this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
-          }, () => { });
-        }).then(() => {
-          return this.recargaritem().then(() => { }, () => { }).then(() => { }, () => { });
+          return this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imgname, this.tipocuestionario).then((ok) => {
+            if (!ok) {
+              imgname = null;
+            } else {
+              this.final.forEach(element => {
+                if (element.codigo == codigo) {
+                  element.respuestas[0].ruta = imgname;
+                }
+              });
+              this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
+            }
+            return true;
+          }, (e) => { console.log('2', e); });
         }).then(() => {
           loading.dismiss();
-        });
+        }).catch((e) => {
+          console.log('2', e);
+          loading.dismiss();
+          this.handleError('error en el dispositivo, intentelo nuevamente');
+        }
+          );
       }).catch(error => {
-              });
+        console.log('err', error);
+      });
   }
 
   b64toBlob(b64Data, contentType, sliceSize) {
@@ -700,14 +760,19 @@ export class FormulariosPage {
   eliminarimagen(codigo, respcodigo) {
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
-      content: 'Cargando informacion...'
+      content: 'Eliminando imagen...'
     });
     loading.present();
     let preguntaid = codigo;
-    this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, '', this.tipocuestionario).then(() => { }, () => { }).then(() => {
-      return this.recargaritem().then(() => { }, () => { }).then(() => {
-        loading.dismiss();
+    this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, '', this.tipocuestionario).then(() => {
+      this.final.forEach(element => {
+        if (element.codigo == codigo) {
+          element.respuestas[0].ruta = null;
+        }
       });
+      loading.dismiss();
+    }, () => {
+      loading.dismiss();
     });
   }
 
@@ -728,101 +793,118 @@ export class FormulariosPage {
     let fechaentro;
     fechaentro = new Date();
     fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' + ("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
-     this.geolocation.getCurrentPosition().then((resp) => {
-     this.datofecha=fechaentro;
-     this.datolatitud=resp.coords.latitude.toString();
-     this.datolongitud=resp.coords.longitude.toString();
+    this.datofecha = fechaentro;
+
+    this.geolocation.getCurrentPosition().then((resp) => {
+      this.datolatitud = resp.coords.latitude.toString();
+      this.datolongitud = resp.coords.longitude.toString();
+
     }).catch((error) => {
-      this.datofecha=fechaentro;
-      this.datolatitud=null;
-      this.datolongitud=null;
-      this.handleError('no se pudo acceder a la ubicacion del telefono ' + error.message);
+      this.datofecha = fechaentro;
+      this.datolatitud = null;
+      this.datolongitud = null;
+
     }).then(() => {
     });
-    return this.formulario.preguntasgrupo(this.grupoidselected, this.tipo).then(preguntasg => {
-      console.log(preguntasg);
-      this.items = preguntasg;
-      if (this.items) {
-        let r = [];
-        this.items.forEach(element => {
-          if(element.codigorespuesta!==""){
-            r.push(element.codigorespuesta);
-          }
-        });
-        this.resp = r;
-        console.log(this.resp);
-        if(this.resp.length>0){
-          return this.formulario.respuestasporpreguntas(this.resp, this.up, this.grupoidselected, this.tipocuestionario).then(data => {
-            this.resp = data;
-            this.items.forEach(element => {
-              if (element.tipo == 3007) {
-                element.encabezado = JSON.parse(atob(element.encabezado));
-                this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
-                  if (data) {
-                    data.forEach(pregunta => {
-                      return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario, pregunta.preguntaid).then((respu) => {
-                        pregunta.respuesta = respu;
-                      });
-                    });
+
+
+
+    return this.db.preguntasporgrupo(this.grupoidselected, this.tipo).then((data: any) => {
+      this.items = data;
+      this.items.forEach(preguntas => {
+        if (preguntas.tipo == 3007) {
+          preguntas.encabezado = JSON.parse(atob(preguntas.encabezado));
+          let loading = this.loadingCtrl.create({
+            spinner: 'bubbles',
+            content: `Cargando informacion de ${preguntas.enunciado}`
+          });
+          loading.present();
+          return this.formulario.preguntasconrespuestastabla(preguntas.codigo).then((datatabla) => {
+            if (datatabla) {
+              let cantidadpreguntas = datatabla.length;
+              let contadordepreguntas = 0;
+              datatabla.forEach(preguntatabla => {
+                return this.formulario.respuestastablas(preguntatabla.codigorespuesta, this.up, this.grupoidselected, preguntas.codigo, this.tipo, preguntatabla.preguntaid).then((respu) => {
+                  contadordepreguntas = contadordepreguntas + 1;
+                  preguntatabla.respuesta = respu;
+                  if (contadordepreguntas == cantidadpreguntas) {
+                    loading.dismiss();
                   }
-                  element.preguntas = data;
-                  return this.items;
-                }, (err) => {
-                })
-              }
-              let vr: any;
-              if (this.resp) {
-                this.resp.forEach(element2 => {
-                  if (element2.codigorespuestapadre == element.codigorespuesta) {
-                    element.respuestas.push(element2);
+                }, err => {
+                  contadordepreguntas = contadordepreguntas + 1;
+                  if (contadordepreguntas == cantidadpreguntas) {
+                    loading.dismiss();
                   }
                 });
-              }
-            })
-            this.resp = JSON.stringify(this.resp);
-          }).
-            then(() => {
-              this.final = this.items;
-              console.log('final',this.final);
+              });
+            } else {
               loading.dismiss();
-              return this.final;
-            }).catch(()=>{
-              loading.dismiss();              
-            });
-        }else{
-          this.items.forEach(element => {
-            if (element.tipo == 3007) {
-              element.encabezado = JSON.parse(atob(element.encabezado));
-              this.formulario.preguntasconrespuestastabla(element.codigo).then((data) => {
-                console.log('datos de preguntas',data);
-                if (data) {
-                  data.forEach(pregunta => {
-                    return this.formulario.respuestastablas(pregunta.codigorespuesta, this.up, this.grupoidselected, element.codigo, this.tipocuestionario,pregunta.preguntaid).then((respu) => {
-                      pregunta.respuesta = respu;
-                    },err=>{});
-                  });
-                }//codigorespuestadelapregunta, unidadp, grupo, preguntaid(hijadela tabla),tipodeformulario
-                element.preguntas = data;
-                this.final=this.items;
-                loading.dismiss();
-                return this.final;
-              }, (err) => {
-                loading.dismiss();
-              })
             }
+            preguntas.preguntas = datatabla;
+          }, (err) => {
+            loading.dismiss();
           })
-        } 
+        } else {
+          return this.db.respuestasporpreguntaf(preguntas.codigorespuesta).then((respuestasdisponibles: any) => {
+            //              console.log('err', respuestasdisponibles);
+            this.resp = respuestasdisponibles;
+            preguntas.prueba = [];
+            this.resp.forEach(posiblerespuesta => {
+              return this.db.respuestasguardadasporpregunta(this.up, this.grupoidselected, this.tipo, preguntas.codigo).then((dataguardada: any) => {
+                if (dataguardada.length) {
+                  posiblerespuesta.respuesta = false;
+                } else {
+                  posiblerespuesta.observacion = dataguardada.observacion;
+                  if (posiblerespuesta.tipo == 210001) {
+                    posiblerespuesta.respuesta = dataguardada.valorseleccionado;
+                    posiblerespuesta.ruta = dataguardada.ruta;
+                  } else if (posiblerespuesta.tipo == 210003) {
+                    posiblerespuesta.respuesta = dataguardada.valorseleccionado;
+                    posiblerespuesta.ruta = dataguardada.ruta;
+                  } else if (posiblerespuesta.tipo == 210002) {
+                    posiblerespuesta.ruta = dataguardada.ruta;
+                    posiblerespuesta.respuesta = parseInt(dataguardada.valorseleccionado);
+                  } else if (posiblerespuesta.tipo == 210004) {
 
-      } else {
-        loading.dismiss();
-        this.handleError('No existen preguntas registradas en este grupo');
-      }
-    },err=>{
+                    posiblerespuesta.ruta = dataguardada.ruta;
+                    let arrayvalores;
+                    if (dataguardada.codigorespuestaseleccionada) {
+                      arrayvalores = dataguardada.codigorespuestaseleccionada.split('_');
+                      if (arrayvalores.indexOf(posiblerespuesta.codigo.toString()) != -1) {
+                        console.log('res', posiblerespuesta, 'array valores', arrayvalores);
 
-    }).catch(()=>{}); 
+                        posiblerespuesta.respuesta = true;
+                        preguntas.prueba.push(posiblerespuesta);
+                      } else {
+                        posiblerespuesta.respuesta = false;
+                      }
+                    } else {
+                      posiblerespuesta.respuesta = false;
+                    }
+
+                  } else {
+                    posiblerespuesta.ruta = dataguardada.ruta;
+                  }
+                }
+                return preguntas.respuestas.push(posiblerespuesta);
+              })
+            });
+
+          })
+        }
+      });
+      this.items = data;
+      return this.items;
+    }).then((datafinal) => {
+      this.final = datafinal;
+      loading.dismiss();
+      //        return this.final;
+
+    });
+
   }
 
-  guardarfechapadre(valor, preguntapadre, preguntaid, fecha) { 
+  guardarfechapadre(valor, preguntapadre, preguntaid, fecha) {
 
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
@@ -836,20 +918,18 @@ export class FormulariosPage {
     }
   }
   guardarpadre(valor, preguntapadre, preguntaid, event) {
-console.log(valor, preguntapadre, preguntaid, event);
+    console.log(valor, preguntapadre, preguntaid, event);
     if (this.unidadproductiva.terminado == 2) {
       this.handleError('No se pueden editar las respuestas una vez envidas');
       this.recargaritem();
     } else {
 
-      if (event) {
-        this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuesta, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
-        this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
+      if (event === "false") {
+//        this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuesta, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
+ //
       } else {
-        if (event === false) {
           this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuesta, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
-
-        }
+          this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
       }
     }
   }
@@ -874,15 +954,15 @@ console.log(valor, preguntapadre, preguntaid, event);
     });
     toast.present();
   }
-  guardarubicacion(unidad, datofecha, latitud, longitud ) {
-    
+  guardarubicacion(unidad, datofecha, latitud, longitud) {
+
     let c;
     if (this.tipocuestionario == 1002) {
       c = 2;
     } else {
       c = 1;
     }
-    console.log('ubicacion',unidad, datofecha, latitud, longitud);
+    console.log('ubicacion', unidad, datofecha, latitud, longitud);
     this.formulario.guardarubicacion(unidad, datofecha, latitud, longitud, this.tipocuestionario);
   }
 
@@ -892,7 +972,7 @@ console.log(valor, preguntapadre, preguntaid, event);
     let enviar = [];
   }
 
-  abrirmapa(unidadproductiva){
+  abrirmapa(unidadproductiva) {
     let modal = this.navCtrl.push(ImagePage, { 'caso': 3, 'unidad': unidadproductiva });
   }
 

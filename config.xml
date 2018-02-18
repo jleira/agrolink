@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.ionicframework.agrolink" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Agrolink</name>
-    <description>An awesome Ionic/Cordova app.</description>
+    <description>Plataforma para la autmatizacion de la gestion de los indicadores del proceso productivo agricola </description>
     <author email="jleira@uninorte.edu.co" href="http://stackpointer.co/">StackPointer</author>
-    <content original-src="index.html" src="http://192.168.100.125:8100" />
+    <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -87,6 +87,7 @@
     <allow-navigation href="http://192.168.0.3:8100" />
     <allow-navigation href="http://10.0.0.17:8100" />
     <allow-navigation href="http://10.20.41.141:8100" />
+    <allow-navigation href="http://10.0.0.15:8100" />
     <engine name="android" spec="~6.3.0" />
     <plugin name="ionic-plugin-keyboard" spec="^2.2.1" />
     <plugin name="cordova-plugin-whitelist" spec="^1.3.1" />
