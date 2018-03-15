@@ -38,14 +38,10 @@ export class FormulariosProvider {
   }
   gruposbase(caso) {
     return this.database.formularioid(caso).then((data: any) => {
-      console.log('idf', data);
       return this.database.gruposbyid(data).then(grupodb => {
         this.items = grupodb;
-        console.log(this.items);
         return this.items;
       });
-
-      //      return this.items; 
     });
   }
   preguntasgrupo(grupo, tipo) {
@@ -61,11 +57,8 @@ export class FormulariosProvider {
     return this.database.preguntasporgrupo(grupo, tipo).then((data: any) => {
       data.forEach(preguntas => {
         this.database.respuestasporpreguntaf(preguntas.codigorespuesta).then((respuestasdisponibles: any) => {
-          console.log('err',respuestasdisponibles);
           respuestasdisponibles.forEach(posiblerespuesta => {
             this.database.respuestasguardadasporpregunta(unidad, grupo, tipo, preguntas.codigo).then((dataguardada: any) => {
-              console.log('dataguardada', dataguardada);
-
               if (dataguardada.length) {                
                 posiblerespuesta.respuesta=false;
 
@@ -75,7 +68,6 @@ export class FormulariosProvider {
                   posiblerespuesta.respuesta = dataguardada.valorseleccionado;
                   posiblerespuesta.ruta = dataguardada.ruta;
                 } else if (posiblerespuesta.tipo == 210003) {
-                  console.log('prueba', dataguardada.valorseleccionado);
                   posiblerespuesta.respuesta = dataguardada.valorseleccionado;
                   posiblerespuesta.ruta = dataguardada.ruta;
                 } else if (posiblerespuesta.tipo == 210002) {
@@ -87,14 +79,13 @@ export class FormulariosProvider {
                   let arrayvalores;
                   if (dataguardada.codigorespuestaseleccionada) {
                     arrayvalores = dataguardada.codigorespuestaseleccionada.split('_');
-                  console.log('res',posiblerespuesta);
                     if (arrayvalores.indexOf(posiblerespuesta.codigo.toString()) != -1) {
                       posiblerespuesta.respuesta = true;
                     } else {
-                      posiblerespuesta.respuesta = false;
+                      posiblerespuesta.respuesta = null;
                     }
                   } else {
-                    posiblerespuesta.respuesta = false;
+                    posiblerespuesta.respuesta = null;
                   };
 
                 } else {
@@ -108,11 +99,7 @@ export class FormulariosProvider {
         })
 
       });
-      console.log('items final prueba',data);
 
-      //      this.items = data;
-
-      //return this.items;
     });
   }
 
@@ -129,16 +116,13 @@ export class FormulariosProvider {
     });
     loading.present();
     return this.database.respuestasporpregunta(codigosrespuesta).then(data => {
-      console.log(data)
       this.items = data;
       return this.items;
     }, err => {
       loading.dismiss();
-      this.handleError('Error cargando informacion, intentelo nuevamente');
+      this.handleError('Error cargando información, inténtelo de nuevo');
     }).then(() => {
-      console.log('respuestas', this.items);
       return this.database.respuestasguardadas(up, grupo, tipo).then((dt) => {
-        console.log('guardado', dt);
         let da: any;
         da = dt;
         if (this.items) {
@@ -151,7 +135,6 @@ export class FormulariosProvider {
                     respuestas.respuesta = valores.valorseleccionado;
                     respuestas.ruta = valores.ruta;
                   } else if (respuestas.tipo == 210003) {
-                    console.log('prueba', valores.valorseleccionado);
                     respuestas.respuesta = valores.valorseleccionado;
                     respuestas.ruta = valores.ruta;
                   } else if (respuestas.tipo == 210002) {
@@ -184,7 +167,7 @@ export class FormulariosProvider {
       })
     }).catch(err => {
       loading.dismiss();
-      this.handleError('Error cargando informacion, intentelo nuevamente');
+      this.handleError('Error cargando información, inténtelo de nuevo');
     });
   }
 
@@ -198,8 +181,8 @@ export class FormulariosProvider {
 
   guardar3001(unidadp, grup, codigopararespuestas, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario) {
     this.database.guardarrespuestaporpregunta(unidadp, grup, codigopararespuestas, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario).then(() =>
-      this.database.respuestasguardadast().then((d) => { console.log('d', d) }, err => { console.log('e', err) })
-    ).catch((err) => { console.log(err) });
+      this.database.respuestasguardadast().then((d) => { }, err => {  })
+    ).catch((err) => {  });
 
   }
   guardarobservacion(up, grupoidselected, respcodigo, preguntaid, observacion, tipof) {
@@ -217,18 +200,14 @@ export class FormulariosProvider {
   preguntasconrespuestastabla(preguntaid) {
     return this.database.preguntastablaporid(preguntaid).then((dt) => {
       this.items = dt;
-      console.log('preguntas tabla',dt);
       return this.items;
     })
   }
-  //codigorespuestadelapregunta, unidadp, grupo, preguntaid(hijadela tabla),tipodeformulario
   respuestastablas(codigorespuesta, up, grupo, preguntapadre, tipo, preguntaid) {
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
       content: 'Cargando informacion...'
     });
-//    loading.present();
-
     return this.database.respuestasapreguntastablas(codigorespuesta).then((data) => {
       this.items = data;
       return this.items;
@@ -237,7 +216,6 @@ export class FormulariosProvider {
       let cant = this.items.length;
       this.items.forEach(element => {
         return this.database.respuestasguardadastabla(up, grupo, preguntapadre, preguntaid, element.codigo, tipo).then((respuesta) => {
-          //          console.log('encontro una respuesta',respuesta);
           let respues = respuesta;
           if (element.tipo == 210001) {
             if (!respuesta) {
@@ -262,22 +240,16 @@ export class FormulariosProvider {
           }
           inicial = inicial + 1;
           if (inicial == cant) {
-//            loading.dismiss();
-
           }
         }, err => {
           inicial = inicial + 1;
           if (inicial == cant) {
-//            loading.dismiss();
-
           }
         });
       });
       return this.items;
     }).catch((err) => {
-      this.handleError('error cargando informacion, intento nuevamente');
-//      loading.dismiss();
-      console.log(err);
+      this.handleError('Error cargando información, inténtelo de nuevo');
     });
 
   }
@@ -285,14 +257,14 @@ export class FormulariosProvider {
     this.database.guardarrespuestaporpreguntatabla(unidadp, grup, codigopararespuestas, preguntapadre, preguntaid, codigosdelasrespuestas, valoresdelasrespuestas, valortext, tipoformulario);
   }
   guardarrespuestatabla(up, grupoidselected, codrespuesta, preguntaid, preguntapadre, valorcodigo, valorvalor, valor, tipocuestionario) {
-    this.database.guardarrespuestaporpreguntatabla(up, grupoidselected, codrespuesta, preguntapadre, preguntaid, valorcodigo, valorvalor, valor, tipocuestionario).then((ok) => { }, (err) => { console.log('este es el erorr', err) });
+    this.database.guardarrespuestaporpreguntatabla(up, grupoidselected, codrespuesta, preguntapadre, preguntaid, valorcodigo, valorvalor, valor, tipocuestionario).then((ok) => { }, (err) => { });
   }
 
   guardarnoconformidades(unidadproductiva, tipo_formulario, categoria, detalle, descripcion, fechacreacion, fechaposiblecierre, estado) {
     return this.database.agregarnoconformidad(unidadproductiva, tipo_formulario, categoria, detalle, descripcion, fechacreacion, fechaposiblecierre, estado).then((dt) => {
       this.items = dt;
       return this.items;
-    }, err => { console.log(err) })
+    }, err => { })
   }
   noconformidades(unidadproductiva, tipo_formulario) {
     return this.database.noconformidades(unidadproductiva, tipo_formulario).then((data) => {
@@ -313,12 +285,9 @@ export class FormulariosProvider {
 
       this.authHttp.get(`${SERVER_URL}/api/catalogValues/findByCatalog/22`).subscribe(
         categoria => {
-          console.log(categoria.json());
           categoria.json().forEach(element => {
             this.database.agregarcategoria(element.codigo, element.campo2).then((ok) => {
-              console.log('ok', ok);
             }, (err) => {
-              console.log('err', err);
             });
           });
         }
@@ -330,49 +299,49 @@ export class FormulariosProvider {
     return this.database.categorias().then((dt) => {
       this.items = dt;
       return this.items;
-    }, err => { console.log(err) })
+    }, err => {})
   }
 
   noconformidadid(id) {
     return this.database.noconformidadid(id).then((dt) => {
       this.items = dt;
       return this.items;
-    }, err => { console.log(err) })
+    }, err => {  })
   }
   editarnoconformidad(id, columna, valor) {
     return this.database.editarnoconformidad(id, columna, valor).then((dt) => {
       this.items = dt;
       return this.items;
-    }, err => { console.log(err) })
+    }, err => { })
   }
 
   agregartarea(noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion) {
     return this.database.agregartarea(noconformidad, nombre, detalle, encargado, fecha, estado, fechacreacion).then((dt) => {
       this.items = dt;
       return this.items;
-    }, err => { console.log(err) })
+    }, err => {  })
   }
 
   tareas(noconformidad) {
     return this.database.tareas(noconformidad).then((dt) => {
       this.items = dt;
       return this.items;
-    }, err => { console.log(err) })
+    }, err => { })
   }
   tareasporid(id) {
     return this.database.tareasporid(id).then((dt) => {
       this.items = dt;
       return this.items;
-    }, err => { console.log(err) })
+    }, err => { })
   }
   tareaseditar(id, nombre, detalle, encargado, fecha, estado, fechacierrereal) {
     return this.database.editartarea(id, nombre, detalle, encargado, fecha, estado, fechacierrereal).then((dt) => {
       this.items = dt;
       return this.items;
-    }, err => { console.log(err) })
+    }, err => { })
   }
   guardarubicacion(unidad, datofecha, latitud, longitud, caso) {
-    this.database.guardarubicacion(unidad, datofecha, latitud, longitud, caso).then((d) => { console.log(d) }, err => { console.log(err) });
+    this.database.guardarubicacion(unidad, datofecha, latitud, longitud, caso).then((d) => {  }, err => {});
   }
 
   enviarrespuesta(formularioaenviar, up, tipo) {
@@ -380,10 +349,12 @@ export class FormulariosProvider {
       spinner: 'bubbles',
       content: 'Enviando informacion para la unidad ' + up.nombre + ' ...'
     });
+    let datosaenviar=formularioaenviar;
+    datosaenviar.formulario.mapa=null;
     loading.present();
+    console.log('datos enviados ',JSON.stringify(datosaenviar));
 
     return this.authHttp.post(`${SERVER_URL}/api/formulario/create/`, formularioaenviar).subscribe((data) => {
-      console.log(data);
       if (data.status == 200) {
         this.cambiarunidadproductiva(up);
         this.handleError('Formulario para la unidad ' + up.nombre + ' Enviado exitosamente');
@@ -398,12 +369,11 @@ export class FormulariosProvider {
       loading.dismiss();
       this.handleError('Error al enviar formulario para la unidad ' + up.nombre);
             
-    })
+    }) 
 
   }
 
   cambiarunidadproductiva(up) {
-    console.log(up);
     this.database.cambiarestado(up.idUnidadProductiva, 2, up.tipo).then(() => {
       this.handleError('unidad ' + up.nombre + ' finalizada exitosamente');
     }, () => {
@@ -414,7 +384,6 @@ export class FormulariosProvider {
   enviarfoto(pregunta) {
     return this.storage.get('jwt').then((jwt) => {
       this.rutaimg = this.file.externalDataDirectory + `${pregunta.unidadproductiva}/${pregunta.grupo.toString()}`;
-      console.log(this.rutaimg, pregunta);
     })
   }
 
@@ -428,7 +397,7 @@ export class FormulariosProvider {
     this.storage.get('jwt').then((jwt) => {
       let options: FileUploadOptions = {
         fileKey: 'file',
-        fileName: imgname.replace(".png", ""),
+        fileName: imgname.replace(".jpg", ""),
         headers: {
           'Authorization': 'Bearer ' + jwt,
           'Content-Type': undefined
@@ -438,7 +407,7 @@ export class FormulariosProvider {
 
       return this.fileTransfer.upload(ruta, `${SERVER_URL}api/photoupload/${idunidad}`, options)
         .then((data) => {
-          this.handleError('foto enviada');
+          this.handleError('Foto enviada');
           loading.dismiss();
         }, (err) => {
           this.handleError(JSON.stringify(err));

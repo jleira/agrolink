@@ -41,7 +41,7 @@ export class ImagePage {
 
     let alert = this.alertCtrl.create({
       title: 'Desea actualizar el mapa',
-      message: 'Para escoger una foto de la galeria del telefono seleccione la opcion Galeria, si desea tomar una foto escoja camara',
+      message: 'Para escoger una foto de la galeria del telefono seleccione la opcion Galeria, si desea tomar una foto seleccione Camara',
       buttons: [
         {
           text: 'Galeria',
@@ -95,7 +95,7 @@ export class ImagePage {
 
 
     }).catch(error => {
-      this.handlermsj('error al guardar mapa');
+      this.handlermsj('Error al guardar mapa');
     });
 
   }
@@ -129,7 +129,7 @@ export class ImagePage {
         })
 
       }).catch(error => {
-        this.handlermsj('error al guardar mapa');
+        this.handlermsj('Error al guardar mapa');
       });
   }
 

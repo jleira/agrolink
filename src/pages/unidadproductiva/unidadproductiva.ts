@@ -107,20 +107,15 @@ export class UnidadproductivaPage {
     profileModal.present();
     profileModal.onDidDismiss(data => {
       if (data) {
-        console.log(data);
 
         this.orientacion = data.orientacion;
         this.mostrar = data.mostrar;
         if (data.territorio > 1) {
           if (data.territorio == 2) {
             this.region.departamentosenpais(data['vereda'].split(',')).then((datapaises) => {
-              console.log('departamentos',datapaises);
               this.region.municipiosendepartamentos(datapaises.split(',')).then((datam) => {
-                console.log('municipios',datam);
                 this.region.regionesenmunicipio(datam).then((datare) => {
-                  console.log('regiones', datare);
                   let tipos = FORMULARIO_AUDITORIA + ',' + FORMULARIO_PROMOTORIA;
-                  console.log('datos a buscaar', this.mostrar.toString(), tipos.toString(), this.orientacion);
                   this.uproductiva.todaslasunidades(datare, this.mostrar.toString(), tipos.toString(), this.orientacion).then((data) => {
                     this.items = data;
                     return this.items;
@@ -131,12 +126,8 @@ export class UnidadproductivaPage {
             });
           } else if (data.territorio == 3) {
             this.region.municipiosendepartamentos(data.vereda.split(',')).then((datam) => {
-                              console.log('municipios',datam);
-
               this.region.regionesenmunicipio(datam).then((datare) => {
-                console.log('regiones', datare);
                 let tipos = FORMULARIO_AUDITORIA + ',' + FORMULARIO_PROMOTORIA;
-                console.log('datos a buscaar', datare, this.mostrar.toString(), tipos.toString(), this.orientacion);
                 this.uproductiva.todaslasunidades(datare, this.mostrar.toString(), tipos.toString(), this.orientacion).then((data) => {
                   this.items = data;
                   return this.items;
@@ -146,9 +137,7 @@ export class UnidadproductivaPage {
             });
           } else if (data.territorio == 4) {
               this.region.regionesenmunicipio(data.vereda.split(',')).then((datare) => {
-                console.log('regiones', datare);
                 let tipos = FORMULARIO_AUDITORIA + ',' + FORMULARIO_PROMOTORIA;
-                console.log('datos a buscaar', this.mostrar.toString(), tipos.toString(), this.orientacion);
                 this.uproductiva.todaslasunidades(datare, this.mostrar.toString(), tipos.toString(), this.orientacion).then((data) => {
                   this.items = data;
                   return this.items;

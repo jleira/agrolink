@@ -344,16 +344,22 @@ export class DbProvider {
   todasuproductivasap(caso) {
     return this.isReady()
       .then(() => {
-        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado, tipo, mapa from unidades_productivas WHERE tipo IN (${caso},1003)`, []).then((data) => {
+        return this.database.executeSql(`SELECT idUnidadProductiva, nombre, regionId, IdProductor, terminado, tipo, mapa, idAsignacion, datosproductor from unidades_productivas WHERE tipo IN (${caso},1003)`, []).then((data) => {
           let todas = [];
           for (let i = 0; i < data.rows.length; i++) {
             let todo = data.rows.item(i);
             this.nombreregion(todo.regionId).then((data: any) => {
               todo.region = data;
             });
-            this.nombreproductor(todo.IdProductor).then((data: any) => {
-              todo.productor = data;
-            });
+            if(todo.IdProductor ){
+              this.nombreproductor(todo.IdProductor).then((data: any) => {
+                todo.productor = data;
+              });  
+            }else{
+              let ndatos=JSON.parse(todo.datosproductor);
+              todo.productor=ndatos.nombre;
+            }
+
             todas.push(todo);
           }
           return todas;
@@ -409,13 +415,24 @@ export class DbProvider {
                 todo.municipioid = data.municipioid;
                 todo.regionnombre = data.nombre;
               });
-              this.datosproductor(todo.IdProductor).then((data: any) => {
-                todo.productornombre = data.nombre;
-                todo.identificacion = data.identificacion;
-                todo.telefono = data.telefono;
-                todo.annoIngreso = data.annoIngreso;
-                todo.ultimaAplicacion = data.ultimaAplicacion;
-              });
+
+              if(todo.IdProductor){
+                this.datosproductor(todo.IdProductor).then((data: any) => {
+                  todo.productornombre = data.nombre;
+                  todo.identificacion = data.identificacion;
+                  todo.telefono = data.telefono;
+                  todo.annoIngreso = data.annoIngreso;
+                  todo.ultimaAplicacion = data.ultimaAplicacion;
+                });
+  
+              }else{
+                let datosdeproductor=JSON.parse(todo.datosproductor);
+                todo.productornombre = datosdeproductor.nombre;
+                todo.identificacion = datosdeproductor.identificacion;
+                todo.telefono = datosdeproductor.telefono;
+                todo.annoIngreso = '';
+                todo.ultimaAplicacion = ' ';
+              }
               todas.push(todo);
             }
             return todas;
@@ -702,7 +719,7 @@ export class DbProvider {
       .then(() => {
         return this.database.executeSql(`INSERT INTO formularios (id, nombre, observaciones, tipo, periodo) VALUES (?, ?, ?, ?, ?);`,
           [codigo, nombre, observaciones, tipo, periodo]);
-      });
+      })
   }
   guardarp(data) {
     return this.isReady()
@@ -1057,9 +1074,8 @@ export class DbProvider {
             }
             return id;
           }).then((idseleccion) => {
-            console.log(idseleccion);
             if (idseleccion == false) {
-              this.handleError2('Debe guardar antes la respuesta, para asi poder asiganar una observacion');
+              this.handleError2('Debe guardar antes la respuesta, para asi poder asignar una observación');
               return false;
             } else {
               return this.database.executeSql(
@@ -1093,7 +1109,7 @@ export class DbProvider {
           }).then((idseleccion) => {
 
             if (idseleccion == false) {
-              this.handleError2('Debe guardar antes la respuesta, para asi poder asiganar una imagen');
+              this.handleError2('Debe guardar antes la respuesta, para asi poder asignar una imagen');
 
               return false;
             } else {
@@ -1215,14 +1231,11 @@ export class DbProvider {
     }, err=>{
     }).then((data)=>{
       if(data){
-        console.log('true');
         return this.database.executeSql(`INSERT INTO preguntastabla 
         (preguntaid, preguntapadre, enunciado, fila, codigorespuesta, observacion) VALUES (?, ?, ?, ?, ?, ?);`,
           [preguntaid, preguntapadre, enunciado, fila, codigorespuesta, observacion]);
 
       }else{
-        console.log('false');
-
         return false;
       }
     })
@@ -1290,13 +1303,17 @@ export class DbProvider {
             return id;
           }).then((idseleccion) => {
             if (idseleccion == false) {
+              if(valortext!==false){
+                return this.database.executeSql(
+                  `INSERT INTO respuestasguardadastabla 
+          (unidadproductiva, grupo, respuestascodigo ,preguntapadre ,preguntaid, codigorespuesta, valorrespuesta, valor , tipoformulario)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                  [unidadp, grup, respuestascodigo, preguntapadre, preguntaid, codigoresp, valorresp, valortext, tipoformulario]);
+              }
+              else {
+                return false;
+              }
 
-              return this.database.executeSql(
-                `INSERT INTO respuestasguardadastabla 
-        (unidadproductiva, grupo, respuestascodigo ,preguntapadre ,preguntaid, codigorespuesta, valorrespuesta, valor , tipoformulario)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-
-                [unidadp, grup, respuestascodigo, preguntapadre, preguntaid, codigoresp, valorresp, valortext, tipoformulario]);
 
             } else {
               return this.database.executeSql(
@@ -1309,7 +1326,6 @@ export class DbProvider {
   }
 
   respuestasguardadastabla(unidadp, grupo, preguntapadre, preguntaid, codigorespuesta, tipoformulario) {
-//    console.log('respuestas de otro ',unidadp, grupo, preguntapadre, preguntaid, codigorespuesta, tipoformulario);
     let up = unidadp;
     let gr = grupo;
     let pr = preguntaid;
@@ -1525,24 +1541,32 @@ export class DbProvider {
     })
   }
 
-  guardarubicacion(idUnidadProductiva,  datofecha, latitud, longitud, caso) {
-
+  guardarubicacion(idUnidadProductiva,  datofecha, latitud, longitud, caso) { 
+    console.log(idUnidadProductiva,  datofecha, latitud, longitud, caso);
     let idseleccion = idUnidadProductiva;
     return this.isReady()
       .then(() => {
         return this.database.executeSql(`SELECT * from unidades_productivas WHERE  idUnidadProductiva =  (?) AND tipo =(?) `, [idseleccion, caso])
           .then((data) => {
             let todo = data.rows.item(0);
+            console.log('unidad a editadar',todo);
               if (todo.latitudinicio === null) {
                 return this.database.executeSql(
                   `UPDATE unidades_productivas SET fechainicio = (?), latitudinicio = (?), longitudinicio=(?),fechafin = (?), latitudfin = (?), longitudfin=(?) , terminado = 1 WHERE idUnidadProductiva = '${idseleccion}' AND tipo = ${todo.tipo};`,
-                  [datofecha, latitud, longitud,datofecha, latitud, longitud]).then((datae) => { return data; }).catch(err => { return err; });
+                  [datofecha, latitud, longitud,datofecha, latitud, longitud]).then((datae) => { console.log('dataok',datae); 
+                  return data; }).catch(err => {
+                    console.log('dataerr',err);
+                     return err; });
               } else {
                 return this.database.executeSql(
                   `UPDATE unidades_productivas SET fechafin = (?), latitudfin = (?), longitudfin=(?) WHERE idUnidadProductiva = '${idseleccion}' AND tipo = ${todo.tipo};`,
-                  [datofecha, latitud, longitud]).then((datae) => { }).catch(err => { return err; });
+                  [datofecha, latitud, longitud]).then((datae) => { console.log('dataok',datae); }).catch(err => { 
+                    console.log('dataerr',err);                    
+                    return err; });
               }
           },er=>{})
+      }).catch((err)=>{
+         console.log('error en la tabla ',err);
       })
   }
 
@@ -1742,6 +1766,21 @@ export class DbProvider {
  
 
   }
+/* formularios(){
+  return this.isReady()
+  .then(() => {
+    return this.database.executeSql(`SELECT * FROM formularios  `, []).then((data) => {
+      let todos=[];
+      if (data.rows.length) {
+        for (let i = 0; i < data.rows.length; i++) {
+          let todo = data.rows.item(0);
+          todos.push(todo);
+        }
+      } 
+      return todos;
+    })
 
+  })
+} */
 
 }

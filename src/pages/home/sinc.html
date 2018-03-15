@@ -14,28 +14,27 @@
   <ion-content fullscreen >
       <ion-item>
           <ion-label>Tipo de formulario</ion-label>
-          <ion-select (ionChange)="habilitartipo($event)">
-              <ion-option  [value]="1001" *ngIf="promotor">Promotoria</ion-option>        
-              <ion-option  [value]="1002" *ngIf="auditor">Auditoria</ion-option>        
+          <ion-select (ionChange)="habilitartipo($event)" okText="Seleccionar" cancelText="Cancelar">
+              <ion-option  [value]="tipopromotoria" *ngIf="promotor">Promotoría</ion-option>        
+              <ion-option  [value]="tipoauditoria" *ngIf="auditor">Auditoría</ion-option>        
 
           </ion-select>
         </ion-item>
   
       <ion-item *ngIf="promotorseleccionado">
-          <ion-label>Unidades para promotoria</ion-label>
+          <ion-label>Unidades para promotoría</ion-label>
       
-          <ion-select multiple (ionChange)="comprobarunidades(1001,$event)">
+          <ion-select multiple (ionChange)="comprobarunidades(tipopromotoria,$event)" okText="Seleccionar" cancelText="Cancelar">
             <div *ngFor="let categoria of upp">
               <ion-option [value]="categoria">{{categoria.nombre}}</ion-option>
-
             </div>
       
-          </ion-select>
+          </ion-select> 
       </ion-item>
       <ion-item *ngIf="auditorseleccionado">
-        <ion-label>Unidades para auditoria</ion-label>
+        <ion-label>Unidades para auditoría</ion-label>
       
-        <ion-select multiple (ionChange)="comprobarunidades(1002,$event)">
+        <ion-select multiple (ionChange)="comprobarunidades(tipoauditoria,$event)" okText="Seleccionar" cancelText="Cancelar">
           <div *ngFor="let categoria of upa">
             <ion-option  [value]="categoria">{{categoria.nombre}}</ion-option>
 
@@ -45,7 +44,7 @@
       </ion-item>
 <div *ngIf="!habilitarenvio">
     <ion-item no-lines>
-        <label>Pregunta sin responder </label>
+        <label>Preguntas sin responder </label>
         </ion-item>
   <ion-item *ngFor="let pregunta of preguntassinresponder" text-wrap (click)="abrirpagina(pregunta)">
       <h2>{{pregunta.preguntaid.enunciado}}</h2>

@@ -1,10 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, LoadingController, ToastController } from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
-import { PerfilProvider } from '../../providers/perfil/perfil';
-import { RegionProvider } from '../../providers/region/region';
-import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
-import { FormulariosProvider } from '../../providers/formularios/formularios';
 import { Http} from '@angular/http';
 import {SERVER_URL} from "../../config";
 let apiUrl = SERVER_URL;
@@ -25,10 +21,6 @@ export class LoginPage {
     public authService: AuthProvider,
     public loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
-    public perfil: PerfilProvider,
-    public region: RegionProvider,
-    public uproductiva: UproductivaProvider,
-    public formularios: FormulariosProvider
   ) {
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
@@ -40,18 +32,13 @@ export class LoginPage {
       loading.dismiss();
       if(data.json()){
         this.empresas=data.json();
-        console.log('1');
       }else{
         this.msj='erroes en el servidor, consulte con su administrador'; 
-        console.log('2');
-
       }
     },
      (err)=>{ 
        loading.dismiss();
        this.msj='erroes en el servidor, consulte con su administrador';
-       console.log('3');
-
     });
 
   }
@@ -60,12 +47,10 @@ export class LoginPage {
       spinner: 'bubbles',
       content: 'Validando datos...'
     });
-    loading.present();
-    
+    loading.present();    
     this.authService.login(value).finally(()=>{
       loading.dismiss();
     }).subscribe(() => {
-
       },
       (err) => {
         this.handleError(err);
@@ -79,7 +64,6 @@ export class LoginPage {
     else {
       message = `Unexpected error: ${error.statusText}`;
     }
-
     const toast = this.toastCtrl.create({
       message,
       duration: 10000,

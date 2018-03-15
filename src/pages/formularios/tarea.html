@@ -23,7 +23,7 @@
     </ion-item>
 
     <ion-item text-wrap>
-      <ion-label stacked>detalles</ion-label>
+      <ion-label stacked>Detalles</ion-label>
       <ion-textarea text-wrap type="text" rows="6" name='detalle' [(ngModel)]="descripciona" required #detalle="ngModel" [class.invalid]="detalle.errors && detalle.dirty">
         
       </ion-textarea>
@@ -47,7 +47,7 @@
         name="fecha" required #fecha="ngModel" [class.invalid]="fecha.errors && fecha.dirty"></ion-datetime>
     </ion-item>
     <ion-item class="error-message" no-lines *ngIf="fecha.errors?.required && fecha.dirty">
-      <p style="color:red">Fecha de posible solucion Requerida </p>
+      <p style="color:red">Fecha pautada de cierre Requerida </p>
     </ion-item>
 
     <div padding>
@@ -62,7 +62,7 @@
     <ion-card-content>
 
       <ion-item>
-        <h2><strong>Inconformidad Id</strong></h2>
+        <h2><strong>No Conformidad Id</strong></h2>
         <h4>{{noconformidada}}</h4>
       </ion-item>
 
@@ -81,7 +81,7 @@
 
 
       <ion-item   text-wrap>
-        <h2><strong>Descripcion</strong></h2>
+        <h2><strong>Descripción</strong></h2>
         <h3>{{descripciona}}</h3>
       </ion-item>
 

@@ -11,7 +11,7 @@ import { UproductivaProvider } from '../../providers/uproductiva/uproductiva';
 export class FiltroupPage {
 
   opciones: any;
-  vereda: any; // por defecto se muestran todas, en caso de que quiera ver una o varias en especifico
+  vereda: any;
   mostrar = '0,1,2';//todas , pendientes, terminadas
   ordenar_por: any;
   orientacion: any;
@@ -47,17 +47,13 @@ export class FiltroupPage {
             this.opciones.forEach(element => {
               veredas.push(element.id);
             });
-            console.log('this',veredas);
             this.vereda = veredas.join(',');
-  
-    
             }
         }else{
           let veredas=[];
           this.opciones.forEach(element => {
             veredas.push(element.id);
           });
-          console.log('this',veredas);
           this.vereda = veredas.join(',');        
         }
       } else {
@@ -67,15 +63,9 @@ export class FiltroupPage {
       this.territorio = 1;
       this.vereda = false;
     }
-
-
     if (!this.orientacion) {
       this.orientacion = false;
     }
-
-
-    console.log(this.mostrar, this.territorio, this.vereda, this.orientacion);
-
     this.viewCtrl.dismiss({
       territorio: this.territorio,
       mostrar: this.mostrar,
@@ -87,8 +77,6 @@ export class FiltroupPage {
     this.viewCtrl.dismiss(false);
   }
   enviar2() {
-
-    console.log(this.territorio);
     if (this.territorio == 1) {
       this.seccion = true;
       this.seccion_select = "";
@@ -99,26 +87,21 @@ export class FiltroupPage {
     if (this.territorio == 2) {
       this.seccion = false;
       this.seccion_select = "Paises";
-      this.uproductiva.paises2().then((data: any) => { console.log(data); this.opciones = data; return this.opciones }, err => {
-        console.log(err);
+      this.uproductiva.paises2().then((data: any) => { this.opciones = data; return this.opciones }, err => {
       });
-
       this.todo = "todos";
     }
     if (this.territorio == 3) {
       this.seccion = false;
       this.seccion_select = "Departamentos";
-      this.uproductiva.departamentos2().then((data: any) => { console.log(data); this.opciones = data; return this.opciones }, err => {
-        console.log(err);
+      this.uproductiva.departamentos2().then((data: any) => { this.opciones = data; return this.opciones }, err => {
       });
       this.todo = "todos";
-
     }
     if (this.territorio == 4) {
       this.seccion = false;
       this.seccion_select = "Municipios";
-      this.uproductiva.municipios2().then((data: any) => { console.log(data); this.opciones = data; return this.opciones }, err => {
-        console.log(err);
+      this.uproductiva.municipios2().then((data: any) => { this.opciones = data; return this.opciones }, err => {
       });
       this.todo = "todos";
 
@@ -126,15 +109,9 @@ export class FiltroupPage {
     if (this.territorio == 5) {
       this.seccion = false;
       this.seccion_select = "Regiones";
-      this.uproductiva.regiones2().then((data: any) => { console.log(data); this.opciones = data; return this.opciones }, err => {
-        console.log(err);
+      this.uproductiva.regiones2().then((data: any) => { this.opciones = data; return this.opciones }, err => {
       });
       this.todo = "todas";
     }
-
-    //    return this.seccion, this.seccion_select, this.opciones, this.todo;
-
-
   }
-
 }

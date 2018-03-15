@@ -12,6 +12,8 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 import { File, DirectoryEntry } from '@ionic-native/file';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Loading } from 'ionic-angular/components/loading/loading';
+import { formatUrlPart } from 'ionic-angular/navigation/url-serializer';
+import { AuthProvider } from '../../providers/auth/auth';
 
 
 @IonicPage()
@@ -38,6 +40,9 @@ export class FormulariosPage {
   datofecha: any;
   datolongitud: any;
   datolatitud: any;
+  administrador = 0;
+  usuario;
+  empresa;
 
 
   constructor(
@@ -53,7 +58,8 @@ export class FormulariosPage {
     private file: File,
     private geolocation: Geolocation,
     public db: DbProvider,
-    public popoverCtrl: PopoverController) {
+    public popoverCtrl: PopoverController,
+    public authService: AuthProvider) {
     this.caso = navParams.get('caso');
   }
 
@@ -137,7 +143,6 @@ export class FormulariosPage {
                       }
                     }
                   }
-
                 })
               });
             }
@@ -155,17 +160,19 @@ export class FormulariosPage {
       modal.present();
     }
   }
-
-
   ionViewDidEnter() {
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
-      content: 'Cargando informacion...'
+      content: 'Cargando información...'
     });
-
-
     if (this.caso == 1) {//auditoria
       loading.present();
+      this.administrador = this.navParams.get('administrador');
+      if (this.administrador) {
+        this.administrador = 1;
+        this.usuario = this.navParams.get('usuario');
+        this.empresa = this.navParams.get('empresa');
+      }
       return this.uproductiva.llamaruproductivasap(1002).then((data: any) => {
         data.forEach(element => {
           element.porcentaje = 0;
@@ -190,22 +197,15 @@ export class FormulariosPage {
                       })
                     })
                   } else {
-
                   };
                 }, err => {
-
                 });
               });
             } else {
-
             }
           }, err => {
-
           })
         });
-
-
-
         this.items = data;
         loading.dismiss();
         return this.items;
@@ -213,6 +213,13 @@ export class FormulariosPage {
 
     } else if (this.caso == 2) {//promotoria
       loading.present();
+      this.administrador = this.navParams.get('administrador');
+      if (this.administrador) {
+        this.administrador = 2;
+        this.usuario = this.navParams.get('usuario');
+        this.empresa = this.navParams.get('empresa');
+
+      }
       return this.uproductiva.llamaruproductivasap(1001).then((data: any) => {
         data.forEach(element => {
           element.porcentaje = 0;
@@ -253,6 +260,17 @@ export class FormulariosPage {
         return this.items;
       });
     } else if (this.caso == 3) {
+
+      this.geolocation.getCurrentPosition().then((resp) => {
+        this.datolatitud = resp.coords.latitude.toString();
+        this.datolongitud = resp.coords.longitude.toString();
+        console.log('coordenadas', this.datolatitud, this.datolatitud);
+      }).catch((error) => {
+        this.datolatitud = null;
+        this.datolongitud = null;
+        console.log('no se puedo acceder a cordenadas');
+      })
+
       loading.present();
       this.unidadproductiva = this.navParams.get('up');
       this.up = this.unidadproductiva.idUnidadProductiva;
@@ -310,7 +328,7 @@ export class FormulariosPage {
       }, err => {
       })
 
-    } else if (this.caso == 4) {//promotoria
+    } else if (this.caso == 4) {
       loading.present();
       this.productor = this.navParams.get('productor');
       this.tipocuestionario = this.navParams.get('tipo');
@@ -324,36 +342,56 @@ export class FormulariosPage {
       fechaentro = new Date();
       fechaentro = fechaentro.getFullYear() + '-' + ("0" + (fechaentro.getMonth() + 1)).slice(-2) + '-' + ("0" + fechaentro.getDate()).slice(-2) + ' ' + ("0" + fechaentro.getHours()).slice(-2) + ':' + ("0" + fechaentro.getMinutes()).slice(-2) + ':00';
       this.datofecha = fechaentro;
+      this.datolatitud=this.navParams.get('latitude');
+      this.datolongitud=this.navParams.get('longitude');
+      if (this.datolatitud && this.datolongitud) {
+        console.log('coordenadas', this.datolatitud,this.datolongitud);
+      } else {
+        let loading = this.loadingCtrl.create({
+          spinner: 'bubbles',
+          content: 'Obteniendo coordenadas...'
+        });
+//        loading.present();
+        this.geolocation.getCurrentPosition().then((resp) => {
+          this.datolatitud = resp.coords.latitude.toString();
+          this.datolongitud = resp.coords.longitude.toString();
+          console.log('coordenadas', resp);
+//          loading.dismiss();  
+        }).catch((error) => {
+//          loading.dismiss();
+          this.datolatitud = null;
+          this.datolongitud = null;
+          console.log('coordenadas', error);        
+          this.handleError('No se pudo obtener información de las ubicacion del dispositivo');
+        })
+  
+      }
+
+
 
       this.geolocation.getCurrentPosition().then((resp) => {
         this.datolatitud = resp.coords.latitude.toString();
         this.datolongitud = resp.coords.longitude.toString();
-        //        this.handleError('ESTA ES LA UNICACION DEL TELEFONO, ' + this.datolatitud + ' ' + this.datolongitud);
       }).catch((error) => {
         this.datofecha = fechaentro;
         this.datolatitud = null;
         this.datolongitud = null;
-        this.handleError('no se pudo acceder a la ubicacion del telefono ' + error.message);
-      }).then(() => {
-      });
-
-
-
+        this.handleError('no se pudo acceder a la ubicación del dispositivo, ' + error.message);
+      })
       this.db.preguntasporgrupo(this.grupoidselected, this.tipo).then((data: any) => {
         this.items = data;
         this.items.forEach(preguntas => {
           if (preguntas.tipo == 3007) {
             preguntas.encabezado = JSON.parse(atob(preguntas.encabezado));
-            console.log(preguntas.encabezado);
             preguntas.celdas = 1;
-            preguntas.encabezado.forEach(element => {                
-                if(element.columnas.length>preguntas.celdas){
-                  preguntas.celdas=element.columnas.length;
-                }
+            preguntas.encabezado.forEach(element => {
+              if (element.columnas.length > preguntas.celdas) {
+                preguntas.celdas = element.columnas.length;
+              }
             });
             let loading = this.loadingCtrl.create({
               spinner: 'bubbles',
-              content: `Cargando informacion de ${preguntas.enunciado}`
+              content: `Cargando información de ${preguntas.enunciado}`
             });
             loading.present();
             return this.formulario.preguntasconrespuestastabla(preguntas.codigo).then((datatabla) => {
@@ -386,8 +424,6 @@ export class FormulariosPage {
           } else {
             if (preguntas.codigorespuesta) {
               return this.db.respuestasporpreguntaf(preguntas.codigorespuesta).then((respuestasdisponibles: any) => {
-
-                //              console.log('err', respuestasdisponibles);
                 this.resp = respuestasdisponibles;
                 preguntas.prueba = [];
                 this.resp.forEach(posiblerespuesta => {
@@ -412,8 +448,6 @@ export class FormulariosPage {
                         if (dataguardada.codigorespuestaseleccionada) {
                           arrayvalores = dataguardada.codigorespuestaseleccionada.split('_');
                           if (arrayvalores.indexOf(posiblerespuesta.codigo.toString()) != -1) {
-//                            console.log('res', posiblerespuesta, 'array valores', arrayvalores);
-
                             posiblerespuesta.respuesta = true;
                             preguntas.prueba.push(posiblerespuesta);
                           } else {
@@ -422,7 +456,6 @@ export class FormulariosPage {
                         } else {
                           posiblerespuesta.respuesta = false;
                         }
-
                       } else {
                         posiblerespuesta.ruta = dataguardada.ruta;
                       }
@@ -439,11 +472,7 @@ export class FormulariosPage {
         return this.items;
       }).then((datafinal) => {
         this.final = datafinal;
-        console.log(this.final);
-
         loading.dismiss();
-        //        return this.final;
-
       });
 
     }
@@ -472,27 +501,23 @@ export class FormulariosPage {
       cas = id;
     }
     if (this.unidadproductiva.terminado == 2) {
-      this.handleError('No se pueden agregar inconformidades una vez envidadas las respuestas');
+      this.handleError('No se pueden agregar no conformidades una vez sincronizados los formularios');
     } else {
       let modal = this.navCtrl.push(NuevanoconformidadPage, { 'up': this.up, 'tipo': this.tipo, 'id': cas, 'productor': this.productor });
     }
   }
-
-
-  //nuevas funciones
   guardarfecha(valor, preguntaid, respcodigo, event) {
     if (this.unidadproductiva.terminado == 2) {
-      this.handleError('No se pueden editar las respuestas una vez envidas');
+      this.handleError('No se pueden editar las respuestas una vez enviadas');
       this.recargaritem();
     } else {
-      console.log('fecha', event);
       this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, event, this.tipocuestionario);
       this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
     }
   }
   guardar3003(valor, preguntaid, respcodigo, respuestafinal) {
     if (this.unidadproductiva.terminado == 2) {
-      this.handleError('No se pueden editar las respuestas una vez envidas');
+      this.handleError('No se pueden editar las respuestas una vez enviadas');
       this.recargaritem();
     } else {
 
@@ -500,13 +525,11 @@ export class FormulariosPage {
       this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
     }
   }
-
   guardar3001(valor, preguntaid, respcodigo) {
     if (this.unidadproductiva.terminado == 2) {
-      this.handleError('No se pueden editar las respuestas una vez envidas');
+      this.handleError('No se pueden editar las respuestas una vez enviadas');
       this.recargaritem();
     } else {
-      console.log(valor, preguntaid, respcodigo);
       this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, true, this.tipocuestionario);
       this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
     }
@@ -514,7 +537,7 @@ export class FormulariosPage {
 
   guardar3006(valor, preguntaid, respcodigo, respuestafinal) {
     if (this.unidadproductiva.terminado == 2) {
-      this.handleError('No se pueden editar las respuestas una vez envidas');
+      this.handleError('No se pueden editar las respuestas una vez enviadas');
       this.recargaritem;
     } else {
       this.formulario.guardar3001(this.up, this.grupoidselected, respcodigo, preguntaid, valor.codigo, valor.valor, respuestafinal, this.tipocuestionario);
@@ -523,10 +546,9 @@ export class FormulariosPage {
   }
   guardar3002(valor, preguntaid, respcodigo) {
     if (this.unidadproductiva.terminado == 2) {
-      this.handleError('No se pueden editar las respuestas una vez envidas');
+      this.handleError('No se pueden editar las respuestas una vez enviadas');
       this.recargaritem;
     } else {
-      console.log(valor, preguntaid, respcodigo);
       let codigosrespuestas: any = [];
       let valoresrespuesta: any = [];
       valor.forEach(element => {
@@ -542,7 +564,6 @@ export class FormulariosPage {
 
   guardarobservacion(preguntaid, respcodigo, observacion) {
     this.formulario.guardarobservacion(this.up, this.grupoidselected, respcodigo, preguntaid, observacion, this.tipocuestionario).then((datos) => {
-      console.log('observacion', datos);
       if (!datos) {
         this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
 
@@ -569,10 +590,48 @@ export class FormulariosPage {
   }
 
   mostrarpreguntas(grupoid, nbre) {
+
     this.navCtrl.push(FormulariosPage, {
-      caso: 4, grupo: grupoid, up: this.unidadproductiva, gruponombre: nbre, tipo: this.navParams.get('tipo')
+      caso: 4, grupo: grupoid, up: this.unidadproductiva, gruponombre: nbre, tipo: this.navParams.get('tipo'),
+      longitude:this.datolongitud,latitude:this.datolatitud
     });
-  }
+/* 
+    if (this.datolatitud && this.datolongitud) {
+      this.navCtrl.push(FormulariosPage, {
+        caso: 4, grupo: grupoid, up: this.unidadproductiva, gruponombre: nbre, tipo: this.navParams.get('tipo'),
+        longitude:this.datolongitud,latitude:this.datolatitud
+      });
+    } else {
+      let loading = this.loadingCtrl.create({
+        spinner: 'bubbles',
+        content: 'Obteniendo coordenadas...'
+      });
+      loading.present();
+      this.geolocation.getCurrentPosition().then((resp) => {
+        this.datolatitud = resp.coords.latitude.toString();
+        this.datolongitud = resp.coords.longitude.toString();
+        console.log('coordenadas', resp);
+        loading.dismiss();
+        this.navCtrl.push(FormulariosPage, {
+          caso: 4, grupo: grupoid, up: this.unidadproductiva, gruponombre: nbre, tipo: this.navParams.get('tipo'),
+          longitude:this.datolongitud,latitude:this.datolatitud
+        });
+
+      }).catch((error) => {
+        loading.dismiss();
+        this.datolatitud = null;
+        this.datolongitud = null;
+        console.log('coordenadas', error);        
+        this.handleError('No se pudo obtener la ubicación de dispositivo');
+        this.navCtrl.push(FormulariosPage, {
+          caso: 4, grupo: grupoid, up: this.unidadproductiva, gruponombre: nbre, tipo: this.navParams.get('tipo'),
+          longitude:this.datolongitud,latitude:this.datolatitud
+        });
+      })
+
+    }
+
+ */  }
 
 
   presentConfirm(codigo, respcodigo) {
@@ -608,7 +667,7 @@ export class FormulariosPage {
       quality: 100,
       destinationType: this.camera.DestinationType.FILE_URI,
       sourceType: this.camera.PictureSourceType.CAMERA,
-      encodingType: this.camera.EncodingType.PNG,
+      encodingType: this.camera.EncodingType.JPEG,
       mediaType: this.camera.MediaType.PICTURE
     }
     let targetPath = this.file.externalDataDirectory;
@@ -679,29 +738,28 @@ export class FormulariosPage {
       destinationType: this.camera.DestinationType.DATA_URL,
       mediaType: this.camera.MediaType.PICTURE,
       saveToPhotoAlbum: true,
-      encodingType: this.camera.EncodingType.PNG
+      encodingType: this.camera.EncodingType.JPEG
     }
+    let loading = this.loadingCtrl.create({
+      spinner: 'bubbles',
+      content: 'Guardando imagen...'
+    });
+    loading.present();
+
     this.camera.getPicture(options)
       .then(imageData => {
-        let loading = this.loadingCtrl.create({
-          spinner: 'bubbles',
-          content: 'Guardando imagen...'
-        });
-        loading.present();
-
-        console.log('1', imageData);
-        let image = "data:image/png;base64," + imageData;
+        let image = "data:image/jpg;base64," + imageData;
         let block = image.split(";");
         let contentType = block[0].split(":")[1];
         let realData = block[1].split(",")[1];
         let blob = this.b64toBlob(realData, contentType, 512);
-        let imgname = Date.now().toString() + '.png';
+        let imgname = Date.now().toString() + '.jpg';
 
-        return this.file.createDir(targetPath, nombrecarpetapadre, false).then(() => { }, (e) => { console.log('2', e); }).then(() => {
+        return this.file.createDir(targetPath, nombrecarpetapadre, false).then(() => { }, (e) => { }).then(() => {
           return this.file.createDir(targetPath + `/${nombrecarpetapadre}`, idgrupo.toString(), false).then(() => {
-          }, (e) => { console.log('3', e); });
+          }, (e) => { });
         }).then(() => {
-          return this.file.writeFile(targetPath + `${nombrecarpetapadre}/${idgrupo.toString()}/`, imgname, blob).then((ok) => { }, (e) => { console.log('2', e); });
+          return this.file.writeFile(targetPath + `${nombrecarpetapadre}/${idgrupo.toString()}/`, imgname, blob).then((ok) => { }, (e) => { });
         }).then(() => {
           return this.formulario.guardarimagen(this.up, this.grupoidselected, respcodigo, preguntaid, imgname, this.tipocuestionario).then((ok) => {
             if (!ok) {
@@ -715,17 +773,17 @@ export class FormulariosPage {
               this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
             }
             return true;
-          }, (e) => { console.log('2', e); });
+          }, (e) => { });
         }).then(() => {
           loading.dismiss();
         }).catch((e) => {
-          console.log('2', e);
           loading.dismiss();
-          this.handleError('error en el dispositivo, intentelo nuevamente');
+          this.handleError('Error en el dispositivo, inténtelo de nuevo');
         }
-          );
+        );
       }).catch(error => {
-        console.log('err', error);
+        this.handleError('No se cargo la imagen, verifique que el formato sea JPG o PNG');
+        loading.dismiss();
       });
   }
 
@@ -846,7 +904,6 @@ export class FormulariosPage {
           })
         } else {
           return this.db.respuestasporpreguntaf(preguntas.codigorespuesta).then((respuestasdisponibles: any) => {
-            //              console.log('err', respuestasdisponibles);
             this.resp = respuestasdisponibles;
             preguntas.prueba = [];
             this.resp.forEach(posiblerespuesta => {
@@ -871,8 +928,6 @@ export class FormulariosPage {
                     if (dataguardada.codigorespuestaseleccionada) {
                       arrayvalores = dataguardada.codigorespuestaseleccionada.split('_');
                       if (arrayvalores.indexOf(posiblerespuesta.codigo.toString()) != -1) {
-                        console.log('res', posiblerespuesta, 'array valores', arrayvalores);
-
                         posiblerespuesta.respuesta = true;
                         preguntas.prueba.push(posiblerespuesta);
                       } else {
@@ -898,8 +953,6 @@ export class FormulariosPage {
     }).then((datafinal) => {
       this.final = datafinal;
       loading.dismiss();
-      //        return this.final;
-
     });
 
   }
@@ -907,7 +960,7 @@ export class FormulariosPage {
   guardarfechapadre(valor, preguntapadre, preguntaid, fecha) {
 
     if (this.unidadproductiva.terminado == 2) {
-      this.handleError('No se pueden editar las respuestas una vez envidas');
+      this.handleError('No se pueden editar las respuestas una vez enviadas');
       this.recargaritem();
     } else {
       if (fecha == "") {
@@ -918,24 +971,24 @@ export class FormulariosPage {
     }
   }
   guardarpadre(valor, preguntapadre, preguntaid, event) {
-    console.log(valor, preguntapadre, preguntaid, event);
     if (this.unidadproductiva.terminado == 2) {
-      this.handleError('No se pueden editar las respuestas una vez envidas');
+      this.handleError('No se pueden editar las respuestas una vez enviadas');
       this.recargaritem();
     } else {
-
       if (event === "false") {
-//        this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuesta, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
- //
       } else {
-          this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuesta, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
+        this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, valor.codigorespuesta, preguntaid, preguntapadre, valor.codigo, valor.valor, event, this.tipocuestionario);
+        if (event === "false" || event === false) {
+        } else {
           this.guardarubicacion(this.up, this.datofecha, this.datolatitud, this.datolongitud);
+        }
+
       }
     }
   }
   guardarobservacionpadre($event, preguntapadre, preguntaid) {
     if (this.unidadproductiva.terminado == 2) {
-      this.handleError('No se pueden editar las respuestas una vez envidas');
+      this.handleError('No se pueden editar las respuestas una vez enviadas');
       this.recargaritem();
     } else {
       this.formulario.guardarrespuestatabla(this.up, this.grupoidselected, null, preguntaid, preguntapadre, '', '', $event.target.value, this.tipocuestionario);
@@ -962,7 +1015,6 @@ export class FormulariosPage {
     } else {
       c = 1;
     }
-    console.log('ubicacion', unidad, datofecha, latitud, longitud);
     this.formulario.guardarubicacion(unidad, datofecha, latitud, longitud, this.tipocuestionario);
   }
 
@@ -976,7 +1028,79 @@ export class FormulariosPage {
     let modal = this.navCtrl.push(ImagePage, { 'caso': 3, 'unidad': unidadproductiva });
   }
 
+  cerrarformulario(tipo) {
 
+    this.db.formularioid(tipo).then((idformulario) => {
+      if (idformulario) {
+        let prompt = this.alertCtrl.create({
+          title: 'Cerrar formulario',
+          message: "Ingrese contraseña para cerrar formulario",
+          inputs: [
+            {
+              name: 'pass',
+              placeholder: 'contraseña',
+              type: 'password'
+            }
+          ],
+          buttons: [
+            {
+              text: 'Cancelar',
+              handler: data => {
+              }
+            },
+            {
+              text: 'Cerrar formulario',
+              handler: data => {
+                this.loginp(data, idformulario);
+              }
+            }
+          ]
+        });
+        prompt.present();
+
+      } else {
+        let msj;
+        if (tipo == 1002) {
+          msj = 'Auditoria';
+        } else {
+          msj = 'Promotoria';
+        }
+        this.handleError('no existe formulario de ' + msj);
+      }
+    })
+
+
+
+
+
+  }
+
+
+  loginp(pass, formulario) {
+    let loading = this.loadingCtrl.create({
+      spinner: 'bubbles',
+      content: 'Validando datos...'
+    });
+
+    loading.present();
+    this.authService.login2(this.usuario, pass.pass, this.empresa).finally(() => {
+      loading.dismiss();
+    }).subscribe(() => {
+
+      this.authService.cerrarformulario(formulario).subscribe((envio) => {
+        this.handleError('Formulario Cerrado');
+      }, err => {
+        let msj = 'Error, intentelo nuevamente';
+        if (err.status == 417) {
+          msj = 'Este formulario ya se encuentra cerrado';
+        }
+        this.handleError(msj);
+      });
+    },
+      (err) => {
+        this.handleError('Error, usuario o contraseña invalido');
+      });
+  }
 
 
 }

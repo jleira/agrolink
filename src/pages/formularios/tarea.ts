@@ -39,8 +39,6 @@ export class tareaPage {
     let day = ("0" + dt.getDate()).slice(-2);
     let year = dt.getFullYear();
     this.fechaminima = year + '-' + month + '-' + day;
-    console.log(this.fechaminima, this.fechamaxima);
-
   }
   ionViewDidLoad() {
     this.caso = this.navParams.get('caso');
@@ -52,7 +50,6 @@ export class tareaPage {
 
       this.editar = false;
     } else if (this.caso == 2) {
-      console.log(this.navParams.get('tarea'));
       this.nombrea = this.navParams.get('tarea').nombre;
       this.descripciona = this.navParams.get('tarea').detalle;
       this.fechaa = this.navParams.get('tarea').fechaPautadaCierre;
@@ -79,7 +76,6 @@ export class tareaPage {
   }
 
   guardartareanueva(values) {
-    console.log(values);
     let msj:string;
     if(this.caso==1){
        msj="Una vez agregada una tarea no podra ser eliminada";
@@ -88,7 +84,6 @@ export class tareaPage {
       msj="Esta seguro que desea editar esta tarea";
     }
 
-    console.log(values);
     if (values.nombre == "" || values.encargado == "" || values.fecha == "" || values.detalle == "") {
       let prompt = this.alertCtrl.create({
         title: 'todos los campos deben estar llenos',

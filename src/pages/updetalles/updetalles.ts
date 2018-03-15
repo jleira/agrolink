@@ -34,7 +34,7 @@ datosregion(id){
     this.reg=dataregion['nombre'];
     this.datosmunicipio(dataregion['municipioid']);
     return this.reg;
-  });
+  }); 
   return this.reg;
 }
 datosmunicipio(id){

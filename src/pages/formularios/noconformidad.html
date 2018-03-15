@@ -19,7 +19,7 @@
       <ion-input type="text" name='descripcion' ngModel required #descripcion="ngModel" [class.invalid]="descripcion.errors && descripcion.dirty"></ion-input>
     </ion-item>
     <ion-item class="error-message" no-lines *ngIf="descripcion.errors?.required && descripcion.dirty">
-      <p style="color:red">Descripcion Corta Requerido </p>
+      <p style="color:red">Descripción Corta Requerida</p>
     </ion-item>
 
     <ion-item text-wrap>
@@ -64,7 +64,7 @@
     </ion-item>
     <ion-item text-wrap no-lines>
       <ion-label stacked>
-        descripcion
+        descripción
       </ion-label>
       <ion-input type="text" [(ngModel)]="descripcion" (change)="editarnoconformidad(id,'descripcion', descripcion)"></ion-input>
     </ion-item>
@@ -91,7 +91,7 @@ Fecha pautada de cierre
       </ion-item>
       <ion-item text-wrap no-lines>
         <h2>
-          descripcion
+          descripción
         </h2>
         <p>
           {{descripcion}}

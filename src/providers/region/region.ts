@@ -50,7 +50,7 @@ export class RegionProvider {
   obtenerdepartamentos() {
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
-      content: 'Descargando informarcion del departamentos...'
+      content: 'Descargando informarción del departamentos...'
     });
     loading.present();
     return this.authHttp.get(`${SERVER_URL}/api/departamentos/`).map(
@@ -95,7 +95,7 @@ export class RegionProvider {
   obtenerregiones() {
     let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
-      content: 'Descargando informarcion del regiones...'
+      content: 'Descargando informarción del regiones...'
     });
     loading.present();
     return this.authHttp.get(`${SERVER_URL}/api/regiones/findAllActive/`).map(

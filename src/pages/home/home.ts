@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {ModalController, NavController, ToastController, LoadingController, AlertController } from 'ionic-angular';
+import { ModalController, NavController, ToastController, LoadingController, AlertController } from 'ionic-angular';
 import { Storage } from "@ionic/storage";
 import { UnidadproductivaPage } from '../unidadproductiva/unidadproductiva';
 import { CasoespecialPage } from '../casoespecial/casoespecial';
@@ -26,6 +26,7 @@ export class HomePage {
   promotor: boolean;
   empresa;
   usuario;
+  administrador = false;
   constructor(
     public authService: AuthProvider,
     public formulario: FormulariosProvider,
@@ -59,16 +60,26 @@ export class HomePage {
       if (this.rol) {
         if (this.rol.indexOf("Auditor") > -1) {
           this.formulario.formularioid(FORMULARIO_AUDITORIA).then((idf) => {
-            if(idf){
+            if (idf) {
               this.auditor = true;
+              if (this.rol.indexOf("Administrador") > -1) {
+                this.administrador = true;
+              }
+
             }
+
           });
         }
         if (this.rol.indexOf("Promotor") > -1) {
           this.formulario.formularioid(FORMULARIO_PROMOTORIA).then((idf) => {
-            if(idf){
-              this.promotor = true;          
+            if (idf) {
+              this.promotor = true;
+              if (this.rol.indexOf("Administrador") > -1) {
+                this.administrador = true;
+              }
+
             }
+
           });
         }
       }
@@ -80,9 +91,9 @@ export class HomePage {
 
   openPage(caso) {
     if (caso == 1) {
-      this.navCtrl.push(FormulariosPage, { caso: 1 });
+      this.navCtrl.push(FormulariosPage, { caso: 1, administrador: this.administrador, usuario: this.usuario, empresa: this.empresa });
     } else if (caso == 2) {
-      this.navCtrl.push(FormulariosPage, { caso: 2 });
+      this.navCtrl.push(FormulariosPage, { caso: 2, administrador: this.administrador, usuario: this.usuario, empresa: this.empresa });
     } else if (caso == 3) {
       this.navCtrl.push(UnidadproductivaPage);
     } else if (caso == 4) {
@@ -111,39 +122,38 @@ export class HomePage {
     toast.present();
   }
 
-  descargardatos(){
+  descargardatos() {
     let alert = this.alertCtrl.create({
 
-      title: 'Descargar datos',
-      message: 'Unez vez descargada la informacion, se borraran todos los datos diligenciados del telefono',
+      title: 'Descargar Datos',
+      message: 'Una vez descargada la información se borraran todos los datos diligenciados en el  dispositivo',
       buttons: [
         {
           text: 'Cancelar',
           handler: () => {
 
-           }
+          }
         },
         {
           text: 'Aceptar',
           handler: (datos) => {
             this.login();
-  //          this.precargardatos(datos);   
           }
         }
       ]
     });
     alert.present();
   }
-  
-  login(){
+
+  login() {
     let alert = this.alertCtrl.create({
 
       title: 'Login',
-      message: 'Una vez se valide la contraseña todos los datos de la app seran borrados',
+      message: 'Una vez se valide la contraseña todos los datos de la app serán borrados',
       inputs: [
         {
           name: 'pass',
-          placeholder: 'contraseña',
+          placeholder: 'Contraseña',
           type: 'password',
         }
       ],
@@ -152,7 +162,7 @@ export class HomePage {
           text: 'Cancelar',
           handler: () => {
 
-           }
+          }
         },
         {
           text: 'Aceptar',
@@ -167,23 +177,23 @@ export class HomePage {
 
   precargardatos(value: any) {
 
-    let datos={
-      username:this.usuario,
-      password:value.pass,
-      empresa:this.empresa
+    let datos = {
+      username: this.usuario,
+      password: value.pass,
+      empresa: this.empresa
     }
-      let loading = this.loadingCtrl.create({
+    let loading = this.loadingCtrl.create({
       spinner: 'bubbles',
       content: 'Validando datos...'
     });
     loading.present();
-    
-    this.authService.precarguededatos(datos).finally(()=>{
+
+    this.authService.precarguededatos(datos).finally(() => {
       loading.dismiss();
     }).subscribe(() => {
 
-      this.ionViewWillEnter();  
-      },
+      this.ionViewWillEnter();
+    },
       (error) => {
 
         if (error.status && error.status === 401) {
@@ -193,7 +203,7 @@ export class HomePage {
         else {
           this.handleError(`Error : ${error.statusText}`);
         }
-        }); 
+      });
   }
 
 

@@ -76,7 +76,6 @@ export class NuevanoconformidadPage {
         return this.tareas;
       });
       this.formulario.noconformidadid(this.id).then((data) => {
-        console.log(data);
         this.descripcion = data[0].descripcion;
         this.detalle = data[0].detalle;
         this.fecha = data[0].fechaposiblecierre;
@@ -131,10 +130,10 @@ export class NuevanoconformidadPage {
          this.fecha = values.fecha;
          this.fechadecierre = 'Noconformidad en progreso';
          this.habilitarcreacion = false;
-         this.handleError('inconformidad guardada');
+         this.handleError('No conformidad guardada');
        loading.dismiss();
            },err=>{
-      this.handleError('Error guardando no conformidad, intente guardar nuevamente');
+      this.handleError('Error guardando no conformidad, inténtelo de nuevo');
       loading.dismiss();
      })
      }
@@ -190,10 +189,10 @@ export class NuevanoconformidadPage {
         this.tareas = tar;
          })
     }, err => {
-      this.handleError('error al guardar tarea, intentelo nuevamente');
+      this.handleError('Error al guardar tarea, inténtelo de nuevo');
     }).catch((err) => {
 
-      this.handleError('error al guardar tarea, intentelo nuevamente');
+      this.handleError('Error al guardar tarea, inténtelo de nuevo');
 
     })
   }
@@ -262,10 +261,10 @@ export class NuevanoconformidadPage {
   
   
       }).catch((err) => {
-        this.handleError('error, intentelo nuevamente');
+        this.handleError('Error al guardar tarea, intentelo de nuevo');
       })
     }else{
-      this.handleError('Para cerrar la no conformidad primero debe culminar todas las tareas ');
+      this.handleError('Para cerrar la no conformidad primero debe culminar todas las tareas asignadas a esta');
     }
 
 

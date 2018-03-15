@@ -31,7 +31,7 @@ import {CustomFormsModule} from 'ng2-validation';
 import {Storage, IonicStorageModule} from "@ionic/storage";
 import { RegionProvider } from '../providers/region/region';
 import { UproductivaProvider } from '../providers/uproductiva/uproductiva';
-import { DbProvider } from '../providers/db/db';
+import { DbProvider } from '../providers/db/db';  
 
 import { SQLite } from '@ionic-native/sqlite';
 import { FormulariosProvider } from '../providers/formularios/formularios';

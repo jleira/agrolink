@@ -1,10 +1,10 @@
 <ion-header>
   <ion-navbar color="pesto-primary">
     <div *ngIf="caso == 1">
-      <ion-title>UNIDADES PARA AUDITORIA </ion-title>
+      <ion-title>UNIDADES PARA AUDITORÍA </ion-title>
     </div>
     <div *ngIf="caso == 2">
-      <ion-title>UNIDADES PARA PROMOTORIA</ion-title>
+      <ion-title>UNIDADES PARA PROMOTORÍA</ion-title>
     </div>
     <div *ngIf="caso == 3">
       <ion-title>Grupos - UNIDAD {{up}}</ion-title>
@@ -41,7 +41,7 @@
   <div *ngIf="caso < 3">
     <ion-item-divider text-wrap color="pesto-light">
       <h2>Unidades pendientes</h2>
-      <p>Son aquellas en las que no se ha iniciado el llenado del formulario</p>
+      <p>Son aquellas unidades las cuales aun no se ha iniciado el llenado del formulario</p>
     </ion-item-divider>
 
     <div *ngFor="let item of items">
@@ -62,15 +62,15 @@
           </ion-row>
           <div class="progress-outer">
             <div class="progress-inner" [style.width]="item.porcentaje+'%'">
-                {{item.porcentaje}} %
+              {{item.porcentaje}} %
             </div>
-        </div>
+          </div>
         </button>
       </ion-card>
     </div>
     <ion-item-divider text-wrap color="pesto-light">
       <h2>Unidades Iniciadas</h2>
-      <p>Son aquellas en las que no se ha iniciado el llenado del formulario pero no se ha enviado al administrador</p>
+      <p>Son aquellas en las no se ha iniciado el llenado del formulario, pero no se ha enviado al administrador</p>
     </ion-item-divider>
     <div *ngFor="let item of items">
 
@@ -91,9 +91,9 @@
           </ion-row>
           <div class="progress-outer">
             <div class="progress-inner" [style.width]="item.porcentaje+'%'">
-                {{item.porcentaje}} %
+              {{item.porcentaje}} %
             </div>
-        </div>
+          </div>
         </button>
       </ion-card>
     </div>
@@ -120,13 +120,28 @@
           </ion-row>
           <div class="progress-outer">
             <div class="progress-inner" [style.width]="item.porcentaje+'%'">
-                {{item.porcentaje}} %
+              {{item.porcentaje}} %
             </div>
-        </div>
+          </div>
         </button>
       </ion-card>
     </div>
 
+    <ion-card *ngIf="administrador ===1" style="border-top:2px solid mediumseagreen">
+      <button ion-item (click)="cerrarformulario(1002)">
+        <h1>
+          Cerrar formulario
+        </h1>
+      </button>
+    </ion-card>
+
+    <ion-card *ngIf="administrador ===2" style="border-top:2px solid mediumseagreen">
+      <button ion-item (click)="cerrarformulario(1001)">
+        <h1>
+          Cerrar formulario
+        </h1>
+      </button>
+    </ion-card>
 
   </div>
   <div *ngIf="caso == 3">
@@ -147,15 +162,15 @@
           </ion-row>
           <div class="progress-outer">
             <div class="progress-inner" [style.width]="item.porcentaje+'%'">
-                {{item.porcentaje}} %
+              {{item.porcentaje}} %
             </div>
-        </div>
+          </div>
 
         </button>
       </ion-card>
     </div>
 
-    <ion-card style="border-top:2px solid green" *ngIf="items" >
+    <ion-card style="border-top:2px solid green" *ngIf="items">
       <button ion-item (click)="abrirmapa(unidadproductiva)">
         <ion-row text-wrap>
           <ion-col col-12 text-center>
@@ -172,7 +187,7 @@
       </button>
     </ion-card>
 
-    <ion-card style="border-top:2px solid red" *ngIf="items" >
+    <ion-card style="border-top:2px solid red" *ngIf="items">
       <button ion-item (click)="noconformidades(unidadproductiva, tipo)">
         <ion-row text-wrap>
           <ion-col col-12 text-center>
@@ -182,7 +197,7 @@
 
           </ion-col>
           <ion-col col-12 text-center>
-            <h6>Son los problemas encontrados alo largo de la promotoria o auditoria, tambien encontramos no conformidades de
+            <h6>Son los problemas encontrados a lo largo de la promotoria o auditoria, también encontramos no conformidades de
               periodos anteriores con el fin de cerrarlas o ver su avance.
             </h6>
           </ion-col>
@@ -323,7 +338,7 @@
       <div *ngIf="item.tipo==3002">
         <ion-item text-wrap no-lines>
           <ion-label class="enunciadopregunta">{{item.enunciado}}</ion-label>
-          <ion-select multiple="true" (ionChange)="guardar3002($event, item.codigo, item.codigorespuesta)">
+          <ion-select multiple="true" (ionChange)="guardar3002($event, item.codigo, item.codigorespuesta)" okText="Seleccionar" cancelText="Cancelar">
             <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
           </ion-select>
         </ion-item>
@@ -362,7 +377,7 @@
         <!--seleccion multiple unica respueista y abierta -->
         <ion-item no-lines>
           <ion-label class="enunciadopregunta">{{item.enunciado}}</ion-label>
-          <ion-select (ionChange)="guardar3001($event, item.codigo, item.codigorespuesta)">
+          <ion-select (ionChange)="guardar3001($event, item.codigo, item.codigorespuesta)" okText="Seleccionar" cancelText="Cancelar">
             <!--(ionChange)="onChange($event, preguntas.id)"-->
             <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
           </ion-select>
@@ -370,7 +385,7 @@
         <div *ngFor="let opciones of item.respuestas;  let i = index">
           <div *ngIf="i==0">
             <ion-item no-lines>
-              <ion-input type="text" [(ngModel)]="opciones.observacion" placeholder="observacion" (change)="guardarobservacion( item.codigo, item.codigorespuesta,opciones.observacion )">
+              <ion-input type="text" [(ngModel)]="opciones.observacion" placeholder="Observación" (change)="guardarobservacion( item.codigo, item.codigorespuesta,opciones.observacion )">
               </ion-input>
             </ion-item>
             <div *ngIf="item.archivo===1">
@@ -403,7 +418,7 @@
         <!--seleccion nmultiple con multiple respuesta y abierta -->
         <ion-item no-lines>
           <ion-label class="enunciadopregunta">{{item.enunciado}} </ion-label>
-          <ion-select multiple="true" (ionChange)="guardar3002($event, item.codigo, item.codigorespuesta)">
+          <ion-select multiple="true" (ionChange)="guardar3002($event, item.codigo, item.codigorespuesta)" okText="Seleccionar" cancelText="Cancelar">
             <!--(ionChange)="onChange($event, preguntas.id)"-->
             <ion-option *ngFor="let opciones of item.respuestas" [value]="opciones" selected="{{opciones.respuesta}}">{{opciones.nombre}}</ion-option>
           </ion-select>
@@ -411,7 +426,7 @@
         <div *ngFor="let opciones of item.respuestas;  let i = index">
           <div *ngIf="i==0">
             <ion-item text-wrap no-lines>
-              <ion-input type="text" [(ngModel)]="opciones.observacion" placeholder="observacion" (change)="guardarobservacion( item.codigo, item.codigorespuesta,opciones.observacion )">
+              <ion-input type="text" [(ngModel)]="opciones.observacion" placeholder="Observación" (change)="guardarobservacion( item.codigo, item.codigorespuesta,opciones.observacion )">
               </ion-input>
             </ion-item>
             <div *ngIf="item.archivo===1">
@@ -449,15 +464,15 @@
         <div class="divscroll">
           <table class="preguntastabla">
             <tr class="encabezadotabla" *ngFor="let encabezado of item.encabezado">
-              <th   *ngFor="let columnas of encabezado.columnas" [attr.rowspan]="columnas.rowspan" [attr.colspan]="columnas.colspan"> {{columnas.enunciado}}</th>
+              <th *ngFor="let columnas of encabezado.columnas" [attr.rowspan]="columnas.rowspan" [attr.colspan]="columnas.colspan"> {{columnas.enunciado}}</th>
             </tr>
             <tr class="cuerpotabla" *ngFor="let preguntas of item.preguntas">
               <td *ngIf="preguntas.observacion==1">{{preguntas.enunciado}}</td>
-              <td *ngFor="let respuestas of preguntas.respuesta" >
+              <td *ngFor="let respuestas of preguntas.respuesta">
                 <div *ngIf="respuestas.tipo==210000" align="left">
                   {{respuestas.constante}}
                 </div>
-                <ion-item *ngIf="respuestas.tipo==210001" align="center" no-lines>                  
+                <ion-item *ngIf="respuestas.tipo==210001" align="center" no-lines>
                   <ion-datetime displayFormat="YYYY-MM-DD" cancelText="Cancelar" [(ngModel)]="respuestas.respuesta" doneText="Guardar" (ionChange)="guardarfechapadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-datetime>
                 </ion-item>
                 <div *ngIf="respuestas.tipo==210002" align="center">
@@ -466,8 +481,8 @@
                 <div *ngIf="respuestas.tipo==210003" align="center">
                   <ion-input type="text" [(ngModel)]="respuestas.respuesta" (change)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-input>
                 </div>
-                <div *ngIf="respuestas.tipo==210004" align="center" >
-                      <ion-checkbox [(ngModel)]="respuestas.respuesta"  (ionChange)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-checkbox>
+                <div *ngIf="respuestas.tipo==210004" align="center">
+                  <ion-checkbox [(ngModel)]="respuestas.respuesta" (ionChange)="guardarpadre(respuestas, item.codigo, preguntas.preguntaid, respuestas.respuesta)"></ion-checkbox>
                 </div>
               </td>
             </tr>
@@ -475,9 +490,9 @@
 
         </div>
 
-        
+
       </div>
-      
+
       <hr>
     </div>
 

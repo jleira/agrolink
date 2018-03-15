@@ -31,6 +31,8 @@ export class EnviardatosPage {
   promotor: boolean;
   auditorseleccionado: boolean;
   promotorseleccionado: boolean;
+  tipopromotoria=FORMULARIO_PROMOTORIA;
+  tipoauditoria=FORMULARIO_AUDITORIA;
 
   constructor(
     public authService: AuthProvider,
@@ -50,7 +52,6 @@ export class EnviardatosPage {
     this.promotorseleccionado = false;
     this.storage.get('roll').then(roll => {
       if (roll) {
-        console.log('roll', roll);
         if (roll.indexOf("Auditor") > -1) {
           this.formulario.formularioid(FORMULARIO_AUDITORIA).then((idf) => {
             if (idf) {
@@ -71,14 +72,14 @@ export class EnviardatosPage {
 
     this.evento = [];
     this.habilitarenvio = false;
-    this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
+    this.uproductiva.llamarunidadesproductivasiniciadas(FORMULARIO_PROMOTORIA).then((data) => {
       this.upp = data;
       if (this.upp.length == 0) {
         this.upp = false;
       }
 
     });
-    this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
+    this.uproductiva.llamarunidadesproductivasiniciadas(FORMULARIO_AUDITORIA).then((data) => {
       this.upa = data;
       if (this.upa.length == 0) {
 
@@ -98,8 +99,7 @@ export class EnviardatosPage {
     this.viewCtrl.dismiss();
   }
   habilitartipo($event) {
-    //   console.log($event);
-    if ($event == 1001) {
+    if ($event == FORMULARIO_PROMOTORIA) {
       this.auditorseleccionado = false;
       this.promotorseleccionado = true;
 
@@ -110,7 +110,6 @@ export class EnviardatosPage {
   }
 
   comprobarunidades(tipo, $event) {
-    //    console.log(tipo, $event);
     this.tipo = tipo;
     this.preguntassinresponder = [];
     this.evento = $event;
@@ -120,11 +119,11 @@ export class EnviardatosPage {
       this.db.formularioid(tipo).then((formularioid) => {
         formulario = formularioid;
         if (formulario == null) {
-          if (tipo == 1001) {
-            this.handleError('No se encuentran formularios para audiotoria registrados en el movil');
+          if (tipo == FORMULARIO_PROMOTORIA) {
+            this.handleError('No se encuentran formularios para audiotoría registrados en el dispositivo');
             this.habilitarenvio = false;
           } else {
-            this.handleError('No se encuentran formularios para promotoria registrados en el movil');
+            this.handleError('No se encuentran formularios para promotoría registrados en el dispositivo');
             this.habilitarenvio = false;
           }
         } else {
@@ -136,11 +135,7 @@ export class EnviardatosPage {
                 this.db.preguntasporgruporequeridas(grupoi.idgrupobase).then((pregunta) => {
                   if (pregunta) {
                     pregunta.forEach(preguntaid => {
-                      //                      console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
                       return this.db.verficarrespuestas(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo).then(tienerespuesta => {
-                        //                        console.log(up.idUnidadProductiva, grupoi.idgrupobase, preguntaid.codigo, tipo, preguntaid.tipo);
-                        //                        console.log(tienerespuesta);
-
                         if (tienerespuesta) {
                           if (this.preguntassinresponder.length == 0) {
                             this.habilitarenvio = true;
@@ -207,7 +202,6 @@ export class EnviardatosPage {
         {
           text: 'Cancelar',
           handler: data => {
-            //            console.log('Cancel clicked');
           }
         },
         {
@@ -235,24 +229,26 @@ export class EnviardatosPage {
       loading.dismiss();
     }).subscribe(() => {
       this.enviartodo();
-      // this.trampita();
     },
-      (err) => {
-        console.log(err);
-        this.handleError(err);
+      (error) => {
+        if (error.status && error.status === 401) {
+          this.handleError('Usuario y/o contraseña incorrecto');
+
+        }
+        else {
+          this.handleError(`Error : ${error.statusText}`);
+        }
       });
   }
   enviartodo() {
     if (this.evento) {
 
       this.evento.forEach(up => {
-        //        console.log('up', up);
         if (up.mapa) {
           up.mapa = "data:image/png:base64," + up.mapa;
         }
 
         let enviar = [];
-        //        console.log(up);
         this.db.formularioid(this.tipo).then((formularioid) => {
           let formulario = formularioid;
           let datosdeinicio;
@@ -268,14 +264,13 @@ export class EnviardatosPage {
           this.db.respuestasparaunidad(up.idUnidadProductiva, this.tipo).then((data) => {
             data.forEach((respuestasdigitadas) => {
               if (respuestasdigitadas.ruta) {
-                this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta,respuestasdigitadas.unidadproductiva);
+                this.formulario.enviarfotoprueba(this.rutaimg + `${respuestasdigitadas.unidadproductiva}/${respuestasdigitadas.grupo.toString()}/${respuestasdigitadas.ruta}`, respuestasdigitadas.ruta, respuestasdigitadas.unidadproductiva);
               }
-              console.log(respuestasdigitadas);
               let valor;
-              if(respuestasdigitadas.codigorespuestaseleccionada){
+              if (respuestasdigitadas.codigorespuestaseleccionada) {
                 valor = respuestasdigitadas.codigorespuestaseleccionada.split('_');
-              }else{
-                valor=[];
+              } else {
+                valor = [];
               }
               if (valor.length > 0) {
                 let i = 0;
@@ -285,6 +280,7 @@ export class EnviardatosPage {
                   let respuestassacadas;
                   respuestassacadas = {
                     formularioRespuestaId: {
+                      idPreguntaPadre:respuestasdigitadas.pregunta,
                       idGrupoBase: respuestasdigitadas.grupo,
                       idPregunta: respuestasdigitadas.pregunta,
                       idRespuesta: respuestasdigitadas.codigorespuestapadre,
@@ -302,6 +298,7 @@ export class EnviardatosPage {
                 let respuestassacadas;
                 respuestassacadas = {
                   formularioRespuestaId: {
+                    idPreguntaPadre:respuestasdigitadas.pregunta,
                     idGrupoBase: respuestasdigitadas.grupo,
                     idPregunta: respuestasdigitadas.pregunta,
                     idRespuesta: respuestasdigitadas.codigorespuestapadre,
@@ -323,6 +320,7 @@ export class EnviardatosPage {
                   let respuestassacadas;
                   respuestassacadas = {
                     formularioRespuestaId: {
+                      idPreguntaPadre:respuestasdigitadas.preguntapadre,
                       idGrupoBase: respuestasdigitadas.grupo,
                       idPregunta: respuestasdigitadas.preguntaid,
                       idRespuesta: respuestasdigitadas.respuestascodigo,
@@ -340,13 +338,15 @@ export class EnviardatosPage {
 
           }).then(() => {
             return this.db.noconformidades(up.idUnidadProductiva, this.tipo).then((noconformidad) => {
-              //              console.log('nconformidad', noconformidad);
               if (noconformidad) {
                 let noconformidade = noconformidad;
                 let no_conformidades = [];
+                let totalincofomidades = noconformidad.length;
+                let contadorinconformidades = 0;
+
                 noconformidad.forEach((nconformidad) => {
 
-                  this.db.tareas(nconformidad.id).then((tareas) => {
+                  return this.db.tareas(nconformidad.id).then((tareas) => {
                     let no_conformidadesf;
                     let codigonc: any;
                     let asignacionc;
@@ -364,7 +364,6 @@ export class EnviardatosPage {
                       let tareajson = [];
                       tareas.forEach((elementa) => {
                         let codigota: any;
-                        //                        console.log(elementa);
                         if (elementa.heredada == 1) {
                           codigota = elementa.id;
                         } else {
@@ -406,7 +405,28 @@ export class EnviardatosPage {
                         "tareas": tareajson
                       }
                       no_conformidades.push(no_conformidadesf);
-
+                      contadorinconformidades = contadorinconformidades + 1;
+                      if (contadorinconformidades == totalincofomidades) {
+                        let datosaenviar = {
+                          formulario: {
+                            "formularioBase": { codigo: formulario },
+                            "asignacion": up.idAsignacion,
+                            'mapa': up.mapa,
+                            fechaInicial: up.fechainicio,
+                            localizacionInicial: {
+                              "longitude": Number(up.longitudinicio),
+                              "latitude": Number(up.latitudinicio)
+                            },
+                            fechaFinal: up.fechafin,
+                            localizacionFinal: {
+                              "longitude": Number(up.longitudfin),
+                              "latitude": Number(up.latitudfin)
+                            }
+                          }, formularioRespuesta,
+                          no_conformidades
+                        };
+                        this.formulario.enviarrespuesta(datosaenviar, up, this.tipo)
+                      }
                     } else {
                       no_conformidadesf = {
                         "noConformidad": {
@@ -427,34 +447,33 @@ export class EnviardatosPage {
                         "tareas": null
                       }
                       no_conformidades.push(no_conformidadesf);
+                      contadorinconformidades = contadorinconformidades + 1;
+                      if (contadorinconformidades == totalincofomidades) {
+                        let datosaenviar = {
+                          formulario: {
+                            "formularioBase": { codigo: formulario },
+                            "asignacion": up.idAsignacion,
+                            'mapa': up.mapa,
+                            fechaInicial: up.fechainicio,
+                            localizacionInicial: {
+                              "longitude": Number(up.longitudinicio),
+                              "latitude": Number(up.latitudinicio)
+                            },
+                            fechaFinal: up.fechafin,
+                            localizacionFinal: {
+                              "longitude": Number(up.longitudfin),
+                              "latitude": Number(up.latitudfin)
+                            }
+                          }, formularioRespuesta,
+                          no_conformidades
+                        };
+                        this.formulario.enviarrespuesta(datosaenviar, up, this.tipo)
+                      }
                     }
                   })
+
+
                 });
-
-                let datosaenviar = {
-                  formulario: {
-                    "formularioBase": { codigo: formulario },
-                    "asignacion": up.idAsignacion,
-                    'mapa': up.mapa,
-                    fechaInicial: up.fechainicio,
-                    localizacionInicial: {
-                      "longitude": Number(up.longitudinicio),
-                      "latitude": Number(up.latitudinicio)
-                    },
-                    fechaFinal: up.fechafin,
-                    localizacionFinal: {
-                      "longitude": Number(up.longitudfin),
-                      "latitude": Number(up.latitudfin)
-                    }
-                  }, formularioRespuesta,
-                  no_conformidades
-                };
-                console.log('prueba', datosaenviar);
-                console.log('json', JSON.stringify(datosaenviar));
-
-                this.formulario.enviarrespuesta(datosaenviar, up, this.tipo)
-
-
               } else {
                 let datosaenviar = {
                   formulario: {
@@ -473,9 +492,6 @@ export class EnviardatosPage {
                     }
                   }, formularioRespuesta
                 };
-
-                console.log('pruebas sin no conformidades', datosaenviar);
-                console.log('json', JSON.stringify(datosaenviar));
                 this.formulario.enviarrespuesta(datosaenviar, up, this.tipo)
               }
 
@@ -490,14 +506,14 @@ export class EnviardatosPage {
       });
       this.evento = [];
       this.habilitarenvio = false;
-      this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
+      this.uproductiva.llamarunidadesproductivasiniciadas(FORMULARIO_PROMOTORIA).then((data) => {
         this.upa = data;
         if (this.upa.length == 0) {
           this.upa = [];
         }
       });
 
-      this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
+      this.uproductiva.llamarunidadesproductivasiniciadas(FORMULARIO_AUDITORIA).then((data) => {
         this.upp = data;
         if (this.upp.length == 0) {
           this.upa = [];
@@ -505,20 +521,19 @@ export class EnviardatosPage {
       });
 
     } else {
-      this.uproductiva.llamarunidadesproductivasiniciadas(1001).then((data) => {
+      this.uproductiva.llamarunidadesproductivasiniciadas(FORMULARIO_PROMOTORIA).then((data) => {
         this.upa = data;
         if (this.upa.length == 0) {
           this.upa = [];
         }
       });
-      this.uproductiva.llamarunidadesproductivasiniciadas(1002).then((data) => {
+      this.uproductiva.llamarunidadesproductivasiniciadas(FORMULARIO_AUDITORIA).then((data) => {
         this.upp = data;
         if (this.upp.length == 0) {
           this.upa = [];
         }
       });
-
-      this.handleError('Debe recargar la pagina para enviar nuevamente los formularios');
+      this.handleError('Debe sali y entrar nuevamente a esta pagina para enviar los formularios restantes');
     }
   }
 

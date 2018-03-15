@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
 import { LoadingController, ToastController } from 'ionic-angular';
-import 'rxjs/add/operator/map';
 import { ReplaySubject, Observable } from "rxjs";
-import { Storage } from "@ionic/storage"; 
+import { Storage } from "@ionic/storage";
 import { AuthHttp } from "angular2-jwt";
 import { SERVER_URL } from "../../config";
 import 'rxjs/Rx';
@@ -85,7 +84,7 @@ export class AuthProvider {
                 err => {
 
                   if (this.cancelar == 0) {
-                    this.handleError2('Error al descargar la informacion de paises, intentelo nuevamente');
+                    this.handleError2('Error al descargar la información de países, inténtelo de nuevo');
                     this.logout(casol);
                     this.cancelar = 1;
                   }
@@ -93,7 +92,7 @@ export class AuthProvider {
               this.region.obtenerdepartamentos().subscribe(() => {
               }, () => {
                 if (this.cancelar == 0) {
-                  this.handleError2('Error al descargar la informacion de departamentos, intentelo nuevamente');
+                  this.handleError2('Error al descargar la información de departamentos, inténtelo de nuevo');
                   this.logout(casol);
                   this.cancelar = 1;
                 }
@@ -101,7 +100,7 @@ export class AuthProvider {
               this.region.obtenermunicipios().subscribe(() => {
               }, () => {
                 if (this.cancelar == 0) {
-                  this.handleError2('Error al descargar la informacion de municipios, intentelo nuevamente');
+                  this.handleError2('Error al descargar la información de municipios, inténtelo de nuevo');
                   this.logout(casol);
                   this.cancelar = 1;
                 }
@@ -109,7 +108,7 @@ export class AuthProvider {
               this.region.obtenerregiones().subscribe(() => {
               }, () => {
                 if (this.cancelar == 0) {
-                  this.handleError2('Error al descargar la informacion de regiones, intentelo nuevamente');
+                  this.handleError2('Error al descargar la información de regiones, inténtelo de nuevo');
                   this.logout(casol);
                   this.cancelar = 1;
                 }
@@ -127,7 +126,7 @@ export class AuthProvider {
                         this.database.agregarcategoria(element.codigo, element.campo2).then((ok) => {
                         }, (err) => {
                           if (this.cancelar == 0) {
-                            this.handleError2('Error al descargar las categorias de las inconformidades , intentelo nuevamente');
+                            this.handleError2('Error al descargar las categorias de las no conformidad , inténtelo de nuevo');
                             this.logout(casol);
                             this.cancelar = 1;
                           }
@@ -135,25 +134,25 @@ export class AuthProvider {
                       });
                     } else {
                       if (this.cancelar == 0) {
-                        this.handleError2('Error al descargar las categorias de las no inconformidades , intentelo nuevamente');
+                        this.handleError2('Error al descargar las categorias de las no conformidad , inténtelo de nuevo');
                         this.logout(casol);
                         this.cancelar = 1;
                       }
                     }
                   }, err => {
                     if (this.cancelar == 0) {
-                      this.handleError2('Error al descargar las categorias de las no inconformidades , intentelo nuevamente');
+                      this.handleError2('Error al descargar las categorias de las no conformidad , inténtelo de nuevo');
                       this.logout(casol);
                       this.cancelar = 1;
                     }
                   }
                 );
-                 this.authHttp.get(`${SERVER_URL}api/inquiries/findByPeriodoUser`).subscribe(
+                this.authHttp.get(`${SERVER_URL}api/inquiries/findByPeriodoUser`).subscribe(
                   data => {
                     if (data.json()) {
                       let tform;
                       let per;
-                      let ultimaiteracion=data.json().length;
+                      let ultimaiteracion = data.json().length;
                       let iteracion = 0;
                       data.json().forEach(element => {
                         if (element.periodo == null) {
@@ -163,17 +162,15 @@ export class AuthProvider {
                         }
 
                         this.database.guardarformulario(element.codigo, element.nombre, element.observaciones, element.cataTienCodigo.codigo, per).then((ok) => {
-                          iteracion= iteracion+1;  
-                          console.log('igualdad',ultimaiteracion,iteracion)
-                          if(ultimaiteracion==iteracion){
+                          iteracion = iteracion + 1;
+                          if (ultimaiteracion == iteracion) {
                             loadingform.dismiss();
                             this.authUser.next(jwt);
                           }
-//                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'CLOSED').subscribe((d)=>{},err=>{})  
                         }, err => {
                           loadingform.dismiss();
                           if (this.cancelar == 0) {
-                            this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
+                            this.handleError2('Error interno en el dispositivo, inténtelo de nuevo');
                             this.logout(casol);
                             this.cancelar = 1;
                           }
@@ -183,9 +180,9 @@ export class AuthProvider {
                           this.database.guardargrupo(element2.idGrupoBase, element2.nombre, element2.posicion, idformulario, element2.textoAyuda).then((ok) => {
                           }, err => {
                             if (this.cancelar == 0) {
-                              this.handleError2('Error interno en el dispositivo, intentelonuevake nuevamente');
+                              this.handleError2('Error interno en el dispositivo, inténtelo de nuevo');
                               this.logout(casol);
-                              this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{},err=>{})
+                              this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                               this.cancelar = 1;
                             }
                           });
@@ -212,10 +209,10 @@ export class AuthProvider {
                                         this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, idgrupo, requerido, '', pr.pregunta.adjuntos, preguntatabla.json()['header']['cuerpo'], element.cataTienCodigo.codigo).then(
                                           () => {
                                           }, err => {
-                                             ;
+                                            ;
                                             if (this.cancelar == 0) {
-                                              this.handleError2('Error en el dispositivo, intentelo nuevamente nuevamente');
-                                              this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{},err=>{})
+                                              this.handleError2('Error en el dispositivo, inténtelo de nuevo nuevamente');
+                                              this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                                               this.logout(casol);
                                               this.cancelar = 1;
                                             }
@@ -223,75 +220,55 @@ export class AuthProvider {
                                         if (preguntatabla.json()) {
                                           preguntatabla.json().preguntaTabla.forEach(preguntatablanueva => {
                                             if (preguntatablanueva.observacion === true) {
-                                              console.log(preguntatablanueva);
                                               preguntatablanueva.observacion = 1;
- /*                                              this.database.guardarpreguntatabla(
-                                                preguntatablanueva.preguntaTablaId.codigoPregunta.codigo,
-                                                preguntatablanueva.preguntaTablaId.codigoPreguntaPadre.codigo,
-                                                preguntatablanueva.preguntaTablaId.codigoPregunta.enunciado,
-                                                preguntatablanueva.fila,
-                                                null,
-                                                preguntatablanueva.observacion).then(
-                                                () => {
-                                                }, err => {
-                                                  if(err.code!==6){
-                                                    if (this.cancelar == 0) {
-                                                      this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
-                                                      this.logout(casol);
-                                                      this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{},err=>{})
-                                                      this.cancelar = 1;
-                                                    }
-                                                  }
-                                                  
-                                                });
-  */                                           } else{
+                                           } else {
                                               preguntatablanueva.observacion = 0;
                                             }
-                                              this.database.guardarpreguntatabla(
-                                                preguntatablanueva.preguntaTablaId.codigoPregunta.codigo,
-                                                preguntatablanueva.preguntaTablaId.codigoPreguntaPadre.codigo,
-                                                preguntatablanueva.preguntaTablaId.codigoPregunta.enunciado,
-                                                preguntatablanueva.fila,
-                                                preguntatablanueva.preguntaTablaId.codigoPregunta.respCodigo.codigo,
-                                                preguntatablanueva.observacion).then(() => {
-                                                  preguntatablanueva.preguntaTablaId.codigoPregunta.respCodigo.valores.forEach(respuestastabla => {
-                                                    this.database.guardarrespuestatabla(
-                                                      respuestastabla.codigo,
-                                                      respuestastabla.nombre,
-                                                      respuestastabla.valor,
-                                                      respuestastabla.valorConstante,
-                                                      respuestastabla.tipoDato,
-                                                      respuestastabla.respCodigo).then(
-                                                      () => {
-                                                      }, err => {
-                                                        if (err.code === 6) {
-                                                        } else {
-                                                          if (this.cancelar == 0) {
-                                                            this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
-                                                            this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{},err=>{})
-                                                            this.logout(casol);
-                                                            this.cancelar = 1;
-                                                          }
+                                            this.database.guardarpreguntatabla(
+                                              preguntatablanueva.preguntaTablaId.codigoPregunta.codigo,
+                                              preguntatablanueva.preguntaTablaId.codigoPreguntaPadre.codigo,
+                                              preguntatablanueva.preguntaTablaId.codigoPregunta.enunciado,
+                                              preguntatablanueva.fila,
+                                              preguntatablanueva.preguntaTablaId.codigoPregunta.respCodigo.codigo,
+                                              preguntatablanueva.observacion).then(() => {
+                                                preguntatablanueva.preguntaTablaId.codigoPregunta.respCodigo.valores.forEach(respuestastabla => {
+                                                  this.database.guardarrespuestatabla(
+                                                    respuestastabla.codigo,
+                                                    respuestastabla.nombre,
+                                                    respuestastabla.valor,
+                                                    respuestastabla.valorConstante,
+                                                    respuestastabla.tipoDato,
+                                                    respuestastabla.respCodigo).then(
+                                                    () => {
+                                                    }, err => {
+                                                      if (err.code === 6) {
+                                                      } else {
+                                                        if (this.cancelar == 0) {
+                                                          this.handleError2('Error interno en el dispositivo, inténtelo de nuevo');
+                                                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
+                                                          this.logout(casol);
+                                                          this.cancelar = 1;
                                                         }
-                                                      });
-                                                  });
-                                                }, (err) => {
-                                                  if (this.cancelar == 0) {
-                                                    if (err.code !== 6) {
-                                                      this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
-                                                      this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{},err=>{})
-                                                      this.logout(casol);
-                                                      this.cancelar = 1;
-                                                    }
+                                                      }
+                                                    });
+                                                });
+                                              }, (err) => {
+                                                if (this.cancelar == 0) {
+                                                  if (err.code !== 6) {
+                                                    this.handleError2('Error interno en el dispositivo, inténtelo de nuevo');
+                                                    this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
+                                                    this.logout(casol);
+                                                    this.cancelar = 1;
                                                   }
                                                 }
-                                                );
-                                            
+                                              }
+                                              );
+
                                           });
                                         } else {
                                           if (this.cancelar == 0) {
                                             this.handleError2('no existen preguntas asignadas a la pregunta tabla ' + pr.pregunta.enunciado);
-                                            this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{},err=>{})
+                                            this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                                             this.logout(casol);
                                             this.cancelar = 1;
                                           }
@@ -300,27 +277,27 @@ export class AuthProvider {
                                         if (err.status == 500) {
                                           if (this.cancelar == 0) {
                                             this.logout(casol);
-                                            this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{ },err=>{})
+                                            this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                                             this.cancelar = 1;
-                                            this.handleError2('Error al descargar la informacion de la pregunta tabla  ' + pr.pregunta.enunciado + ' , error en el servidor');
+                                            this.handleError2('Error al descargar la información de la pregunta tabla  ' + pr.pregunta.enunciado + ' , error en el servidor');
                                           }
                                         } else {
                                           if (this.cancelar == 0) {
                                             this.logout(casol);
-                                            this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{ },err=>{ })
+                                            this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                                             this.cancelar = 1;
-                                            this.handleError2('Error al descargar la informacion pregunta tabla  ' + pr.pregunta.enunciado + ', intentelo nuevamente');
+                                            this.handleError2('Error al descargar la información pregunta tabla  ' + pr.pregunta.enunciado + ', inténtelo de nuevo');
                                           }
                                         }
                                       }
-                                    ); 
+                                    );
                                   } else {
                                     this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, idgrupo, requerido, '', pr.pregunta.adjuntos, '', element.cataTienCodigo.codigo).then(
                                       () => {
                                       }, err => {
-                                         ;
+                                        ;
                                         if (this.cancelar == 0) {
-                                          this.handleError2('Error interno en el dispositivo, intentelonuevake nuevamente');
+                                          this.handleError2('Error interno en el dispositivo, inténtelo de nuevo');
                                           this.cancelar = 1;
                                         }
                                       });
@@ -329,10 +306,10 @@ export class AuthProvider {
                                   this.database.guardarpregunta(pr.pregunta.codigo, pr.pregunta.enunciado, pr.posicion, pr.pregunta.cataTipeCodigo.codigo, pr.valorinicial, idgrupo, requerido, pr.pregunta.respCodigo.codigo, pr.pregunta.adjuntos, '', element.cataTienCodigo.codigo).then(
                                     (ok) => {
                                     }, (err) => {
-                                       ;
+                                      ;
                                       if (this.cancelar == 0) {
-                                        this.handleError2('Error interno en el dispositivo, intentelonuevake nuevamente');
-                                        this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{ },err=>{ })
+                                        this.handleError2('Error interno en el dispositivo, inténtelo de nuevo');
+                                        this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                                         this.logout(casol);
                                         this.cancelar = 1;
                                       }
@@ -345,14 +322,14 @@ export class AuthProvider {
                                             (ok) => {
                                             }, (err) => {
                                               if (err.code === 6) {
-                                                
-                                              }else{
+
+                                              } else {
                                                 if (this.cancelar == 0) {
-                                                   this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
-                                                   this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{ },err=>{ })
-                                                   this.logout(casol);
+                                                  this.handleError2('Error interno en el dispositivo, inténtelo de nuevo');
+                                                  this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
+                                                  this.logout(casol);
                                                   this.cancelar = 1;
-                                                 }
+                                                }
                                               }
                                             });
                                         });
@@ -360,14 +337,14 @@ export class AuthProvider {
                                         if (this.cancelar == 0) {
                                           this.handleError2('No existen respuestas para la pregunta ' + pr.pregunta.enunciado);
                                           this.logout(casol);
-                                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{ },err=>{ })
+                                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                                           this.cancelar = 1;
                                         }
                                       }
                                     }, err => {
                                       if (err.status == 500) {
                                         if (this.cancelar == 0) {
-                                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{ },err=>{ })
+                                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                                           this.logout(casol);
                                           this.cancelar = 1;
                                           this.handleError2('Error al descargar las respuestas de la pregunta ' + pr.pregunta.enunciado + ' , error en el servidor');
@@ -376,9 +353,9 @@ export class AuthProvider {
                                       } else {
                                         if (this.cancelar == 0) {
                                           this.logout(casol);
-                                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{ },err=>{ })
+                                          this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                                           this.cancelar = 1;
-                                          this.handleError2('Error al descargar las respuestas de la pregunta ' + pr.pregunta.enunciado + ', intentelo nuevamente');
+                                          this.handleError2('Error al descargar las respuestas de la pregunta ' + pr.pregunta.enunciado + ', inténtelo de nuevo');
                                         }
                                       }
                                     });
@@ -388,7 +365,7 @@ export class AuthProvider {
                             } else {
                               this.handleError2('no existen preguntas asignadas al grupo ' + element2.nombre);
                               if (this.cancelar == 0) {
-                                this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{ },err=>{ })
+                                this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                                 this.logout(casol);
                                 this.cancelar = 1;
                               }
@@ -396,15 +373,15 @@ export class AuthProvider {
                           }, (err) => {
                             if (err.status == 500) {
                               if (this.cancelar == 0) {
-                                this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{ },err=>{ })
+                                this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                                 this.logout(casol);
                                 this.cancelar = 1;
                                 this.handleError2('Error al descargar la preguntas en el grupo ' + element2.nombre + ' , error en el servidor');
                               }
                             } else {
                               if (this.cancelar == 0) {
-                                this.handleError2('Error al descargar la informacion en el grupo ' + element2.nombre + ', intentelo nuevamente');
-                                this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`,'ACTIVE').subscribe((d)=>{ },err=>{ })
+                                this.handleError2('Error al descargar la informacion en el grupo ' + element2.nombre + ', inténtelo de nuevo');
+                                this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${element.codigo}`, 'ACTIVE').subscribe((d) => { }, err => { })
                                 this.logout(casol);
                                 this.cancelar = 1;
                               }
@@ -426,16 +403,17 @@ export class AuthProvider {
                   }, err => {
                     loadingform.dismiss();
                     if (this.cancelar == 0) {
-                      this.handleError2('Error al descargar la informacion de formularios base, intentelo nuevamente');
+                      this.handleError2('Error al descargar la información de formularios base, inténtelo de nuevo');
                       this.logout(casol);
                       this.cancelar = 1;
                     }
-                  }) 
+                  })
 
 
-                
-                  this.authHttp.get(`${SERVER_URL}/api/asignaciones/user`).subscribe(
+
+                this.authHttp.get(`${SERVER_URL}/api/asignaciones/user`).subscribe(
                   data => {
+                    console.log('data',data.json());
                     if (data.json()) {
                       this.storage.get('codigo').then((micodigo) => {
                         data.json().forEach(element => {
@@ -451,18 +429,24 @@ export class AuthProvider {
                           }
                           if (element.auditor) {
                             if (element.auditor.codigo === micodigo) {
-                              tipo = 1002;
-                              this.agregaru(element, long, lat, tipo,casol);
-                              this.noconformidades(element.unidadProductiva['idUnidadProductiva'], 1002,casol);
+                              tipo = 1002;                      
+                              if(this.cancelar==0){
+                                console.log('unidades asignadas',element);
+                                this.agregaru(element, long, lat, tipo, casol);
+                                 this.noconformidades(element.unidadProductiva['idUnidadProductiva'], 1002, casol);
+//                                   this.precargue(element.unidadProductiva['idUnidadProductiva'], 1002);  
+                              }
                             }
                           }
                           if (element.promotor) {
                             if (element.promotor.codigo === micodigo) {
                               tipo = 1001;
+                              if(this.cancelar==0){                            
                               this.agregaru(element, long, lat, tipo, casol);
-                              this.noconformidades(element.unidadProductiva['idUnidadProductiva'], 1001, casol);
-
+                               this.noconformidades(element.unidadProductiva['idUnidadProductiva'], 1001, casol);
+ //                              this.precargue(element.unidadProductiva['idUnidadProductiva'], 1001);
                             }
+                          }
                           }
                         });
                       }, err => {
@@ -489,14 +473,14 @@ export class AuthProvider {
 
               if (err.status == 500) {
                 if (this.cancelar == 0) {
-                  this.handleError2('Error al descargar la informacion de la persona logeada, error en el servidor');
+                  this.handleError2('Error al descargar la información de la persona logeada, error en el servidor');
                   this.logout(casol);
                   this.cancelar = 1;
                 }
 
               } else {
                 if (this.cancelar == 0) {
-                  this.handleError2('Error al descargar la informacion de la persona logeada, intentelo nuevamente');
+                  this.handleError2('Error al descargar la información de la persona logeada, inténtelo de nuevo');
                   this.logout(casol);
                   this.cancelar = 1;
                 }
@@ -528,8 +512,7 @@ export class AuthProvider {
 
 
   logout(caso) {
-    console.log(caso);
-    if(caso==1){
+    if (caso == 1) {
       this.database.limpiardb().then((ok) => { }, () => { });
       this.storage.remove('jwt').then(() => this.authUser.next(null));
       this.storage.remove('nombre');
@@ -541,9 +524,9 @@ export class AuthProvider {
       this.storage.remove('reload');
       this.storage.remove('empresa');
       this.storage.remove('subperiodo');
-  
-    }else if(caso== 2){
-            
+
+    } else if (caso == 2) {
+
     }
   }
   guardarinfo(value, empresa) {
@@ -603,16 +586,16 @@ export class AuthProvider {
 
   agregaru(element, long, lat, tipo, casol) {
     this.database.agregarunidadproductiva(
-      element.unidadProductiva['idUnidadProductiva'], 
-      element.unidadProductiva['nombre'], 
+      element.unidadProductiva['idUnidadProductiva'],
+      element.unidadProductiva['nombre'],
       element.unidadProductiva['fechaIngreso'],
-      element.unidadProductiva['region']['idRegion'], 
-      long, 
-      lat, 
-      element.unidadProductiva['productor']['idProductor'], 
+      element.unidadProductiva['region']['idRegion'],
+      long,
+      lat,
+      element.unidadProductiva['productor']['idProductor'],
       tipo, element.idAsignacion
     ).then((ok) => {
-      this.validarproductor(element.unidadProductiva['productor']['idProductor'],casol).then((data: any) => {
+      this.validarproductor(element.unidadProductiva['productor']['idProductor'], casol).then((data: any) => {
         if (data == 0) {
           this.database.agregarproductor(
             element.unidadProductiva['productor']['idProductor'],
@@ -638,7 +621,8 @@ export class AuthProvider {
         return ok
       },
       (err) => {
-        this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
+        this.handleError2('Error interno en el dispositivo, inténtelo de nuevo');
+
         if (this.cancelar == 0) {
           this.logout(casol);
           this.cancelar = 1;
@@ -656,7 +640,7 @@ export class AuthProvider {
           this.database.agregarnoconformidadantigua(element.codigo, unidad, tipo, element.categoria, element.detalle, element.descripcion, element.fechaCreacion, element.fechaPautadaCierre, element.status, element.asignacion, element.fechaRealCierre).then(
             (ok) => { }, err => {
               if (this.cancelar == 0) {
-                this.handleError2('Error interno en el dispositivo, intentelo nuevamente');
+                this.handleError2('Error interno en el dispositivo, inténtelo de nuevo');
                 this.logout(casol);
                 this.cancelar = 1;
               }
@@ -666,7 +650,7 @@ export class AuthProvider {
             this.database.agregartareaantigua(element2.codigo, element2.noConformidad, element2.nombre, element2.descripcion, element2.encargado, element2.fechaPautadaCierre, element2.estado, element2.fechaCreacion, element2.fechaRealCierre).then((ok) => {
             }, () => {
               if (this.cancelar == 0) {
-                this.handleError2('Error interno, intentelo nuevamente');
+                this.handleError2('Error interno, inténtelo de nuevo');
                 this.logout(casol);
                 this.cancelar = 1;
               }
@@ -685,7 +669,7 @@ export class AuthProvider {
         if (this.cancelar == 0) {
           this.logout(casol);
           this.cancelar = 1;
-          this.handleError2('Error al descargar las no conformidades pertenecientes a la unidad productiva ' + unidad + ', intentelo nuevamente');
+          this.handleError2('Error al descargar las no conformidades pertenecientes a la unidad productiva ' + unidad + ', inténtelo de nuevo');
         }
       }
 
@@ -693,23 +677,34 @@ export class AuthProvider {
     })
   }
   precargue(unidad, tipo) {
-        this.authHttp.get(`${SERVER_URL}api/forrmualrio/precargue/${tipo}/${unidad}`).subscribe((data) => {
-         if (data.json()) {
-           data.json().forEach(element => {
-//            this.formularios.guardar3001(unidad, element.grupoidselected, element.respcodigo, element.preguntaid, element.codigosrespuestas, element.valoresrespuesta, true, tipo);
-           });
-         }
-       }, err => {
-//         this.logout(casol);
-         if (err.status == 500) {
-           this.handleError2('Error al descargar las no conformidades pertenecientes a la unidad productiva ' + unidad + ', error en el servidor ');
-         } else {
-           this.handleError2('Error al descargar las no conformidades pertenecientes a la unidad productiva ' + unidad + ', intentelo nuevamente');
-         }
-   
-       })
-   
-    
+    this.authHttp.get(`${SERVER_URL}api/formulario/precargue/${tipo}/${unidad}`).subscribe((data) => {
+      if (data.status===200) {
+        console.log(data.json());
+        data.json().forEach(element => {
+          if(element.formularioRespuestaId.idPreguntaPadre===element.formularioRespuestaId.idPregunta){
+            this.formularios.guardar3001(unidad, element.formularioRespuestaId.idGrupoBase, element.formularioRespuestaId.idRespuesta, element.formularioRespuestaId.idPregunta, 
+              element.formularioRespuestaId.idValorRespuesta, element.valorIndicador,element.valor, tipo);
+          }else{
+            this.formularios.guardarrespuestatabla(unidad, element.formularioRespuestaId.idGrupoBase, element.formularioRespuestaId.idRespuesta, element.formularioRespuestaId.idPregunta, 
+              element.formularioRespuestaId.idPreguntaPadre,element.formularioRespuestaId.idValorRespuesta, element.valorIndicador,
+              element.valor, tipo);   
+          }
+        });
+      }
+    }, err => {
+      //         this.logout(casol);
+      if (err.status == 500) {
+        this.handleError2('Error al realizar precargue para la unidad productiva ' + unidad + ', error en el servidor ');
+      } else {
+        this.handleError2('Error al l realizar precargue para la unidad productiva ' + unidad + ', inténtelo de nuevo');
+      }
+
+    })
+
+
+  }
+  cerrarformulario(idformulario) {
+    return this.authHttp.post(`${SERVER_URL}api/inquiries/changeStatus/${idformulario}`, 'CLOSED')
   }
 
 
